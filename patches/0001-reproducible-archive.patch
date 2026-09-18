@@ -1,0 +1,45 @@
+--- a/scripts/valhalla_build_extract
++++ b/scripts/valhalla_build_extract
+@@ -5,6 +5,7 @@
+ import ctypes
+ from io import BytesIO
+ import json
++import os
+ from math import floor
+ import logging
+ from pathlib import Path
+@@ -100,7 +101,8 @@
+                 tar_member = self._tar_obj.getmember(normalized_path)
+                 tar.addfile(tar_member, self._tar_obj.extractfile(tar_member.name))
+             else:
+-                tar.add(str(self.path.joinpath(normalized_path)), arcname=normalized_path)
++                tar.add(str(self.path.joinpath(normalized_path)), arcname=normalized_path,
++                        filter=reproducible_tar_info)
+                 tar_member = tar.getmember(normalized_path)
+ 
+ 
+@@ -360,6 +362,15 @@
+     return int(level) | (int(idx.replace("/", "")) << 3)
+ 
+ 
++def reproducible_tar_info(info: tarfile.TarInfo) -> tarfile.TarInfo:
++    if "SOURCE_DATE_EPOCH" in os.environ:
++        info.mtime = int(os.environ["SOURCE_DATE_EPOCH"])
++        info.uid = info.gid = 0
++        info.uname = info.gname = ""
++        info.pax_headers = {}
++    return info
++
++
+ def get_tar_info(name: str, size: int) -> tarfile.TarInfo:
+     """Creates and returns a tarinfo object"""
+     tarinfo = tarfile.TarInfo(name)
+@@ -367,7 +378,7 @@
+     tarinfo.mtime = int(time())
+     tarinfo.type = tarfile.REGTYPE
+ 
+-    return tarinfo
++    return reproducible_tar_info(tarinfo)
+ 
+ 
+ def write_index_to_tar(tar_fp_: Path):

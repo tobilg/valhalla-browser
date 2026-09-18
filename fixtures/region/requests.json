@@ -1,0 +1,112 @@
+[
+  {
+    "name": "vaduz-short",
+    "request": {
+      "locations": [
+        {
+          "lat": 47.1392862,
+          "lon": 9.5227962,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.145,
+          "lon": 9.5168,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "auto",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "balzers-ruggell",
+    "request": {
+      "locations": [
+        {
+          "lat": 47.0666667,
+          "lon": 9.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.2397558,
+          "lon": 9.5262874,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "auto",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "vaduz-malbun",
+    "request": {
+      "locations": [
+        {
+          "lat": 47.1392862,
+          "lon": 9.5227962,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.1027934,
+          "lon": 9.6083946,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "auto",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "restriction-2366291",
+    "request": {
+      "locations": [
+        {
+          "lat": 47.210584,
+          "lon": 9.5023717,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.210852,
+          "lon": 9.5024974,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "auto",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "outside",
+    "request": {
+      "locations": [
+        {
+          "lat": 48.5,
+          "lon": 10.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 48.51,
+          "lon": 10.51,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "auto",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  }
+]

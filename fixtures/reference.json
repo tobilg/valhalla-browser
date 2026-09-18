@@ -1,0 +1,789 @@
+{
+  "release": "fixture-v1-d6492d76afe4f581",
+  "valhallaRevision": "a60c7cbfc83e073f50887cd27e0109d02e6b64e5",
+  "configSha256": "ff64cf8154ad8632a32bb589541b637484066d9cb51267ad7e03d3d7a9a1b459",
+  "cases": [
+    {
+      "name": "short",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.24,
+            "lon": 9.2355,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.24,
+            "lon": 9.2395,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "trip": {
+          "locations": [
+            {
+              "type": "break",
+              "lat": 47.24,
+              "lon": 9.2355,
+              "original_index": 0
+            },
+            {
+              "type": "break",
+              "lat": 47.24,
+              "lon": 9.2395,
+              "original_index": 1
+            }
+          ],
+          "legs": [
+            {
+              "maneuvers": [
+                {
+                  "type": 1,
+                  "instruction": "Drive east on Row 1.",
+                  "verbal_succinct_transition_instruction": "Drive east. Then You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "Drive east on Row 1. Then You will arrive at your destination.",
+                  "verbal_post_transition_instruction": "Continue for 300 meters.",
+                  "street_names": [
+                    "Row 1"
+                  ],
+                  "bearing_after": 90,
+                  "time": 27.208,
+                  "length": 0.302,
+                  "cost": 23.807,
+                  "begin_shape_index": 0,
+                  "end_shape_index": 1,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 4,
+                  "instruction": "You have arrived at your destination.",
+                  "verbal_transition_alert_instruction": "You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "You have arrived at your destination.",
+                  "bearing_before": 90,
+                  "time": 0.0,
+                  "length": 0.0,
+                  "cost": 0.0,
+                  "begin_shape_index": 1,
+                  "end_shape_index": 1,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                }
+              ],
+              "summary": {
+                "has_time_restrictions": false,
+                "has_toll": false,
+                "has_highway": false,
+                "has_ferry": false,
+                "min_lat": 47.239999,
+                "min_lon": 9.2355,
+                "max_lat": 47.239999,
+                "max_lon": 9.2395,
+                "time": 27.208,
+                "length": 0.302,
+                "cost": 23.807
+              },
+              "shape": "_shbyAwaurP?_yF"
+            }
+          ],
+          "summary": {
+            "has_time_restrictions": false,
+            "has_toll": false,
+            "has_highway": false,
+            "has_ferry": false,
+            "min_lat": 47.239999,
+            "min_lon": 9.2355,
+            "max_lat": 47.239999,
+            "max_lon": 9.2395,
+            "time": 27.208,
+            "length": 0.302,
+            "cost": 23.807
+          },
+          "status_message": "Found route between points",
+          "status": 0,
+          "units": "kilometers",
+          "language": "en-US"
+        }
+      }
+    },
+    {
+      "name": "cross-tile",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.235,
+            "lon": 9.2355,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.265,
+            "lon": 9.2645,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "trip": {
+          "locations": [
+            {
+              "type": "break",
+              "lat": 47.235,
+              "lon": 9.2355,
+              "original_index": 0
+            },
+            {
+              "type": "break",
+              "lat": 47.265,
+              "lon": 9.2645,
+              "original_index": 1
+            }
+          ],
+          "legs": [
+            {
+              "maneuvers": [
+                {
+                  "type": 1,
+                  "instruction": "Drive west on Row 0.",
+                  "verbal_succinct_transition_instruction": "Drive west. Then Turn right onto Column 0.",
+                  "verbal_pre_transition_instruction": "Drive west on Row 0. Then Turn right onto Column 0.",
+                  "verbal_post_transition_instruction": "Continue for 40 meters.",
+                  "street_names": [
+                    "Row 0"
+                  ],
+                  "bearing_after": 270,
+                  "time": 3.401,
+                  "length": 0.037,
+                  "cost": 2.976,
+                  "begin_shape_index": 0,
+                  "end_shape_index": 1,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Column 0.",
+                  "verbal_transition_alert_instruction": "Turn right onto Column 0.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Column 0.",
+                  "verbal_post_transition_instruction": "Continue for 3 kilometers.",
+                  "street_names": [
+                    "Column 0"
+                  ],
+                  "bearing_before": 270,
+                  "bearing_after": 0,
+                  "time": 300.814,
+                  "length": 3.342,
+                  "cost": 277.182,
+                  "begin_shape_index": 1,
+                  "end_shape_index": 7,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Row 6.",
+                  "verbal_transition_alert_instruction": "Turn right onto Row 6.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Row 6.",
+                  "verbal_post_transition_instruction": "Continue for 2 kilometers.",
+                  "street_names": [
+                    "Row 6"
+                  ],
+                  "bearing_before": 0,
+                  "bearing_after": 90,
+                  "time": 200.729,
+                  "length": 2.229,
+                  "cost": 189.107,
+                  "begin_shape_index": 7,
+                  "end_shape_index": 13,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 4,
+                  "instruction": "You have arrived at your destination.",
+                  "verbal_transition_alert_instruction": "You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "You have arrived at your destination.",
+                  "bearing_before": 90,
+                  "time": 0.0,
+                  "length": 0.0,
+                  "cost": 0.0,
+                  "begin_shape_index": 13,
+                  "end_shape_index": 13,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                }
+              ],
+              "summary": {
+                "has_time_restrictions": false,
+                "has_toll": false,
+                "has_highway": false,
+                "has_ferry": false,
+                "min_lat": 47.235,
+                "min_lon": 9.235,
+                "max_lat": 47.265,
+                "max_lon": 9.2645,
+                "time": 504.945,
+                "length": 5.609,
+                "cost": 469.266
+              },
+              "shape": "oz~ayAwaurP?f^owH?owH?owH?owH?owH?owH??owH?owH?owH?owH?owH?gxG"
+            }
+          ],
+          "summary": {
+            "has_time_restrictions": false,
+            "has_toll": false,
+            "has_highway": false,
+            "has_ferry": false,
+            "min_lat": 47.235,
+            "min_lon": 9.235,
+            "max_lat": 47.265,
+            "max_lon": 9.2645,
+            "time": 504.945,
+            "length": 5.609,
+            "cost": 469.266
+          },
+          "status_message": "Found route between points",
+          "status": 0,
+          "units": "kilometers",
+          "language": "en-US"
+        }
+      }
+    },
+    {
+      "name": "oneway-forward",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.245,
+            "lon": 9.2455,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.245,
+            "lon": 9.2495,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "trip": {
+          "locations": [
+            {
+              "type": "break",
+              "lat": 47.245,
+              "lon": 9.2455,
+              "original_index": 0
+            },
+            {
+              "type": "break",
+              "lat": 47.245,
+              "lon": 9.2495,
+              "original_index": 1
+            }
+          ],
+          "legs": [
+            {
+              "maneuvers": [
+                {
+                  "type": 1,
+                  "instruction": "Drive east on Row 2.",
+                  "verbal_succinct_transition_instruction": "Drive east. Then You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "Drive east on Row 2. Then You will arrive at your destination.",
+                  "verbal_post_transition_instruction": "Continue for 300 meters.",
+                  "street_names": [
+                    "Row 2"
+                  ],
+                  "bearing_after": 90,
+                  "time": 27.205,
+                  "length": 0.302,
+                  "cost": 24.485,
+                  "begin_shape_index": 0,
+                  "end_shape_index": 1,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 4,
+                  "instruction": "You have arrived at your destination.",
+                  "verbal_transition_alert_instruction": "You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "You have arrived at your destination.",
+                  "bearing_before": 90,
+                  "time": 0.0,
+                  "length": 0.0,
+                  "cost": 0.0,
+                  "begin_shape_index": 1,
+                  "end_shape_index": 1,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                }
+              ],
+              "summary": {
+                "has_time_restrictions": false,
+                "has_toll": false,
+                "has_highway": false,
+                "has_ferry": false,
+                "min_lat": 47.245,
+                "min_lon": 9.2455,
+                "max_lat": 47.245,
+                "max_lon": 9.2495,
+                "time": 27.205,
+                "length": 0.302,
+                "cost": 24.485
+              },
+              "shape": "okrbyAwrhsP?_yF"
+            }
+          ],
+          "summary": {
+            "has_time_restrictions": false,
+            "has_toll": false,
+            "has_highway": false,
+            "has_ferry": false,
+            "min_lat": 47.245,
+            "min_lon": 9.2455,
+            "max_lat": 47.245,
+            "max_lon": 9.2495,
+            "time": 27.205,
+            "length": 0.302,
+            "cost": 24.485
+          },
+          "status_message": "Found route between points",
+          "status": 0,
+          "units": "kilometers",
+          "language": "en-US"
+        }
+      }
+    },
+    {
+      "name": "oneway-reverse",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.245,
+            "lon": 9.2495,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.245,
+            "lon": 9.2455,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "trip": {
+          "locations": [
+            {
+              "type": "break",
+              "lat": 47.245,
+              "lon": 9.2495,
+              "original_index": 0
+            },
+            {
+              "type": "break",
+              "lat": 47.245,
+              "lon": 9.2455,
+              "original_index": 1
+            }
+          ],
+          "legs": [
+            {
+              "maneuvers": [
+                {
+                  "type": 1,
+                  "instruction": "Drive east on Row 2.",
+                  "verbal_succinct_transition_instruction": "Drive east. Then Turn right onto Column 3.",
+                  "verbal_pre_transition_instruction": "Drive east on Row 2. Then Turn right onto Column 3.",
+                  "verbal_post_transition_instruction": "Continue for 40 meters.",
+                  "street_names": [
+                    "Row 2"
+                  ],
+                  "bearing_after": 90,
+                  "time": 3.413,
+                  "length": 0.037,
+                  "cost": 3.072,
+                  "begin_shape_index": 0,
+                  "end_shape_index": 1,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Column 3.",
+                  "verbal_transition_alert_instruction": "Turn right onto Column 3.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Column 3.",
+                  "verbal_post_transition_instruction": "Continue for 600 meters.",
+                  "street_names": [
+                    "Column 3"
+                  ],
+                  "bearing_before": 90,
+                  "bearing_after": 180,
+                  "time": 52.235,
+                  "length": 0.557,
+                  "cost": 55.117,
+                  "begin_shape_index": 1,
+                  "end_shape_index": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Row 1.",
+                  "verbal_transition_alert_instruction": "Turn right onto Row 1.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Row 1.",
+                  "verbal_post_transition_instruction": "Continue for 400 meters.",
+                  "street_names": [
+                    "Row 1"
+                  ],
+                  "bearing_before": 180,
+                  "bearing_after": 270,
+                  "time": 36.125,
+                  "length": 0.378,
+                  "cost": 38.618,
+                  "begin_shape_index": 2,
+                  "end_shape_index": 3,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Column 2.",
+                  "verbal_transition_alert_instruction": "Turn right onto Column 2.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Column 2.",
+                  "verbal_post_transition_instruction": "Continue for 600 meters.",
+                  "street_names": [
+                    "Column 2"
+                  ],
+                  "bearing_before": 270,
+                  "bearing_after": 0,
+                  "time": 52.235,
+                  "length": 0.557,
+                  "cost": 53.116,
+                  "begin_shape_index": 3,
+                  "end_shape_index": 4,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Row 2.",
+                  "verbal_transition_alert_instruction": "Turn right onto Row 2.",
+                  "verbal_succinct_transition_instruction": "Turn right. Then You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "Turn right onto Row 2. Then You will arrive at your destination.",
+                  "verbal_post_transition_instruction": "Continue for 40 meters.",
+                  "street_names": [
+                    "Row 2"
+                  ],
+                  "bearing_before": 0,
+                  "bearing_after": 90,
+                  "time": 5.505,
+                  "length": 0.037,
+                  "cost": 11.06,
+                  "begin_shape_index": 4,
+                  "end_shape_index": 5,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 4,
+                  "instruction": "You have arrived at your destination.",
+                  "verbal_transition_alert_instruction": "You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "You have arrived at your destination.",
+                  "bearing_before": 90,
+                  "time": 0.0,
+                  "length": 0.0,
+                  "cost": 0.0,
+                  "begin_shape_index": 5,
+                  "end_shape_index": 5,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                }
+              ],
+              "summary": {
+                "has_time_restrictions": false,
+                "has_toll": false,
+                "has_highway": false,
+                "has_ferry": false,
+                "min_lat": 47.239999,
+                "min_lon": 9.245,
+                "max_lat": 47.245,
+                "max_lon": 9.25,
+                "time": 149.515,
+                "length": 1.567,
+                "cost": 160.984
+              },
+              "shape": "okrbyAwlpsP?g^nwH??nwHowH??g^"
+            }
+          ],
+          "summary": {
+            "has_time_restrictions": false,
+            "has_toll": false,
+            "has_highway": false,
+            "has_ferry": false,
+            "min_lat": 47.239999,
+            "min_lon": 9.245,
+            "max_lat": 47.245,
+            "max_lon": 9.25,
+            "time": 149.515,
+            "length": 1.567,
+            "cost": 160.984
+          },
+          "status_message": "Found route between points",
+          "status": 0,
+          "units": "kilometers",
+          "language": "en-US"
+        }
+      }
+    },
+    {
+      "name": "restricted-turn",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.25,
+            "lon": 9.2455,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.2545,
+            "lon": 9.25,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "trip": {
+          "locations": [
+            {
+              "type": "break",
+              "lat": 47.25,
+              "lon": 9.2455,
+              "original_index": 0
+            },
+            {
+              "type": "break",
+              "lat": 47.2545,
+              "lon": 9.25,
+              "original_index": 1
+            }
+          ],
+          "legs": [
+            {
+              "maneuvers": [
+                {
+                  "type": 1,
+                  "instruction": "Drive west on Row 3.",
+                  "verbal_succinct_transition_instruction": "Drive west. Then Turn right onto Column 2.",
+                  "verbal_pre_transition_instruction": "Drive west on Row 3. Then Turn right onto Column 2.",
+                  "verbal_post_transition_instruction": "Continue for 40 meters.",
+                  "street_names": [
+                    "Row 3"
+                  ],
+                  "bearing_after": 270,
+                  "time": 3.4,
+                  "length": 0.037,
+                  "cost": 3.06,
+                  "begin_shape_index": 0,
+                  "end_shape_index": 1,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Column 2.",
+                  "verbal_transition_alert_instruction": "Turn right onto Column 2.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Column 2.",
+                  "verbal_post_transition_instruction": "Continue for 600 meters.",
+                  "street_names": [
+                    "Column 2"
+                  ],
+                  "bearing_before": 270,
+                  "bearing_after": 0,
+                  "time": 52.235,
+                  "length": 0.557,
+                  "cost": 53.117,
+                  "begin_shape_index": 1,
+                  "end_shape_index": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Row 4.",
+                  "verbal_transition_alert_instruction": "Turn right onto Row 4.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Row 4.",
+                  "verbal_post_transition_instruction": "Continue for 400 meters.",
+                  "street_names": [
+                    "Row 4"
+                  ],
+                  "bearing_before": 0,
+                  "bearing_after": 90,
+                  "time": 36.125,
+                  "length": 0.378,
+                  "cost": 38.618,
+                  "begin_shape_index": 2,
+                  "end_shape_index": 3,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Column 3.",
+                  "verbal_transition_alert_instruction": "Turn right onto Column 3.",
+                  "verbal_succinct_transition_instruction": "Turn right. Then You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "Turn right onto Column 3. Then You will arrive at your destination.",
+                  "verbal_post_transition_instruction": "Continue for 60 meters.",
+                  "street_names": [
+                    "Column 3"
+                  ],
+                  "bearing_before": 90,
+                  "bearing_after": 180,
+                  "time": 7.15,
+                  "length": 0.056,
+                  "cost": 14.54,
+                  "begin_shape_index": 3,
+                  "end_shape_index": 4,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 4,
+                  "instruction": "You have arrived at your destination.",
+                  "verbal_transition_alert_instruction": "You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "You have arrived at your destination.",
+                  "bearing_before": 180,
+                  "time": 0.0,
+                  "length": 0.0,
+                  "cost": 0.0,
+                  "begin_shape_index": 4,
+                  "end_shape_index": 4,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                }
+              ],
+              "summary": {
+                "has_time_restrictions": false,
+                "has_toll": false,
+                "has_highway": false,
+                "has_ferry": false,
+                "min_lat": 47.25,
+                "min_lon": 9.245,
+                "max_lat": 47.254999,
+                "max_lon": 9.25,
+                "time": 98.911,
+                "length": 1.028,
+                "cost": 109.336
+              },
+              "shape": "_d|byAwrhsP?f^owH??owHf^?"
+            }
+          ],
+          "summary": {
+            "has_time_restrictions": false,
+            "has_toll": false,
+            "has_highway": false,
+            "has_ferry": false,
+            "min_lat": 47.25,
+            "min_lon": 9.245,
+            "max_lat": 47.254999,
+            "max_lon": 9.25,
+            "time": 98.911,
+            "length": 1.028,
+            "cost": 109.336
+          },
+          "status_message": "Found route between points",
+          "status": 0,
+          "units": "kilometers",
+          "language": "en-US"
+        }
+      }
+    },
+    {
+      "name": "disconnected",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.24,
+            "lon": 9.2355,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.3,
+            "lon": 9.305,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "nativeError": 442
+      }
+    },
+    {
+      "name": "outside",
+      "request": {
+        "locations": [
+          {
+            "lat": 48.5,
+            "lon": 10.5,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 48.51,
+            "lon": 10.51,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "nativeError": 171
+      }
+    }
+  ]
+}

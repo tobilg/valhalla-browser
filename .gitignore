@@ -67,3 +67,31 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+plans/
+external-projects/
+
+# Browser SDK generated artifacts
+node_modules/
+public/wasm/
+public/datasets/
+public/manifest.json
+public/region.json
+public/minio.json
+public/r2.json
+R2-MANIFEST-*.json
+test-results/
+__pycache__/
+
+.DS_Store
+
+# Package distribution
+dist/
+*.tgz
+
+# Workspace generated notices and documentation preview state
+packages/valhalla-browser/README.md
+packages/valhalla-browser/LICENSE
+packages/valhalla-browser/NOTICE.md
+.wrangler/
+.dev.vars*

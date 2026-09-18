@@ -1,0 +1,50 @@
+{
+  "name": "valhalla-browser",
+  "version": "0.0.1",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./worker.js": "./dist/worker.js",
+    "./valhalla-browser.wasm": "./dist/valhalla-browser.wasm",
+    "./runtime.json": "./dist/runtime.json"
+  },
+  "types": "./dist/client.d.ts",
+  "scripts": {
+    "build": "pnpm run typecheck && node scripts/build-package.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.worker.json",
+    "prepack": "pnpm run build"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vite": "8.3.0"
+  },
+  "description": "Browser-local Valhalla routing in a Web Worker, with on-demand graph tiles and bundled WebAssembly.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobilg/valhalla-browser.git",
+    "directory": "packages/valhalla-browser"
+  },
+  "module": "./dist/index.js",
+  "unpkg": "./dist/index.js",
+  "jsdelivr": "./dist/index.js",
+  "files": [
+    "dist/",
+    "LICENSE",
+    "NOTICE.md",
+    "README.md"
+  ],
+  "sideEffects": [
+    "./dist/worker.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

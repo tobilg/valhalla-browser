@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Valhalla · browser routing</title>
+<link rel="stylesheet" href="./style.css">
+<main>
+  <header><p>VALHALLA / LOCAL ROUTING LAB</p><h1>A route, computed here.</h1>
+    <p>Routes calculated in your browser from versioned road graphs. No route server or map credentials.</p></header>
+  <section class="workspace">
+    <form id="route-form">
+      <label>Dataset<select id="dataset"></select></label>
+      <label>Test journey<select id="preset"></select></label>
+      <fieldset><legend>Origin</legend><label>Latitude<input id="from-lat" type="number" step="any" required></label><label>Longitude<input id="from-lon" type="number" step="any" required></label></fieldset>
+      <fieldset><legend>Destination</legend><label>Latitude<input id="to-lat" type="number" step="any" required></label><label>Longitude<input id="to-lon" type="number" step="any" required></label></fieldset>
+      <label>Graph transport<select id="transport"><option value="indexed-tar">Indexed archive · byte ranges</option><option value="individual-tiles">Individual tile objects</option></select></label>
+      <label>Travel profile<select><option>Driving</option></select></label>
+      <div class="actions"><button id="route" type="submit">Calculate route</button><button id="cancel" type="button" disabled>Cancel</button></div>
+      <p id="status" role="status">Ready to initialize.</p>
+    </form>
+    <div class="result"><svg id="geometry" viewBox="0 0 640 440" aria-label="Calculated route geometry" role="img"><text x="320" y="220" text-anchor="middle">Your route will appear here</text></svg><p id="summary">Select a test journey</p><ol id="maneuvers"></ol></div>
+  </section>
+  <p id="attribution">Synthetic test data · not for navigation</p>
+  <details><summary>Development diagnostics</summary><p>Graph responses appear in DevTools Network as 206 ranges or individual .gph objects. Repeat a route to inspect decoded tile reuse. Cancel terminates the worker; the next route creates a fresh instance.</p><button id="export" type="button">Export latest diagnostics</button><pre id="diagnostics">No measurements yet.</pre></details>
+</main>
+<script type="module" src="./main.js"></script>
+</html>

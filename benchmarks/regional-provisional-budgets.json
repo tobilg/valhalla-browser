@@ -1,0 +1,17 @@
+{
+  "status": "proposed after measurement; not owner-approved release criteria",
+  "scope": "Liechtenstein 2015 Balzers-Ruggell, Apple M2 16 GiB, desktop Playwright engines, direct loopback MinIO",
+  "evidence": "docs/regional-benchmarks.md",
+  "coldIncludes": "worker/module/graph initialization and first route; compilation cache uncontrolled",
+  "coldRouteP95Ms": 2000,
+  "warmRouteP95Ms": 100,
+  "wasmHeapCapacityHighWaterBytes": 201326592,
+  "decodedTileCacheBudgetBytes": 33554432,
+  "coldRouteTileDownloads": 5,
+  "coldRouteTileBytes": 1476944,
+  "warmRouteTileDownloads": 0,
+  "physicalMobile": null,
+  "wanOrCdn": null,
+  "browserProcessRss": null,
+  "releaseApproval": null
+}

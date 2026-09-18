@@ -1,0 +1,13 @@
+[
+  {
+    "AllowedOrigins": ["*"],
+    "AllowedMethods": ["GET", "HEAD"],
+    "AllowedHeaders": ["Range", "If-None-Match", "If-Modified-Since"],
+    "ExposeHeaders": [
+      "Content-Range", "Content-Length", "Content-Encoding", "ETag",
+      "Last-Modified", "Accept-Ranges", "Cache-Control", "Age",
+      "CF-Cache-Status", "CF-Ray", "Timing-Allow-Origin"
+    ],
+    "MaxAgeSeconds": 3600
+  }
+]

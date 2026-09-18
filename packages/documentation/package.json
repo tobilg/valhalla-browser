@@ -1,0 +1,16 @@
+{
+  "name": "@tobilg/valhalla-browser-documentation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "typedoc",
+    "preview": "wrangler pages dev dist --port 8081",
+    "deploy": "wrangler pages deploy dist --project-name valhalla-browser-api --branch main"
+  },
+  "devDependencies": {
+    "valhalla-browser": "workspace:*",
+    "typedoc": "0.28.20",
+    "typescript": "6.0.3",
+    "wrangler": "4.134.0"
+  }
+}

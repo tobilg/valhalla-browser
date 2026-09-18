@@ -1,0 +1,95 @@
+name: Browser routing proof
+on:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      version:
+        value: ${{ jobs.source-build-and-proof.outputs.version }}
+      tarball:
+        value: ${{ jobs.source-build-and-proof.outputs.tarball }}
+permissions:
+  contents: read
+jobs:
+  source-build-and-proof:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    outputs:
+      version: ${{ steps.candidate.outputs.version }}
+      tarball: ${{ steps.candidate.outputs.tarball }}
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Prove documentation has no native build prerequisite.
+      - run: pnpm run build:docs
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - run: pnpm run test:docs
+      - run: pnpm run build:native
+      - run: pnpm run data
+      - run: pnpm run data:region
+      - run: pnpm run build:wasm
+      - name: Restore runner ownership of container outputs
+        run: sudo chown -R "$(id -u):$(id -g)" build public fixtures
+      - run: pnpm run test:data
+      - run: pnpm run build
+      - run: pnpm run test:data:build
+      - run: pnpm test
+      - run: pnpm run pack:sdk
+      - id: candidate
+        run: node scripts/release.js candidate
+      - run: pnpm run test:package
+        env:
+          SDK_TARBALL: build/package/${{ steps.candidate.outputs.tarball }}
+      - run: pnpm run test:cdn-import
+        env:
+          SDK_TARBALL: build/package/${{ steps.candidate.outputs.tarball }}
+      - run: pnpm run test:examples
+        env:
+          SDK_TARBALL: build/package/${{ steps.candidate.outputs.tarball }}
+      - run: pnpm run test:browser
+      - run: pnpm run test:browser
+        env:
+          BROWSER: firefox
+      - run: pnpm run test:browser
+        env:
+          BROWSER: webkit
+      - run: pnpm run minio:start
+      - run: pnpm run minio:publish
+      - run: pnpm run test:demo --minio
+      - run: pnpm run test:demo --preview --minio
+      - run: pnpm run test:matrix
+      - name: Verified SDK release candidate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sdk-release
+          path: |
+            build/package/${{ steps.candidate.outputs.tarball }}
+            build/package/release.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Verified documentation
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: documentation
+          path: packages/documentation/dist/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Preserve executed results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: browser-proof
+          path: |
+            test-results/*.json
+            test-results/*.png
+            build/reports/
+          retention-days: 14
+      - run: pnpm run minio:stop
+        if: always()
+        continue-on-error: true

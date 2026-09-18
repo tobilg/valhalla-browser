@@ -1,0 +1,49 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "valhalla-browser API",
+  "entryPoints": [
+    "../valhalla-browser/src/client.ts"
+  ],
+  "tsconfig": "./tsconfig.json",
+  "router": "structure-dir",
+  "out": "dist",
+  "readme": "../../README.md",
+  "plugin": ["./readme-theme.js"],
+  "theme": "readme-overview",
+  "projectDocuments": [
+    "guides/*.md",
+    "../../docs/building-graph-data.md",
+    "../../docs/object-storage-hosting.md"
+  ],
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "validation": {
+    "notDocumented": true,
+    "notExported": true,
+    "invalidLink": true
+  },
+  "packagesRequiringDocumentation": [
+    "valhalla-browser"
+  ],
+  "requiredToBeDocumented": [
+    "Enum",
+    "EnumMember",
+    "Variable",
+    "Class",
+    "Interface",
+    "TypeAlias",
+    "Function",
+    "Constructor",
+    "Property",
+    "Method",
+    "Accessor"
+  ],
+  "treatWarningsAsErrors": true,
+  "titleLink": "/",
+  "sourceLinkTemplate": "https://github.com/tobilg/valhalla-browser/blob/{gitRevision}/{path}#L{line}",
+  "navigationLinks": {
+    "GitHub": "https://github.com/tobilg/valhalla-browser",
+    "npm": "https://www.npmjs.com/package/valhalla-browser"
+  }
+}

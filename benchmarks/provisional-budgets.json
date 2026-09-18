@@ -1,0 +1,18 @@
+{
+  "status": "proposed, not approved for release",
+  "basedOn": "docs/benchmarks.md",
+  "scope": "synthetic fixture-v1 on Apple M2 16 GiB, Chromium 145, loopback HTTP",
+  "percentileMethod": "nearest rank; cold n=10 is exploratory",
+  "workerReadyP95Ms": 300,
+  "coldRouteHostP95Ms": 750,
+  "warmRouteHostP95Ms": 10,
+  "wasmHeapCapacityHighWaterBytes": 201326592,
+  "decodedTileCacheBudgetBytes": 33554432,
+  "crossTileColdTileBytes": 16840,
+  "crossTileColdFetchAttempts": 6,
+  "sameWorkerRepeatTileFetchAttempts": 0,
+  "hardCancelAcknowledgementMs": 50,
+  "browserProcessMemoryBudget": null,
+  "mobileBudget": null,
+  "cdnOriginByteBudget": null
+}

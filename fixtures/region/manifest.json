@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "release": "liechtenstein-2015-v1-101d55d9c93febce",
+  "created": "2026-09-17T00:00:00Z",
+  "valhallaRevision": "a60c7cbfc83e073f50887cd27e0109d02e6b64e5",
+  "valhallaVersion": "3.8.3",
+  "costings": [
+    "auto"
+  ],
+  "coverage": [
+    9.471078,
+    47.04774,
+    9.636217,
+    47.27128
+  ],
+  "source": {
+    "kind": "openstreetmap",
+    "file": "valhalla/test/data/liechtenstein-latest.osm.pbf",
+    "snapshot": "2015-07-27T21:14:01Z",
+    "sha256": "b8b6c7f2122bd46a65b1d1c669b47c20df4f784a501ace3221d5ea6053121ecc",
+    "attribution": "\u00a9 OpenStreetMap contributors, ODbL 1.0. Historical benchmark data; not for navigation.",
+    "licenseUrl": "https://www.openstreetmap.org/copyright",
+    "timezone": {
+      "release": "2026c",
+      "url": "https://github.com/evansiroky/timezone-boundary-builder/releases/download/2026c/timezones-with-oceans-1970.shapefile.zip",
+      "sha256": "e68090f0c7b1f3574287098baeef7554ac73e21c52c4d548d7edf304efb417f2",
+      "license": "ODbL 1.0; timezone-boundary-builder / OpenStreetMap contributors"
+    },
+    "administrativeBoundaries": "Built by pinned valhalla_build_admins from the same PBF. Extract-boundary completeness is limited."
+  },
+  "config": {
+    "url": "config.json",
+    "sha256": "5478c9b8e61ae8a43faa0d3283ad3fdc47724565520925037aacdb4e4f8799ed"
+  },
+  "archive": {
+    "url": "graph.tar",
+    "size": "1484800",
+    "etag": "\"fbcaaa393656a8e3fa6cb85c96f59422702d8672cafc540a0a12d6c4c5e817da\"",
+    "headerSha256": "b799da63f41f02c753cdd2d2772a328fab37236561db2240b18620f06b3b2eee",
+    "indexSize": "80",
+    "indexSha256": "ce3dd192f85fd1147112480f78ba9732bbfe85096ef6d41d020f87df5c1a4e78"
+  },
+  "tiles": {
+    "24856": {
+      "path": "0/003/107.gph",
+      "offset": "1536",
+      "size": "62664",
+      "sha256": "b178bb573df16cbfa5fdbf0d2b72720510f1b80e1a162134f634edb4d0173c36"
+    },
+    "396073": {
+      "path": "1/049/509.gph",
+      "offset": "65024",
+      "size": "112440",
+      "sha256": "a732629c832a091d4393ccefc14183740b53e5658131afd1fced124a56787114"
+    },
+    "6319018": {
+      "path": "2/000/789/877.gph",
+      "offset": "178176",
+      "size": "86152",
+      "sha256": "94af1f897c85498aab80567773afe2bf67784684a89aa5b308cc6e91b505ab2e"
+    },
+    "6319026": {
+      "path": "2/000/789/878.gph",
+      "offset": "265216",
+      "size": "1197624",
+      "sha256": "44ae37b5e0cae4f5cfc451d16e4bf63f8a77ede613779f3ef4d43598c5c7fb99"
+    },
+    "6330546": {
+      "path": "2/000/791/318.gph",
+      "offset": "1463808",
+      "size": "18064",
+      "sha256": "1d47cf03dc230285db6823569244eadeef019b9961d0ded01ac22186fbe6ada2"
+    }
+  },
+  "build": {
+    "configSha256": "c97e9b4d23324dfb6b1e018920b43a69008c84b95e30819fe0ac7f336d621467",
+    "includedModes": [
+      "driving",
+      "bicycle",
+      "pedestrian"
+    ]
+  }
+}

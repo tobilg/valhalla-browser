@@ -1,0 +1,16 @@
+{
+  "name": "@tobilg/valhalla-browser-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "valhalla-browser": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "8.3.0"
+  }
+}

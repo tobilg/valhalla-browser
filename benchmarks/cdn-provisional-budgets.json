@@ -1,0 +1,17 @@
+{
+  "status": "engineering proposal after measurement; not owner-approved release criteria",
+  "evidence": "docs/cdn-benchmarks.md",
+  "scope": "Apple M2 desktop, recorded Chromium/Firefox/WebKit, pinned 21.838 km Liechtenstein route, local JS/WASM delivery, public data through TXL with recorded CDN policies",
+  "coldState": "new worker and isolated browser HTTP context; archive edge warm; individual tiles DYNAMIC; compilation cache uncontrolled",
+  "sampleCounts": { "cold": 5, "warm": 20 },
+  "indexedTarColdHostP95Ms": 2500,
+  "individualTilesColdHostP95Ms": 3000,
+  "sameWorkerWarmHostP95Ms": 125,
+  "wasmHeapCapacityHighWaterBytes": 201326592,
+  "coldRouteTileFetchAttempts": 5,
+  "coldRouteValidatedTileBytes": 1476944,
+  "sameWorkerWarmTileFetchAttempts": 0,
+  "fullArchiveBodyGetAllowed": false,
+  "providerOriginBytes": null,
+  "limits": "Not a public SLA, handset target or equal-CDN-policy transport decision. Rebaseline after cache configuration changes; five cold samples are insufficient for stable tail-latency estimates."
+}

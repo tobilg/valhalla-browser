@@ -1,0 +1,1321 @@
+{
+  "release": "liechtenstein-2015-v1-101d55d9c93febce",
+  "valhallaRevision": "a60c7cbfc83e073f50887cd27e0109d02e6b64e5",
+  "configSha256": "5478c9b8e61ae8a43faa0d3283ad3fdc47724565520925037aacdb4e4f8799ed",
+  "cases": [
+    {
+      "name": "vaduz-short",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.1392862,
+            "lon": 9.5227962,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.145,
+            "lon": 9.5168,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "trip": {
+          "locations": [
+            {
+              "type": "break",
+              "lat": 47.139286,
+              "lon": 9.522796,
+              "original_index": 0
+            },
+            {
+              "type": "break",
+              "lat": 47.145,
+              "lon": 9.5168,
+              "side_of_street": "right",
+              "original_index": 1
+            }
+          ],
+          "legs": [
+            {
+              "maneuvers": [
+                {
+                  "type": 1,
+                  "instruction": "Drive west on Postgass.",
+                  "verbal_succinct_transition_instruction": "Drive west. Then Turn right onto \u00c4ulestrasse.",
+                  "verbal_pre_transition_instruction": "Drive west on Postgass. Then Turn right onto \u00c4ulestrasse.",
+                  "verbal_post_transition_instruction": "Continue for 70 meters.",
+                  "street_names": [
+                    "Postgass"
+                  ],
+                  "bearing_after": 265,
+                  "time": 7.2,
+                  "length": 0.07,
+                  "cost": 6.66,
+                  "begin_shape_index": 0,
+                  "end_shape_index": 2,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto \u00c4ulestrasse.",
+                  "verbal_transition_alert_instruction": "Turn right onto \u00c4ulestrasse.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto \u00c4ulestrasse.",
+                  "verbal_post_transition_instruction": "Continue for 200 meters.",
+                  "street_names": [
+                    "\u00c4ulestrasse"
+                  ],
+                  "bearing_before": 265,
+                  "bearing_after": 353,
+                  "time": 20.028,
+                  "length": 0.249,
+                  "cost": 27.583,
+                  "begin_shape_index": 2,
+                  "end_shape_index": 21,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter Adlerkreisel and take the 2nd exit onto Landstrasse.",
+                  "verbal_transition_alert_instruction": "Enter Adlerkreisel and take the 2nd exit onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 2nd exit.",
+                  "verbal_pre_transition_instruction": "Enter Adlerkreisel and take the 2nd exit onto Landstrasse.",
+                  "street_names": [
+                    "Adlerkreisel"
+                  ],
+                  "bearing_before": 350,
+                  "bearing_after": 46,
+                  "time": 6.17,
+                  "length": 0.037,
+                  "cost": 9.242,
+                  "begin_shape_index": 21,
+                  "end_shape_index": 32,
+                  "roundabout_exit_count": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 600 meters.",
+                  "street_names": [
+                    "Landstrasse"
+                  ],
+                  "bearing_before": 290,
+                  "bearing_after": 333,
+                  "time": 39.832,
+                  "length": 0.55,
+                  "cost": 41.629,
+                  "begin_shape_index": 32,
+                  "end_shape_index": 48,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Feldstrasse.",
+                  "verbal_transition_alert_instruction": "Turn right onto Feldstrasse.",
+                  "verbal_succinct_transition_instruction": "Turn right. Then, in 80 meters, Your destination will be on the right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Feldstrasse. Then, in 80 meters, Your destination will be on the right.",
+                  "verbal_post_transition_instruction": "Continue for 80 meters.",
+                  "street_names": [
+                    "Feldstrasse"
+                  ],
+                  "bearing_before": 307,
+                  "bearing_after": 30,
+                  "time": 9.193,
+                  "length": 0.074,
+                  "cost": 21.124,
+                  "begin_shape_index": 48,
+                  "end_shape_index": 52,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 5,
+                  "instruction": "Your destination is on the right.",
+                  "verbal_transition_alert_instruction": "Your destination will be on the right.",
+                  "verbal_pre_transition_instruction": "Your destination is on the right.",
+                  "bearing_before": 33,
+                  "time": 0.0,
+                  "length": 0.0,
+                  "cost": 0.0,
+                  "begin_shape_index": 52,
+                  "end_shape_index": 52,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                }
+              ],
+              "summary": {
+                "has_time_restrictions": false,
+                "has_toll": false,
+                "has_highway": false,
+                "has_ferry": false,
+                "min_lat": 47.138796,
+                "min_lon": 9.515858,
+                "max_lat": 47.145185,
+                "max_lon": 9.522555,
+                "time": 82.424,
+                "length": 0.98,
+                "cost": 106.24
+              },
+              "shape": "iac|xAuvedQvAnk@XxKsJ`AiGl@}MPsFFuSf@}Df@gB\\{D`AyD`BaB~@_E~BqDfD{@v@yF|E_F|DaEnCyCxA{BRaBEIiBa@qAkAcBs@s@i@Wm@Ck@Jk@^e@r@[nAKtAkAVyAr@mBfBqStVqC`D_AhAuKpMmPbWoUr]kT|YcAdBaDrFgJ`Qau@pxAwF~LgZts@mDqC_F{D_JwIcKuJ"
+            }
+          ],
+          "summary": {
+            "has_time_restrictions": false,
+            "has_toll": false,
+            "has_highway": false,
+            "has_ferry": false,
+            "min_lat": 47.138796,
+            "min_lon": 9.515858,
+            "max_lat": 47.145185,
+            "max_lon": 9.522555,
+            "time": 82.424,
+            "length": 0.98,
+            "cost": 106.24
+          },
+          "status_message": "Found route between points",
+          "status": 0,
+          "units": "kilometers",
+          "language": "en-US"
+        }
+      }
+    },
+    {
+      "name": "balzers-ruggell",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.0666667,
+            "lon": 9.5,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.2397558,
+            "lon": 9.5262874,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "trip": {
+          "locations": [
+            {
+              "type": "break",
+              "lat": 47.066666,
+              "lon": 9.5,
+              "side_of_street": "right",
+              "original_index": 0
+            },
+            {
+              "type": "break",
+              "lat": 47.239755,
+              "lon": 9.526287,
+              "side_of_street": "left",
+              "original_index": 1
+            }
+          ],
+          "legs": [
+            {
+              "maneuvers": [
+                {
+                  "type": 2,
+                  "instruction": "Drive southwest on Alberweg.",
+                  "verbal_succinct_transition_instruction": "Drive southwest. Then Turn right onto Schlossweg.",
+                  "verbal_pre_transition_instruction": "Drive southwest on Alberweg. Then Turn right onto Schlossweg.",
+                  "verbal_post_transition_instruction": "Continue for 200 meters.",
+                  "street_names": [
+                    "Alberweg"
+                  ],
+                  "bearing_after": 244,
+                  "time": 12.758,
+                  "length": 0.177,
+                  "cost": 11.482,
+                  "begin_shape_index": 0,
+                  "end_shape_index": 1,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Schlossweg.",
+                  "verbal_transition_alert_instruction": "Turn right onto Schlossweg.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Schlossweg.",
+                  "verbal_post_transition_instruction": "Continue for 300 meters.",
+                  "street_names": [
+                    "Schlossweg"
+                  ],
+                  "bearing_before": 244,
+                  "bearing_after": 339,
+                  "time": 25.496,
+                  "length": 0.29,
+                  "cost": 43.208,
+                  "begin_shape_index": 1,
+                  "end_shape_index": 18,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter the roundabout and take the 1st exit onto Gagoz.",
+                  "verbal_transition_alert_instruction": "Enter the roundabout and take the 1st exit onto Gagoz.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 1st exit.",
+                  "verbal_pre_transition_instruction": "Enter the roundabout and take the 1st exit onto Gagoz.",
+                  "bearing_before": 347,
+                  "bearing_after": 31,
+                  "time": 2.206,
+                  "length": 0.022,
+                  "cost": 9.125,
+                  "begin_shape_index": 18,
+                  "end_shape_index": 23,
+                  "roundabout_exit_count": 1,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Gagoz.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Gagoz.",
+                  "verbal_post_transition_instruction": "Continue for 1 kilometer.",
+                  "street_names": [
+                    "Gagoz"
+                  ],
+                  "bearing_before": 28,
+                  "bearing_after": 75,
+                  "time": 53.973,
+                  "length": 1.118,
+                  "cost": 48.34,
+                  "begin_shape_index": 23,
+                  "end_shape_index": 43,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 16,
+                  "instruction": "Bear left onto Landstrasse.",
+                  "verbal_transition_alert_instruction": "Bear left onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Bear left.",
+                  "verbal_pre_transition_instruction": "Bear left onto Landstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 4 kilometers.",
+                  "street_names": [
+                    "Landstrasse"
+                  ],
+                  "bearing_before": 91,
+                  "bearing_after": 72,
+                  "time": 251.831,
+                  "length": 4.388,
+                  "cost": 242.446,
+                  "begin_shape_index": 43,
+                  "end_shape_index": 113,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter the roundabout and take the 2nd exit onto Landstrasse.",
+                  "verbal_transition_alert_instruction": "Enter the roundabout and take the 2nd exit onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 2nd exit.",
+                  "verbal_pre_transition_instruction": "Enter the roundabout and take the 2nd exit onto Landstrasse.",
+                  "bearing_before": 339,
+                  "bearing_after": 35,
+                  "time": 6.934,
+                  "length": 0.035,
+                  "cost": 4.067,
+                  "begin_shape_index": 113,
+                  "end_shape_index": 120,
+                  "roundabout_exit_count": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 1 kilometer.",
+                  "street_names": [
+                    "Landstrasse"
+                  ],
+                  "bearing_before": 266,
+                  "bearing_after": 335,
+                  "time": 73.952,
+                  "length": 1.078,
+                  "cost": 69.297,
+                  "begin_shape_index": 120,
+                  "end_shape_index": 140,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter the roundabout and take the 2nd exit onto Landstrasse.",
+                  "verbal_transition_alert_instruction": "Enter the roundabout and take the 2nd exit onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 2nd exit.",
+                  "verbal_pre_transition_instruction": "Enter the roundabout and take the 2nd exit onto Landstrasse.",
+                  "bearing_before": 348,
+                  "bearing_after": 61,
+                  "time": 8.244,
+                  "length": 0.028,
+                  "cost": 3.519,
+                  "begin_shape_index": 140,
+                  "end_shape_index": 147,
+                  "roundabout_exit_count": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 1.5 kilometers.",
+                  "street_names": [
+                    "Landstrasse"
+                  ],
+                  "bearing_before": 337,
+                  "bearing_after": 12,
+                  "time": 72.66,
+                  "length": 1.445,
+                  "cost": 74.741,
+                  "begin_shape_index": 147,
+                  "end_shape_index": 175,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter Aukreisel and take the 2nd exit onto Heiligkreuz.",
+                  "verbal_transition_alert_instruction": "Enter Aukreisel and take the 2nd exit onto Heiligkreuz.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 2nd exit.",
+                  "verbal_pre_transition_instruction": "Enter Aukreisel and take the 2nd exit onto Heiligkreuz.",
+                  "street_names": [
+                    "Aukreisel"
+                  ],
+                  "bearing_before": 352,
+                  "bearing_after": 25,
+                  "time": 5.506,
+                  "length": 0.031,
+                  "cost": 8.539,
+                  "begin_shape_index": 175,
+                  "end_shape_index": 185,
+                  "roundabout_exit_count": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Heiligkreuz.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Heiligkreuz.",
+                  "verbal_post_transition_instruction": "Continue for 400 meters.",
+                  "street_names": [
+                    "Heiligkreuz"
+                  ],
+                  "bearing_before": 287,
+                  "bearing_after": 356,
+                  "time": 22.274,
+                  "length": 0.449,
+                  "cost": 25.325,
+                  "begin_shape_index": 185,
+                  "end_shape_index": 202,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter Kreisel Landtag and take the 2nd exit onto \u00c4ulestrasse.",
+                  "verbal_transition_alert_instruction": "Enter Kreisel Landtag and take the 2nd exit onto \u00c4ulestrasse.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 2nd exit.",
+                  "verbal_pre_transition_instruction": "Enter Kreisel Landtag and take the 2nd exit onto \u00c4ulestrasse.",
+                  "street_names": [
+                    "Kreisel Landtag"
+                  ],
+                  "bearing_before": 347,
+                  "bearing_after": 39,
+                  "time": 5.158,
+                  "length": 0.029,
+                  "cost": 8.628,
+                  "begin_shape_index": 202,
+                  "end_shape_index": 212,
+                  "roundabout_exit_count": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto \u00c4ulestrasse.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto \u00c4ulestrasse.",
+                  "verbal_post_transition_instruction": "Continue for 500 meters.",
+                  "street_names": [
+                    "\u00c4ulestrasse"
+                  ],
+                  "bearing_before": 290,
+                  "bearing_after": 340,
+                  "time": 29.041,
+                  "length": 0.462,
+                  "cost": 31.551,
+                  "begin_shape_index": 212,
+                  "end_shape_index": 240,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter Adlerkreisel and take the 2nd exit onto Landstrasse.",
+                  "verbal_transition_alert_instruction": "Enter Adlerkreisel and take the 2nd exit onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 2nd exit.",
+                  "verbal_pre_transition_instruction": "Enter Adlerkreisel and take the 2nd exit onto Landstrasse.",
+                  "street_names": [
+                    "Adlerkreisel"
+                  ],
+                  "bearing_before": 350,
+                  "bearing_after": 46,
+                  "time": 6.17,
+                  "length": 0.037,
+                  "cost": 9.242,
+                  "begin_shape_index": 240,
+                  "end_shape_index": 251,
+                  "roundabout_exit_count": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 3 kilometers.",
+                  "street_names": [
+                    "Landstrasse"
+                  ],
+                  "bearing_before": 290,
+                  "bearing_after": 333,
+                  "time": 231.101,
+                  "length": 3.2,
+                  "cost": 234.082,
+                  "begin_shape_index": 251,
+                  "end_shape_index": 338,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 9,
+                  "instruction": "Bear right onto Feldkircher Strasse/16.",
+                  "verbal_transition_alert_instruction": "Bear right onto Feldkircher Strasse.",
+                  "verbal_succinct_transition_instruction": "Bear right. Then Turn left onto Poststrasse.",
+                  "verbal_pre_transition_instruction": "Bear right onto Feldkircher Strasse, 16. Then Turn left onto Poststrasse.",
+                  "verbal_post_transition_instruction": "Continue for 40 meters.",
+                  "street_names": [
+                    "Feldkircher Strasse",
+                    "16"
+                  ],
+                  "bearing_before": 30,
+                  "bearing_after": 41,
+                  "time": 2.822,
+                  "length": 0.039,
+                  "cost": 9.847,
+                  "begin_shape_index": 338,
+                  "end_shape_index": 339,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 15,
+                  "instruction": "Turn left onto Poststrasse.",
+                  "verbal_transition_alert_instruction": "Turn left onto Poststrasse.",
+                  "verbal_succinct_transition_instruction": "Turn left. Then, in 90 meters, Bear right onto Im Bretscha.",
+                  "verbal_pre_transition_instruction": "Turn left onto Poststrasse. Then, in 90 meters, Bear right onto Im Bretscha.",
+                  "verbal_post_transition_instruction": "Continue for 90 meters.",
+                  "street_names": [
+                    "Poststrasse"
+                  ],
+                  "bearing_before": 41,
+                  "bearing_after": 308,
+                  "time": 7.505,
+                  "length": 0.09,
+                  "cost": 11.386,
+                  "begin_shape_index": 339,
+                  "end_shape_index": 345,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 9,
+                  "instruction": "Bear right onto Im Bretscha.",
+                  "verbal_transition_alert_instruction": "Bear right onto Im Bretscha.",
+                  "verbal_succinct_transition_instruction": "Bear right.",
+                  "verbal_pre_transition_instruction": "Bear right onto Im Bretscha.",
+                  "verbal_post_transition_instruction": "Continue for 1 kilometer.",
+                  "street_names": [
+                    "Im Bretscha"
+                  ],
+                  "bearing_before": 302,
+                  "bearing_after": 337,
+                  "time": 79.211,
+                  "length": 1.098,
+                  "cost": 88.126,
+                  "begin_shape_index": 345,
+                  "end_shape_index": 372,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter the roundabout and take the 2nd exit onto Benderer Strasse.",
+                  "verbal_transition_alert_instruction": "Enter the roundabout and take the 2nd exit onto Benderer Strasse.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 2nd exit.",
+                  "verbal_pre_transition_instruction": "Enter the roundabout and take the 2nd exit onto Benderer Strasse.",
+                  "bearing_before": 347,
+                  "bearing_after": 73,
+                  "time": 11.642,
+                  "length": 0.076,
+                  "cost": 9.435,
+                  "begin_shape_index": 372,
+                  "end_shape_index": 386,
+                  "roundabout_exit_count": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Benderer Strasse.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Benderer Strasse.",
+                  "verbal_post_transition_instruction": "Continue for 4 kilometers.",
+                  "street_names": [
+                    "Benderer Strasse"
+                  ],
+                  "bearing_before": 273,
+                  "bearing_after": 348,
+                  "time": 181.978,
+                  "length": 3.697,
+                  "cost": 173.838,
+                  "begin_shape_index": 386,
+                  "end_shape_index": 424,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter Bendern Post Kreisel and take the 2nd exit onto Ruggeller Strasse.",
+                  "verbal_transition_alert_instruction": "Enter Bendern Post Kreisel and take the 2nd exit onto Ruggeller Strasse.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 2nd exit.",
+                  "verbal_pre_transition_instruction": "Enter Bendern Post Kreisel and take the 2nd exit onto Ruggeller Strasse.",
+                  "street_names": [
+                    "Bendern Post Kreisel"
+                  ],
+                  "bearing_before": 355,
+                  "bearing_after": 50,
+                  "time": 7.406,
+                  "length": 0.046,
+                  "cost": 10.968,
+                  "begin_shape_index": 424,
+                  "end_shape_index": 434,
+                  "roundabout_exit_count": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Ruggeller Strasse.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Ruggeller Strasse.",
+                  "verbal_post_transition_instruction": "Continue for 4 kilometers.",
+                  "street_names": [
+                    "Ruggeller Strasse"
+                  ],
+                  "bearing_before": 273,
+                  "bearing_after": 346,
+                  "time": 211.886,
+                  "length": 3.822,
+                  "cost": 218.911,
+                  "begin_shape_index": 434,
+                  "end_shape_index": 501,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Poststrasse.",
+                  "verbal_transition_alert_instruction": "Turn right onto Poststrasse.",
+                  "verbal_succinct_transition_instruction": "Turn right. Then, in 90 meters, Bear right onto Nellengasse.",
+                  "verbal_pre_transition_instruction": "Turn right onto Poststrasse. Then, in 90 meters, Bear right onto Nellengasse.",
+                  "verbal_post_transition_instruction": "Continue for 90 meters.",
+                  "street_names": [
+                    "Poststrasse"
+                  ],
+                  "bearing_before": 36,
+                  "bearing_after": 122,
+                  "time": 10.011,
+                  "length": 0.091,
+                  "cost": 16.87,
+                  "begin_shape_index": 501,
+                  "end_shape_index": 506,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 9,
+                  "instruction": "Bear right onto Nellengasse.",
+                  "verbal_transition_alert_instruction": "Bear right onto Nellengasse.",
+                  "verbal_succinct_transition_instruction": "Bear right. Then Your destination will be on the left.",
+                  "verbal_pre_transition_instruction": "Bear right onto Nellengasse. Then Your destination will be on the left.",
+                  "verbal_post_transition_instruction": "Continue for 90 meters.",
+                  "street_names": [
+                    "Nellengasse"
+                  ],
+                  "bearing_before": 121,
+                  "bearing_after": 132,
+                  "time": 8.081,
+                  "length": 0.088,
+                  "cost": 14.415,
+                  "begin_shape_index": 506,
+                  "end_shape_index": 516,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 6,
+                  "instruction": "Your destination is on the left.",
+                  "verbal_transition_alert_instruction": "Your destination will be on the left.",
+                  "verbal_pre_transition_instruction": "Your destination is on the left.",
+                  "bearing_before": 156,
+                  "time": 0.0,
+                  "length": 0.0,
+                  "cost": 0.0,
+                  "begin_shape_index": 516,
+                  "end_shape_index": 516,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                }
+              ],
+              "summary": {
+                "has_time_restrictions": false,
+                "has_toll": false,
+                "has_highway": false,
+                "has_ferry": false,
+                "min_lat": 47.065888,
+                "min_lon": 9.496443,
+                "max_lat": 47.24073,
+                "max_lon": 9.52571,
+                "time": 1327.858,
+                "length": 21.838,
+                "cost": 1377.403
+              },
+              "shape": "k|uwxAwxybQjj@lbCeO|GwDrM_AKqBAqBb@oBt@mCfBcCxA_@VwFpDyClB}BzA}SfK{PtIob@~UcFnAuCp@WcBk@qAeA_AoAWqATc@{EuA_MyC{QugAyuEkWigAon@}iCef@_rBaHyVcGiOmHkNyIaLc\\c\\qIyKoHeMqEoMsBcLqAgNQ_LXyRBeNc@oGoBkJaC{GgE{FgGaHgCwC_McL{KaMyO}NuO}LoGeFyW{QkAs@aGeDkQcJoKsFaz@{c@yKaGml@k[}n@_]o_Acf@yy@{a@wb@wTqyDerB{xBsmAsD_Ca[_SweCswA}}@ki@gb@_Zuf@cc@s{@}gAoG}Hci@ep@}RsTkSqOgTiLuHyDk]uMwUeFiRiBoe@mBi{@hGkv@rFin@`Ekl@vAuZq@ieA_IiOw@}LWid@t@wq@bEw_@dBaVKmd@{Asv@sIig@gBqL[sXWq^K}BIc}@QeXO}VEaGAy[Da^t@yFbAwJ~CcGrCq@oBy@_A{A_@qAZaAhAm@rCF|CuKtGcV`H_UfF}[vFcMlBuvAjRqc@lHcLvBkXvB_[f@qNq@kHSkTk@kx@oDioAqGwcAsDmMGcYQgGfAyD`AMsA]mAc@o@cAi@}ANcAfAg@xBiDmAuDe@{EIwQQwUNco@Tep@r@w|@rAk`@nAcQx@{WdAo~@`F_QnAkStAa`@fDgQxA{sBlScWnGgDh@ap@xJeE`Awj@jKo[hIyTvCiO~@eDXea@jDsEp@WiAc@_Am@o@u@Wy@?u@Vo@n@a@`ASnAMnA{EV_Pl@qMRmLHaWp@}CHch@bAma@ReE[{NgAmBQaMiAeTeDaFmAgQ_BaFlBc@VYuAa@s@k@e@y@Sw@Fu@d@c@p@a@tAEfBDl@gDpBoK~CkWjFwG|@y@LwNnBc\\fE}Er@_L~AsJ`AiGl@}MPsFFuSf@}Df@gB\\{D`AyD`BaB~@_E~BqDfD{@v@yF|E_F|DaEnCyCxA{BRaBEIiBa@qAkAcBs@s@i@Wm@Ck@Jk@^e@r@[nAKtAkAVyAr@mBfBqStVqC`D_AhAuKpMmPbWoUr]kT|YcAdBaDrFgJ`Qau@pxAwF~LgZts@cIdPyJ~PkNnUuLtQeMxNyRfPo_@j^m`@hZy`@tRs]lNqd@fNuLpDes@rTgGxB}e@pQuRhIaOrEoU~DsGn@eDZyf@bF{P`CiHjAwj@rJ_Q`CyEj@kEn@w[zCu^hF}IlA{VhDaJpB}U~KoA`AoEjDmTvJiOpCyKtAeZnAwd@I_HXqMbB}KhBoKpCaGhA}PdEou@jNu\\vEm_@pEi\\~D{bA~GoLfA_c@R_TgBkCSyD{@kFg@mu@mHoLaBsLuBeN{AkK}C_LsFkBgAmPaKoP{KyHwDeEoDcHsGyHeIkCwBmOySwCAyC~AuB~BuCdGsKtXyBxGkBvBs@v@_BViFRwb@bDmEXem@rDgElAkFGs]~Byh@hEuOfAwNz@oTnA}AJem@jDuhA~Jaf@|B}B`@y^~A}Lv@iPlAU@aV`B}XjBwp@rGof@nL@yA@wAa@aDaAgC}A_BmBq@e@@kABiBz@yAhB{@lCYbDHfD\\nBiFjAaaCth@wtBre@eeBt\\miD~u@szGpwAqcE|{@_[jIkgEz_AuEbAk\\nHaV`Diq@rOed@bHc`@vByc@tAaWa@_Iw@cBQeAKsb@eDkfAeQswBg[uQoCoCm@ar@cFco@yDwEYyEYax@kDgPqA}Y]cNk@kNKuNZiSx@wJ`@yC\\[uD_@kAm@}@cBe@_A@y@Xi@l@g@lA_@pCRzCiEr@_E`BcKtDsSrAiUo@eWuEoY{HyIeCmL_Eq]aJ_MaDsUeGo\\mFyWeDkLy@qLiAeSw@{Sm@{AW_KOgLg@sb@{Awz@kB_c@wA_c@eFo\\oJmV{Iuk@qZac@i^sKqLkKkL_\\wg@sVeg@{HwQaa@s_A{R_`@aUac@iJgNwJgNwHmKiIgJqMePke@ge@yRiQeQ{OoxAapAsNeMacCmvBoo@}j@isAykAw{DkhDwAmAabAe{@{K}JqHsGac@y_@uHuGeKmI{AeBo]{ZwKwIuI{H}a@s^wcAu}@oUeSoCcCsD}D|CoJdD}IfFuQrDaMnBqGlAeCd@y@`A]jA]lAWrIc@rEk@bEgAhE_BzDcC"
+            }
+          ],
+          "summary": {
+            "has_time_restrictions": false,
+            "has_toll": false,
+            "has_highway": false,
+            "has_ferry": false,
+            "min_lat": 47.065888,
+            "min_lon": 9.496443,
+            "max_lat": 47.24073,
+            "max_lon": 9.52571,
+            "time": 1327.858,
+            "length": 21.838,
+            "cost": 1377.403
+          },
+          "status_message": "Found route between points",
+          "status": 0,
+          "units": "kilometers",
+          "language": "en-US"
+        }
+      }
+    },
+    {
+      "name": "vaduz-malbun",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.1392862,
+            "lon": 9.5227962,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.1027934,
+            "lon": 9.6083946,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "trip": {
+          "locations": [
+            {
+              "type": "break",
+              "lat": 47.139286,
+              "lon": 9.522796,
+              "original_index": 0
+            },
+            {
+              "type": "break",
+              "lat": 47.102793,
+              "lon": 9.608394,
+              "side_of_street": "right",
+              "original_index": 1
+            }
+          ],
+          "legs": [
+            {
+              "maneuvers": [
+                {
+                  "type": 1,
+                  "instruction": "Drive west on Postgass.",
+                  "verbal_succinct_transition_instruction": "Drive west. Then Turn right onto \u00c4ulestrasse.",
+                  "verbal_pre_transition_instruction": "Drive west on Postgass. Then Turn right onto \u00c4ulestrasse.",
+                  "verbal_post_transition_instruction": "Continue for 70 meters.",
+                  "street_names": [
+                    "Postgass"
+                  ],
+                  "bearing_after": 265,
+                  "time": 7.2,
+                  "length": 0.07,
+                  "cost": 6.66,
+                  "begin_shape_index": 0,
+                  "end_shape_index": 2,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto \u00c4ulestrasse.",
+                  "verbal_transition_alert_instruction": "Turn right onto \u00c4ulestrasse.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto \u00c4ulestrasse.",
+                  "verbal_post_transition_instruction": "Continue for 200 meters.",
+                  "street_names": [
+                    "\u00c4ulestrasse"
+                  ],
+                  "bearing_before": 265,
+                  "bearing_after": 353,
+                  "time": 20.028,
+                  "length": 0.249,
+                  "cost": 27.583,
+                  "begin_shape_index": 2,
+                  "end_shape_index": 21,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter Adlerkreisel and take the 2nd exit onto Landstrasse.",
+                  "verbal_transition_alert_instruction": "Enter Adlerkreisel and take the 2nd exit onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 2nd exit.",
+                  "verbal_pre_transition_instruction": "Enter Adlerkreisel and take the 2nd exit onto Landstrasse.",
+                  "street_names": [
+                    "Adlerkreisel"
+                  ],
+                  "bearing_before": 350,
+                  "bearing_after": 46,
+                  "time": 6.17,
+                  "length": 0.037,
+                  "cost": 9.242,
+                  "begin_shape_index": 21,
+                  "end_shape_index": 32,
+                  "roundabout_exit_count": 2,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Landstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 600 meters.",
+                  "street_names": [
+                    "Landstrasse"
+                  ],
+                  "bearing_before": 290,
+                  "bearing_after": 333,
+                  "time": 39.832,
+                  "length": 0.55,
+                  "cost": 41.629,
+                  "begin_shape_index": 32,
+                  "end_shape_index": 48,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Feldstrasse.",
+                  "verbal_transition_alert_instruction": "Turn right onto Feldstrasse.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Feldstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 300 meters.",
+                  "street_names": [
+                    "Feldstrasse"
+                  ],
+                  "bearing_before": 307,
+                  "bearing_after": 30,
+                  "time": 27.678,
+                  "length": 0.254,
+                  "cost": 44.916,
+                  "begin_shape_index": 48,
+                  "end_shape_index": 58,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto F\u00fcrst-Franz-Josef-Strasse.",
+                  "verbal_transition_alert_instruction": "Turn right onto F\u00fcrst-Franz-Josef-Strasse.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto F\u00fcrst-Franz-Josef-Strasse.",
+                  "verbal_post_transition_instruction": "Continue for 1.5 kilometers.",
+                  "street_names": [
+                    "F\u00fcrst-Franz-Josef-Strasse"
+                  ],
+                  "bearing_before": 46,
+                  "bearing_after": 135,
+                  "time": 84.25,
+                  "length": 1.255,
+                  "cost": 88.414,
+                  "begin_shape_index": 58,
+                  "end_shape_index": 136,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 15,
+                  "instruction": "Turn left onto Bergstrasse.",
+                  "verbal_transition_alert_instruction": "Turn left onto Bergstrasse.",
+                  "verbal_succinct_transition_instruction": "Turn left. Then Turn right to stay on Bergstrasse.",
+                  "verbal_pre_transition_instruction": "Turn left onto Bergstrasse. Then Turn right to stay on Bergstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 100 meters.",
+                  "street_names": [
+                    "Bergstrasse"
+                  ],
+                  "bearing_before": 155,
+                  "bearing_after": 37,
+                  "time": 6.133,
+                  "length": 0.101,
+                  "cost": 10.66,
+                  "begin_shape_index": 136,
+                  "end_shape_index": 145,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right to stay on Bergstrasse.",
+                  "verbal_transition_alert_instruction": "Turn right to stay on Bergstrasse.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right to stay on Bergstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 1.5 kilometers.",
+                  "street_names": [
+                    "Bergstrasse"
+                  ],
+                  "bearing_before": 47,
+                  "bearing_after": 120,
+                  "time": 70.675,
+                  "length": 1.475,
+                  "cost": 68.507,
+                  "begin_shape_index": 145,
+                  "end_shape_index": 229,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 16,
+                  "instruction": "Bear left onto Schlossstrasse.",
+                  "verbal_transition_alert_instruction": "Bear left onto Schlossstrasse.",
+                  "verbal_succinct_transition_instruction": "Bear left.",
+                  "verbal_pre_transition_instruction": "Bear left onto Schlossstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 1.5 kilometers.",
+                  "street_names": [
+                    "Schlossstrasse"
+                  ],
+                  "bearing_before": 170,
+                  "bearing_after": 133,
+                  "time": 89.868,
+                  "length": 1.68,
+                  "cost": 94.691,
+                  "begin_shape_index": 229,
+                  "end_shape_index": 363,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 15,
+                  "instruction": "Turn left onto Bergstrasse.",
+                  "verbal_transition_alert_instruction": "Turn left onto Bergstrasse.",
+                  "verbal_succinct_transition_instruction": "Turn left. Then Turn right to stay on Bergstrasse.",
+                  "verbal_pre_transition_instruction": "Turn left onto Bergstrasse. Then Turn right to stay on Bergstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 100 meters.",
+                  "street_names": [
+                    "Bergstrasse"
+                  ],
+                  "bearing_before": 160,
+                  "bearing_after": 61,
+                  "time": 13.288,
+                  "length": 0.115,
+                  "cost": 19.555,
+                  "begin_shape_index": 363,
+                  "end_shape_index": 376,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right to stay on Bergstrasse.",
+                  "verbal_transition_alert_instruction": "Turn right to stay on Bergstrasse.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right to stay on Bergstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 500 meters.",
+                  "street_names": [
+                    "Bergstrasse"
+                  ],
+                  "bearing_before": 1,
+                  "bearing_after": 96,
+                  "time": 36.713,
+                  "length": 0.472,
+                  "cost": 37.284,
+                  "begin_shape_index": 376,
+                  "end_shape_index": 427,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right to stay on Bergstrasse.",
+                  "verbal_transition_alert_instruction": "Turn right to stay on Bergstrasse.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right to stay on Bergstrasse.",
+                  "verbal_post_transition_instruction": "Continue for 1.5 kilometers.",
+                  "street_names": [
+                    "Bergstrasse"
+                  ],
+                  "bearing_before": 19,
+                  "bearing_after": 110,
+                  "time": 126.965,
+                  "length": 1.723,
+                  "cost": 124.853,
+                  "begin_shape_index": 427,
+                  "end_shape_index": 544,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 10,
+                  "instruction": "Turn right onto Ritzlinastrasse.",
+                  "verbal_transition_alert_instruction": "Turn right onto Ritzlinastrasse.",
+                  "verbal_succinct_transition_instruction": "Turn right.",
+                  "verbal_pre_transition_instruction": "Turn right onto Ritzlinastrasse.",
+                  "verbal_post_transition_instruction": "Continue for 6 kilometers.",
+                  "street_names": [
+                    "Ritzlinastrasse"
+                  ],
+                  "bearing_before": 5,
+                  "bearing_after": 92,
+                  "time": 352.885,
+                  "length": 5.829,
+                  "cost": 346.688,
+                  "begin_shape_index": 544,
+                  "end_shape_index": 753,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 15,
+                  "instruction": "Turn left onto Turnastrasse.",
+                  "verbal_transition_alert_instruction": "Turn left onto Turnastrasse.",
+                  "verbal_succinct_transition_instruction": "Turn left. Then Your destination will be on the right.",
+                  "verbal_pre_transition_instruction": "Turn left onto Turnastrasse. Then Your destination will be on the right.",
+                  "verbal_post_transition_instruction": "Continue for 50 meters.",
+                  "street_names": [
+                    "Turnastrasse"
+                  ],
+                  "bearing_before": 174,
+                  "bearing_after": 90,
+                  "time": 9.278,
+                  "length": 0.046,
+                  "cost": 19.055,
+                  "begin_shape_index": 753,
+                  "end_shape_index": 755,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 5,
+                  "instruction": "Your destination is on the right.",
+                  "verbal_transition_alert_instruction": "Your destination will be on the right.",
+                  "verbal_pre_transition_instruction": "Your destination is on the right.",
+                  "bearing_before": 87,
+                  "time": 0.0,
+                  "length": 0.0,
+                  "cost": 0.0,
+                  "begin_shape_index": 755,
+                  "end_shape_index": 755,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                }
+              ],
+              "summary": {
+                "has_time_restrictions": false,
+                "has_toll": false,
+                "has_highway": false,
+                "has_ferry": false,
+                "min_lat": 47.102858,
+                "min_lon": 9.515858,
+                "max_lat": 47.146451,
+                "max_lon": 9.608386,
+                "time": 890.969,
+                "length": 13.858,
+                "cost": 939.743
+              },
+              "shape": "iac|xAuvedQvAnk@XxKsJ`AiGl@}MPsFFuSf@}Df@gB\\{D`AyD`BaB~@_E~BqDfD{@v@yF|E_F|DaEnCyCxA{BRaBEIiBa@qAkAcBs@s@i@Wm@Ck@Jk@^e@r@[nAKtAkAVyAr@mBfBqStVqC`D_AhAuKpMmPbWoUr]kT|YcAdBaDrFgJ`Qau@pxAwF~LgZts@mDqC_F{D_JwI}V_VgL_N_JeIoQuRyDgEoMeUgCiEdCmErDaG~H}KjC{DzBeExBeF|BkGlA_FdCqLdC}MhE_RjCiN|Jk^`BqIdQa`AV}C`@qEX_MAsLg@_F}C}f@FuH~@gG`DkHpC{@nMg@|O?xMiDx{@kk@pJyEjMmChEOlGcA`NOnHOhJc@jL@zDBbMq@`OcAdKWdFRhD~AbB|AzBxBlBp@lDj@bB]`A}@^mADaDKmBYs@q@gB}AmAoAH{AIwCG_Bw@mAs@_Au@_@yABkCXqBt@gAnDi@hEhAbJvAlLdApGNxGNhEHtG?|Ir@fHxAnDf@rAyAd@oCw@iCmBuAoFsD{JkLwEyGiC_EeCgDeByCMmADkA^mAl@w@v@w@lB[nA?pBJvHhAtOlAnKGhEGxFq@bOuCjL_E`GeDdGsDln@ea@pV_P`ViPnFoCjKaCzHgAnCiApBqAvFiGjG{GjQuQlAsA~DuCvDuEzHqEvHeCzI_CrFeDhDsGvJyPnBaHvCiDtBkBdDgAbD}@tLcAnPsAlQsAvMkBpM}DxK_D`YaLdHwC|EcAdFa@dNq@tMgAjHaAjFUjE}@hDmApGaAbEaBfASvBc@lCD~DpBzC`C|CpA~Dj@bEQlEYdDm@xBqAjEgFhDoHpDqIzDwGhC_DdDcG`EoDdFkDbKsDhHkD|HeDlIsCzMeEzMwBvAyBdBkEpDuEbEiCtBSbBk@nB}C~CqH`C}HpA_DtAsB`FeEpEk@xFQrLi@`IsB|DoA~Dm@vEb@hEbAxCb@rBe@pBuAlGyEtE}GfEaG`BoDlCuC~BcAxB@bD^tChBtFfFxAp@fBMr@w@|@cAhX{c@lKcOvJkLlEgGrAyC\\mDDyJHeCn@wE`@}D^eGPmHCyGa@uEaDqOo@sCY}EHkC\\oCbAiCdAi@fAFvIjCzGdB|EjApDJ|Fe@dAG|B}EjHvOnCvBrLrDhF?nDEdGk@|EcBnEuBbK_IvD}EdDwFrFkNjE_LZcD`@sJ\\uG`AuG|ByGdFiJxD{EnEmDnKuAhC{@xBaA`EsDhDaHjEmM|FoVb@wHOqI}AiKi@oCeAuFo@aHGcELcFnB{JhCeJnAoKXkL\\sLRwHVsEh@{I~@sIP_AbF}WfA_FrAeE~BkI`CwHvC{GhDyCfDeAbCy@jIqA|DoBdDeD~BoDbCiCpCgAtHe@zAe@tBm@~Ao@~L}CVGlFaCaAuB_AuDoByKi@{CsCsLmBcD_CuBmDy@qBFoA?wGp@eA_@a@Ym@gAKgAIiBXcBj@aBjBeAbF?lEQ`BMhB]nRwGnM{EzFuBn@STMbEwB|DyCpCqBvC_B~BgA`Ck@vD[zDK`CQrDeAdBeA|ByBrBgDrLiRzMwSfC_Dt@{AVmATgCQyA_@e@g@a@u@G{@TaAn@cJdK{CxC{@t@q@\\aBr@mCT}Hf@sCOaAa@qBu@gAkA]cBAwAt@oC|C}EfDoFfBqDpCcIzAeGhDuPt@mCnA{EdBsE~@oBl@iAzAsBbAs@tBkAvAo@`Fk@vNaAvKwBzDiA`CcA~BkA|H{E~EgEnDoD|CgE|KgOpFiG`CqBbC}AbFoCvMgE~O_FtA_@xEqBfE}BfEgDpBsCbAeDt@sDDyDOkEu@gD_AgDmBkDeHwFwFiCuCoAuHeBeEq@mE[{DBuDCaIv@eF`BqDlBgCdBeCzBsDbEsEnF_HhF{DjCwErAoHbBuC^oDPmQv@{Lv@kL`AgR`Awg@~CuAPu@FaKj@eKj@}GL_IRoEP_TIaQUaJi@yI{AsFYwI{@_MuBcLo@{CP{Dl@sEdBaFpDgEtEiHjIoIfHmI|B}HLgIBcIp@eFt@}E|DuFjDcBzBgCdFcDpIoBrIsEjJmGpHeH~CeH|@wFLcHhAaLhC_MxGwBK}A_A]e@s@{CE{BR{A`@wBx@sAbFwDrFqDnKuGrLoNdGkO`@iAjAaEjAiGbCgSrBeo@nBiPZqCxGiSbDwHtE_GbF_EjGsEzG}BxGmAbHq@hI?`PRfLmAvH_D|GiI`GkOvFsR~EkV|Ew[pBeOpAoQnC}OhEqN|LaNtEkDnCkDpC}Et@oFKqFw@iGa@wAuAkCiDcCgGiCyJgDoHqCmDiBiAsB_AuBu@{DIoF^oF`BgLtCgKrCyH`D}GtFaIdG}FjM{J`FeErEoGnJuOhK_O`NoMnQcL|O}GxN{Evi@yMxGsCnGqFlD{DxDcEhLkLxNeKpBcB|AsCfAuBx@{BdAiHbx@_fRZmGn@}JrAoMjBmLlBgIpBqGnCuGfDuGrHsKnBcCzS{P|S_LfLiGdKaGh@Yzm@m]bJkHjDoEhCwGvAkI~@kMIoJu@yJ{Mgp@m@oRUcTKiOaGin@e@_FQed@nBiTlCqLzOyi@hDiPdCsPrB{RhBaZ|CmeAlCaOnCgObC_^A_`@GiBuAga@kA{W{B}QgGw_AUm\\Im`@zG{h@lCca@|Bg]Jih@?qk@a@oMR}Jv@_J|I}j@|BiZvBuUxBkQxC}TxHod@~Ium@tKse@dEsZ^eLT{GOyRsAgz@xA}T|DkRlJySvGcNhO}a@fSk`@tH{QrHsQpc@gfA`^kaApDwJpD}J~IcUtCoHvRa]jScVhAuAvH_HlFuEtZwS`GqJ~AiCzFsUzAoTi@mXm@gQDsQpAqMbAyInEwP|@{A|M_UtA_CjF}IbG}JjF_HjSiTvO{LjScGtRqDvFLzC?`F?~AIdIaCp@m@~BuElBmHp@uCdAsCbDwDrF{@t@M~Iu@?gHe@k\\"
+            }
+          ],
+          "summary": {
+            "has_time_restrictions": false,
+            "has_toll": false,
+            "has_highway": false,
+            "has_ferry": false,
+            "min_lat": 47.102858,
+            "min_lon": 9.515858,
+            "max_lat": 47.146451,
+            "max_lon": 9.608386,
+            "time": 890.969,
+            "length": 13.858,
+            "cost": 939.743
+          },
+          "status_message": "Found route between points",
+          "status": 0,
+          "units": "kilometers",
+          "language": "en-US"
+        }
+      }
+    },
+    {
+      "name": "restriction-2366291",
+      "request": {
+        "locations": [
+          {
+            "lat": 47.210584,
+            "lon": 9.5023717,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 47.210852,
+            "lon": 9.5024974,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "trip": {
+          "locations": [
+            {
+              "type": "break",
+              "lat": 47.210584,
+              "lon": 9.502371,
+              "original_index": 0
+            },
+            {
+              "type": "break",
+              "lat": 47.210852,
+              "lon": 9.502497,
+              "original_index": 1
+            }
+          ],
+          "legs": [
+            {
+              "maneuvers": [
+                {
+                  "type": 1,
+                  "instruction": "Drive northeast.",
+                  "verbal_succinct_transition_instruction": "Drive northeast. Then Bear right onto Im Schwibboga.",
+                  "verbal_pre_transition_instruction": "Drive northeast. Then Bear right onto Im Schwibboga.",
+                  "verbal_post_transition_instruction": "Continue for 60 meters.",
+                  "bearing_after": 41,
+                  "time": 4.445,
+                  "length": 0.061,
+                  "cost": 4.001,
+                  "begin_shape_index": 0,
+                  "end_shape_index": 7,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 9,
+                  "instruction": "Bear right onto Im Schwibboga.",
+                  "verbal_transition_alert_instruction": "Bear right onto Im Schwibboga.",
+                  "verbal_succinct_transition_instruction": "Bear right. Then Enter Eschner Strasse and take the 4th exit onto Im Schwibboga.",
+                  "verbal_pre_transition_instruction": "Bear right onto Im Schwibboga. Then Enter Eschner Strasse and take the 4th exit onto Im Schwibboga.",
+                  "verbal_post_transition_instruction": "Continue for 100 meters.",
+                  "street_names": [
+                    "Im Schwibboga"
+                  ],
+                  "bearing_before": 84,
+                  "bearing_after": 103,
+                  "time": 7.249,
+                  "length": 0.099,
+                  "cost": 16.915,
+                  "begin_shape_index": 7,
+                  "end_shape_index": 19,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 26,
+                  "instruction": "Enter Eschner Strasse and take the 4th exit onto Im Schwibboga.",
+                  "verbal_transition_alert_instruction": "Enter Eschner Strasse and take the 4th exit onto Im Schwibboga.",
+                  "verbal_succinct_transition_instruction": "Enter the roundabout and take the 4th exit.",
+                  "verbal_pre_transition_instruction": "Enter Eschner Strasse and take the 4th exit onto Im Schwibboga.",
+                  "street_names": [
+                    "Eschner Strasse"
+                  ],
+                  "bearing_before": 148,
+                  "bearing_after": 183,
+                  "time": 11.244,
+                  "length": 0.062,
+                  "cost": 10.517,
+                  "begin_shape_index": 19,
+                  "end_shape_index": 34,
+                  "roundabout_exit_count": 4,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 27,
+                  "instruction": "Exit the roundabout onto Im Schwibboga.",
+                  "verbal_succinct_transition_instruction": "Exit the roundabout. Then, in 200 meters, You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "Exit the roundabout onto Im Schwibboga. Then, in 200 meters, You will arrive at your destination.",
+                  "verbal_post_transition_instruction": "Continue for 200 meters.",
+                  "street_names": [
+                    "Im Schwibboga"
+                  ],
+                  "bearing_before": 299,
+                  "bearing_after": 319,
+                  "time": 10.895,
+                  "length": 0.15,
+                  "cost": 17.72,
+                  "begin_shape_index": 34,
+                  "end_shape_index": 50,
+                  "verbal_multi_cue": true,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                },
+                {
+                  "type": 4,
+                  "instruction": "You have arrived at your destination.",
+                  "verbal_transition_alert_instruction": "You will arrive at your destination.",
+                  "verbal_pre_transition_instruction": "You have arrived at your destination.",
+                  "bearing_before": 278,
+                  "time": 0.0,
+                  "length": 0.0,
+                  "cost": 0.0,
+                  "begin_shape_index": 50,
+                  "end_shape_index": 50,
+                  "travel_mode": "drive",
+                  "travel_type": "car"
+                }
+              ],
+              "summary": {
+                "has_time_restrictions": false,
+                "has_toll": false,
+                "has_highway": false,
+                "has_ferry": false,
+                "min_lat": 47.210229,
+                "min_lon": 9.502371,
+                "max_lat": 47.210852,
+                "max_lon": 9.50448,
+                "time": 33.835,
+                "length": 0.372,
+                "cost": 49.154
+              },
+              "shape": "odo`yAgi~bQ??_DaCaA}AoAiE]}GMwE_@cNZqDbCmQnBgQ~@eHt@iGdA}A^u@Xc@x@eAf@[l@YrAg@t@n@x@N|@ChAk@bAyAZsBE{BQwAk@mA}@m@{AQ}An@_A`BSbAIpAk@Ji@Ve@Xc@n@gAlCc@rAS`CA`Cu@hG_AdHoBfQcClQ[pDsAzNy@dKKfG"
+            }
+          ],
+          "summary": {
+            "has_time_restrictions": false,
+            "has_toll": false,
+            "has_highway": false,
+            "has_ferry": false,
+            "min_lat": 47.210229,
+            "min_lon": 9.502371,
+            "max_lat": 47.210852,
+            "max_lon": 9.50448,
+            "time": 33.835,
+            "length": 0.372,
+            "cost": 49.154
+          },
+          "status_message": "Found route between points",
+          "status": 0,
+          "units": "kilometers",
+          "language": "en-US"
+        }
+      }
+    },
+    {
+      "name": "outside",
+      "request": {
+        "locations": [
+          {
+            "lat": 48.5,
+            "lon": 10.5,
+            "radius": 30,
+            "minimum_reachability": 0
+          },
+          {
+            "lat": 48.51,
+            "lon": 10.51,
+            "radius": 30,
+            "minimum_reachability": 0
+          }
+        ],
+        "costing": "auto",
+        "units": "kilometers",
+        "language": "en-US"
+      },
+      "expected": {
+        "nativeError": 171
+      }
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "release": "fixture-v1-d6492d76afe4f581",
+  "created": "2026-09-17T00:00:00Z",
+  "valhallaRevision": "a60c7cbfc83e073f50887cd27e0109d02e6b64e5",
+  "valhallaVersion": "3.8.3",
+  "costings": [
+    "auto"
+  ],
+  "coverage": [
+    9.23,
+    47.23,
+    9.57,
+    47.57
+  ],
+  "source": {
+    "kind": "synthetic-osm",
+    "file": "fixtures/development.osm",
+    "sha256": "85e9dac986b00362c149aada5dee513ef038f5c3fe8d81cbf1324fca5d7a7013",
+    "attribution": "Synthetic test roads authored for this project; not real navigation data."
+  },
+  "config": {
+    "url": "config.json",
+    "sha256": "ff64cf8154ad8632a32bb589541b637484066d9cb51267ad7e03d3d7a9a1b459"
+  },
+  "archive": {
+    "url": "graph.tar",
+    "size": "30720",
+    "etag": "\"47643b422cabd51eb9fb95111dac27e5bdf8e4f6d6703e4b61ef6eaa5d7f336c\"",
+    "headerSha256": "f4ef93001bc7d8ad0f636e902b163c4a61a8073be15d97df0d9dcf366ecf8ec6",
+    "indexSize": "112",
+    "indexSha256": "28295c1a687e2917b2ce4c86450f14e9272ce98951716249588ae985019fd24c"
+  },
+  "tiles": {
+    "24856": {
+      "path": "0/003/107.gph",
+      "offset": "1536",
+      "size": "1488",
+      "sha256": "052ca9e24eac9488dc88d95853a21caf471dec5b3d30646426d1018b23277178"
+    },
+    "396073": {
+      "path": "1/049/509.gph",
+      "offset": "3584",
+      "size": "1616",
+      "sha256": "bdd16893366866d5e06c896d1b8a7ab42df3078a7f1fb0aeaec5217f046da2da"
+    },
+    "6319010": {
+      "path": "2/000/789/876.gph",
+      "offset": "6144",
+      "size": "2792",
+      "sha256": "904739dd28cf840601b5d7db7924186c7896c823ca025f8f20b01d058c396a24"
+    },
+    "6319018": {
+      "path": "2/000/789/877.gph",
+      "offset": "9728",
+      "size": "3368",
+      "sha256": "9f694044c4caee1a63a4ae860609603f35073187aa48e5aa42a5efdfb3f3f8a6"
+    },
+    "6330530": {
+      "path": "2/000/791/316.gph",
+      "offset": "13824",
+      "size": "3368",
+      "sha256": "501dd02540b3766e7dfb9c74e0e542acbdb91f76b763bb81fb7206d0f347d38b"
+    },
+    "6330538": {
+      "path": "2/000/791/317.gph",
+      "offset": "17920",
+      "size": "4208",
+      "sha256": "0fe3c47a89b4081611ce590b8bd752708ecbf0bbd893361ef9d68efad6ccc9e7"
+    },
+    "6342066": {
+      "path": "2/000/792/758.gph",
+      "offset": "23040",
+      "size": "520",
+      "sha256": "12b32696cf14443658fa7f8c75067631eaf56baed6ff0f69b68767d2d43c2565"
+    }
+  }
+}

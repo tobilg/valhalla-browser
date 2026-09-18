@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "lib": ["ES2022", "WebWorker"], "noEmit": true },
+  "files": ["src/worker.ts", "src/emscripten.d.ts"]
+}

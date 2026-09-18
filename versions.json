@@ -1,0 +1,14 @@
+{
+  "valhalla": "a60c7cbfc83e073f50887cd27e0109d02e6b64e5",
+  "valhallaRelease": "3.8.3",
+  "emscripten": "6.0.0",
+  "buildImage": "emscripten/emsdk:6.0.0@sha256:9eed2e47b4206928b22f99d2917013ad5462d777bb24cb546a652729896badd8",
+  "protobuf": "v21.12",
+  "protobufRevision": "f0dc78d7e6e331b8c6bb2d5283e06aa26883ca7c",
+  "zlib": "v1.3.1",
+  "zlibRevision": "51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf",
+  "ubuntuSnapshot": "20260917T000000Z",
+  "communityReference": "0246aee917aa4d72808d277cf560ac859c2ee227",
+  "minioImage": "quay.io/minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e",
+  "minioClientImage": "quay.io/minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727"
+}

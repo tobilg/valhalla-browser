@@ -1,0 +1,52 @@
+{
+  "name": "valhalla-browser-workspace",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.4.2",
+  "engines": {
+    "node": ">=22.22.2"
+  },
+  "scripts": {
+    "build": "pnpm run build:demo && pnpm run build:docs",
+    "build:sdk": "pnpm --filter valhalla-browser build",
+    "build:demo": "pnpm --filter valhalla-browser build && pnpm --filter @tobilg/valhalla-browser-demo build",
+    "build:docs": "pnpm --filter @tobilg/valhalla-browser-documentation build",
+    "dev": "pnpm run build:sdk && pnpm --filter @tobilg/valhalla-browser-demo dev",
+    "preview": "pnpm --filter @tobilg/valhalla-browser-demo preview",
+    "preview:docs": "pnpm --filter @tobilg/valhalla-browser-documentation preview",
+    "deploy:docs": "pnpm run build:docs && pnpm --filter @tobilg/valhalla-browser-documentation deploy",
+    "pack:sdk": "pnpm --filter valhalla-browser pack --pack-destination build/package",
+    "build:native": "bash scripts/build.sh native",
+    "build:wasm": "bash scripts/build.sh wasm",
+    "data": "bash scripts/data.sh",
+    "data:region": "bash scripts/data.sh --region",
+    "data:osm": "bash scripts/build-dataset.sh",
+    "data:etags": "node scripts/dataset-etags.js",
+    "r2:prepare": "node scripts/prepare-r2.js",
+    "minio:start": "node scripts/minio.js start",
+    "minio:publish": "node scripts/minio.js publish",
+    "minio:stop": "node scripts/minio.js stop",
+    "typecheck": "pnpm --filter valhalla-browser typecheck",
+    "test": "node --import tsx --test test/*.test.js",
+    "test:data": "python3 test/dataset_test.py",
+    "test:data:build": "node test/dataset-build.js",
+    "test:browser": "node test/browser.js",
+    "test:demo": "node test/demo.js",
+    "test:matrix": "node test/matrix.js",
+    "test:cdn": "node --import tsx test/cdn.js",
+    "test:cdn:objects": "node --import tsx test/cdn-objects.js",
+    "test:cdn:cors": "node --import tsx test/cdn-cors.js",
+    "test:package": "node test/package.js",
+    "test:cdn-import": "node test/cdn-import.js",
+    "test:docs": "node test/docs.js",
+    "test:examples": "node test/examples.js",
+    "benchmark": "node test/browser.js --benchmark"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.3",
+    "playwright": "1.58.2",
+    "tsx": "4.23.13",
+    "vite": "8.3.0",
+    "yaml": "2.9.0"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "extends": "../valhalla-browser/tsconfig.json",
+  "compilerOptions": { "noEmit": true },
+  "files": ["../valhalla-browser/src/client.ts", "../valhalla-browser/src/assets.d.ts"]
+}

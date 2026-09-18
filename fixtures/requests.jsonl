@@ -1,0 +1,7 @@
+{"locations": [{"lat": 47.24, "lon": 9.2355, "radius": 30, "minimum_reachability": 0}, {"lat": 47.24, "lon": 9.2395, "radius": 30, "minimum_reachability": 0}], "costing": "auto", "units": "kilometers", "language": "en-US"}
+{"locations": [{"lat": 47.235, "lon": 9.2355, "radius": 30, "minimum_reachability": 0}, {"lat": 47.265, "lon": 9.2645, "radius": 30, "minimum_reachability": 0}], "costing": "auto", "units": "kilometers", "language": "en-US"}
+{"locations": [{"lat": 47.245, "lon": 9.2455, "radius": 30, "minimum_reachability": 0}, {"lat": 47.245, "lon": 9.2495, "radius": 30, "minimum_reachability": 0}], "costing": "auto", "units": "kilometers", "language": "en-US"}
+{"locations": [{"lat": 47.245, "lon": 9.2495, "radius": 30, "minimum_reachability": 0}, {"lat": 47.245, "lon": 9.2455, "radius": 30, "minimum_reachability": 0}], "costing": "auto", "units": "kilometers", "language": "en-US"}
+{"locations": [{"lat": 47.25, "lon": 9.2455, "radius": 30, "minimum_reachability": 0}, {"lat": 47.2545, "lon": 9.25, "radius": 30, "minimum_reachability": 0}], "costing": "auto", "units": "kilometers", "language": "en-US"}
+{"locations": [{"lat": 47.24, "lon": 9.2355, "radius": 30, "minimum_reachability": 0}, {"lat": 47.3, "lon": 9.305, "radius": 30, "minimum_reachability": 0}], "costing": "auto", "units": "kilometers", "language": "en-US"}
+{"locations": [{"lat": 48.5, "lon": 10.5, "radius": 30, "minimum_reachability": 0}, {"lat": 48.51, "lon": 10.51, "radius": 30, "minimum_reachability": 0}], "costing": "auto", "units": "kilometers", "language": "en-US"}
