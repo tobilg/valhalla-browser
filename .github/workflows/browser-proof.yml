@@ -1,5 +1,8 @@
 name: Browser routing proof
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
   workflow_call:
     outputs:
@@ -19,9 +22,9 @@ jobs:
     env:
       WRANGLER_SEND_METRICS: 'false'
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: pnpm
@@ -63,9 +66,20 @@ jobs:
       - run: pnpm run minio:publish
       - run: pnpm run test:demo --minio
       - run: pnpm run test:demo --preview --minio
+      - run: pnpm run test:demo:static
       - run: pnpm run test:matrix
+      - name: Build demo with the public R2 manifest
+        if: vars.VITE_DEMO_MANIFEST_URL != ''
+        env:
+          VITE_DEMO_MANIFEST_URL: ${{ vars.VITE_DEMO_MANIFEST_URL }}
+        run: pnpm --filter @tobilg/valhalla-browser-demo build
+      - name: Verify configured demo artifact
+        if: vars.VITE_DEMO_MANIFEST_URL != ''
+        env:
+          VITE_DEMO_MANIFEST_URL: ${{ vars.VITE_DEMO_MANIFEST_URL }}
+        run: pnpm run test:demo:static --artifact
       - name: Verified SDK release candidate
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v7
         with:
           name: sdk-release
           path: |
@@ -74,15 +88,22 @@ jobs:
           if-no-files-found: error
           retention-days: 14
       - name: Verified documentation
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v7
         with:
           name: documentation
           path: packages/documentation/dist/
           if-no-files-found: error
           retention-days: 14
+      - name: Verified demo
+        uses: actions/upload-artifact@v7
+        with:
+          name: demo
+          path: packages/demo/dist/
+          if-no-files-found: error
+          retention-days: 14
       - name: Preserve executed results
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@v7
         with:
           name: browser-proof
           path: |

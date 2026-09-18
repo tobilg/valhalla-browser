@@ -74,8 +74,22 @@ pnpm run build:demo
 pnpm run preview
 ```
 
-A separately deployed static demo needs its selected fixture/discovery paths or
-equivalent configuration. Package consumers supply their own compatible manifest.
+To run or build the demo against the R2 copy of the Liechtenstein 2015 graph,
+set `VITE_DEMO_MANIFEST_URL`. Replace the example with your real versioned manifest:
+
+```sh
+VITE_DEMO_MANIFEST_URL=https://routing.example.com/datasets/your-release-id/manifest.json pnpm run dev
+VITE_DEMO_MANIFEST_URL=https://routing.example.com/datasets/your-release-id/manifest.json pnpm run build:demo
+pnpm run preview
+```
+
+Alternatively, copy `packages/demo/.env.example` to `packages/demo/.env.local`
+(ignored by Git), replace its URL, and restart Vite. The setting is embedded at
+build time. The configured demo bundles the five Liechtenstein journey inputs,
+defaults to Balzers–Ruggell, and fetches graph data from the supplied manifest;
+it needs no local discovery/preset endpoints. Leave the variable unset for the
+local fixture/MinIO selectors. Repository CI uses the same variable under GitHub
+Actions **Variables**; see [release setup](releases.md#configure-the-demos-r2-dataset).
 
 ## Clean native checkout
 
@@ -119,6 +133,7 @@ BROWSER=firefox pnpm run test:browser
 BROWSER=webkit pnpm run test:browser
 pnpm run test:demo
 pnpm run test:demo --preview
+pnpm run test:demo:static     # Standalone build, bundled Liechtenstein presets, separate graph origin.
 ```
 
 Without `SDK_TARBALL`, the package/CDN/example tests run `pnpm pack` themselves.
@@ -136,6 +151,10 @@ tile headers and incompatible archives; they also check immutable publication.
 Public deployment-validator checks run with `pnpm test` using a local HTTP server.
 The browser suite preserves full native JSON comparison, actual Asyncify suspension,
 range faults, serialized calls, cache bounds and CPU/fetch cancellation recovery.
+The static-demo test compiles an isolated build with the manifest environment
+variable, serves only its output, and verifies all regional presets, selective
+tile loading, warm reuse and cancellation/recovery in all three browsers. It
+does not contact R2 or use the repository's Vite data middleware.
 
 ```sh
 pnpm run minio:start
@@ -174,8 +193,18 @@ the SDK does not supply a public dataset service.
 
 The [R2 CORS policy](r2-cors.json) records the cross-origin header policy.
 
-The reusable browser-proof workflow builds native artifacts and performs the
-full verification. Tagged releases publish its exact SDK tarball and deploy its
-matching documentation artifact. See [release setup](releases.md) for trusted
+The reusable **Browser routing proof** workflow runs on every push to `main`,
+including documentation-only changes, and can also be started manually. It builds
+native/WASM artifacts and graphs, runs unit/data tests, verifies the package, CDN
+imports, README examples, demo and documentation, and runs the browser and MinIO
+suites across Chromium, Firefox and WebKit. Reports and verified artifacts are
+retained for 14 days. Public-CDN probes (`test:cdn`, `test:cdn:cors` and
+`test:cdn:objects`) remain manual because they require your deployment URL and data;
+CI uses local HTTP servers and MinIO for transport verification.
+
+Pushes to `main` only verify and upload artifacts. Tagged releases publish the
+same workflow's exact SDK tarball and deploy its matching documentation and demo
+artifacts to the `valhalla-browser-api` and `valhalla-browser` Pages projects.
+See [release setup](releases.md) for trusted
 publishing, initial package setup and manual dry runs. Local passes do not claim
 that GitHub Actions, npm publication or Cloudflare deployment has executed.

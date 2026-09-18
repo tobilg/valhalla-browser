@@ -95,3 +95,5 @@ packages/valhalla-browser/LICENSE
 packages/valhalla-browser/NOTICE.md
 .wrangler/
 .dev.vars*
+.env.local
+.env.*.local

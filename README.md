@@ -5,7 +5,8 @@ TypeScript declarations, the worker, and compiled WebAssembly. Standard graph
 tiles load on demand through HTTP ranges from an indexed TAR, or as individual
 `.gph` objects. Routing runs locally; the data host serves static files.
 
-[API documentation](https://valhalla-browser-api.pages.dev) ·
+[Demo](https://valhalla-browser.gh.tobilg.com)
+[API documentation](https://valhalla-browser-api.gh.tobilg.com)
 [Source](https://github.com/tobilg/valhalla-browser) ·
 [Release setup](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
 
@@ -308,9 +309,14 @@ pnpm test:demo
 The root README is also the TypeDoc homepage and is copied into the npm package.
 Guides and API comments are maintained with the source. Stable version tags
 publish the verified SDK through npm trusted publishing, then deploy documentation
-to **valhalla-browser-api** on Cloudflare Pages. See
+to **valhalla-browser-api** and the demo to **valhalla-browser** on Cloudflare Pages. See
 [release setup](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
 for the initial npm publication, trust configuration, Pages setup and dry runs.
+
+For the hosted demo, set the GitHub repository variable `VITE_DEMO_MANIFEST_URL`
+to your public R2 manifest URL for the Liechtenstein 2015 graph. The build bundles
+the same journey presets and downloads graph tiles from that URL. Locally, the
+same environment variable can be passed to `pnpm run dev` or `pnpm run build:demo`.
 
 ## Limits and licensing
 

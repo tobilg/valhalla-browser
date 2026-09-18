@@ -1,13 +1,23 @@
 import { Router } from 'valhalla-browser';
+import regionalRequests from '../../fixtures/region/requests.json';
 
 const $ = id => document.getElementById(id);
-const discovery = await (await fetch('/manifest.json')).json();
-const datasets = [{ id: 'fixture', name: 'Synthetic fixture · local HTTP', ...discovery, requestsUrl: '/fixtures/requests.json' }];
-const optional = async url => { const response = await fetch(url); return response.ok ? response.json() : null; };
-const [region, minio, r2] = await Promise.all([optional('/public/region.json'), optional('/public/minio.json'), optional('/public/r2.json')]);
-if (region) datasets.push({ id: 'region', name: 'Liechtenstein 2015 · local HTTP', ...region, requestsUrl: '/fixtures/region/requests.json' });
-for (const item of minio?.datasets ?? []) datasets.push({ ...item, id: item.requestsUrl.includes('/region/') ? 'minio-region' : 'minio-fixture' });
-if (r2) datasets.push({ ...r2, id: 'r2-region' });
+const manifestUrl = import.meta.env.VITE_DEMO_MANIFEST_URL?.trim();
+const datasets = [];
+if (manifestUrl) {
+  // Only the journey inputs are bundled. Valhalla still downloads the graph
+  // from the configured versioned manifest and calculates every route locally.
+  datasets.push({ id: 'r2-region', name: 'Liechtenstein 2015 · R2', manifestUrl,
+    regional: true, requests: regionalRequests });
+} else {
+  const discovery = await (await fetch('/manifest.json')).json();
+  datasets.push({ id: 'fixture', name: 'Synthetic fixture · local HTTP', ...discovery, requestsUrl: '/fixtures/requests.json' });
+  const optional = async url => { const response = await fetch(url); return response.ok ? response.json() : null; };
+  const [region, minio, r2] = await Promise.all([optional('/public/region.json'), optional('/public/minio.json'), optional('/public/r2.json')]);
+  if (region) datasets.push({ id: 'region', name: 'Liechtenstein 2015 · local HTTP', ...region, requestsUrl: '/fixtures/region/requests.json' });
+  for (const item of minio?.datasets ?? []) datasets.push({ ...item, id: item.requestsUrl.includes('/region/') ? 'minio-region' : 'minio-fixture' });
+  if (r2) datasets.push({ ...r2, id: 'r2-region' });
+}
 let router, active, lastDiagnostics, fixtures, selected;
 for (const dataset of datasets) $('dataset').add(new Option(dataset.name, dataset.id));
 const requestedDataset = new URL(location.href).searchParams.get('dataset');
@@ -17,13 +27,14 @@ async function selectDataset() {
   try {
     await router?.dispose(); router = undefined;
     selected = datasets.find(d => d.id === $('dataset').value);
-    fixtures = await (await fetch(selected.requestsUrl)).json();
+    fixtures = selected.requests ?? await (await fetch(selected.requestsUrl)).json();
+    const regional = selected.regional ?? selected.requestsUrl.includes('/region/');
     $('preset').replaceChildren(...fixtures.map(f => new Option(f.name, f.name)));
-    $('preset').value = selected.requestsUrl.includes('/region/') ? 'balzers-ruggell' : 'cross-tile';
+    $('preset').value = regional ? 'balzers-ruggell' : 'cross-tile';
     selectFixture();
     $('geometry').replaceChildren(); $('maneuvers').replaceChildren();
     $('summary').textContent = 'Select a test journey';
-    $('attribution').textContent = selected.requestsUrl.includes('/region/')
+    $('attribution').textContent = regional
       ? '© OpenStreetMap contributors · ODbL 1.0 · July 2015 historical benchmark extract · not for navigation'
       : 'Synthetic test roads · not for navigation';
     $('status').textContent = 'Ready to initialize.';

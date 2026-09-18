@@ -32,6 +32,7 @@
     "test:data:build": "node test/dataset-build.js",
     "test:browser": "node test/browser.js",
     "test:demo": "node test/demo.js",
+    "test:demo:static": "node test/demo-static.js",
     "test:matrix": "node test/matrix.js",
     "test:cdn": "node --import tsx test/cdn.js",
     "test:cdn:objects": "node --import tsx test/cdn-objects.js",

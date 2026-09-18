@@ -2,16 +2,21 @@
 
 The release workflow is `.github/workflows/release.yml` in
 `tobilg/valhalla-browser`. It publishes **valhalla-browser** and deploys documentation
-to **valhalla-browser-api**. The demo is a private workspace application and is
-not deployed by this workflow. Neither private package nor the workspace root
-is published to npm.
+to **valhalla-browser-api** and the demo website to **valhalla-browser** on
+Cloudflare Pages. The demo and documentation remain private workspace packages;
+neither package nor the workspace root is published to npm.
+
+Every push to `main` runs the full **Browser routing proof** workflow and uploads
+test reports, the SDK candidate, documentation and demo artifacts. These branch pushes
+do not publish to npm or deploy either site; publication and deployment remain
+part of the tagged release workflow described below.
 
 ## Prepare the accounts once
 
 The unscoped npm package must exist before you can configure its trusted publisher.
-For the first version, run **Release SDK and documentation** manually from GitHub
+For the first version, run **Release SDK, documentation and demo** manually from GitHub
 Actions on the intended commit. Manual runs are dry runs: they build native/WASM,
-run the verification suites, and upload `sdk-release` and `documentation` artifacts,
+run the verification suites, and upload `sdk-release`, `documentation` and `demo` artifacts,
 without publishing or deploying. Download the verified SDK tarball from `sdk-release`.
 
 Log into npm as the owner and publish that exact tarball once, using your normal
@@ -38,19 +43,60 @@ provenance. Installs, builds, tests and packing use pnpm 12.4.2. Do not add
 `NPM_TOKEN` or `NODE_AUTH_TOKEN`; there is no token fallback. See
 [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).
 
-Create a Cloudflare Pages **Direct Upload** project named `valhalla-browser-api`,
-with production branch `main`. Use the dashboard or, when ready:
+Create Cloudflare Pages **Direct Upload** projects named `valhalla-browser-api`
+(documentation) and `valhalla-browser` (demo), each with production branch `main`.
+Reuse the existing documentation project if it is already configured. Use the
+dashboard or, when ready:
 
 ```sh
 pnpm --filter @tobilg/valhalla-browser-documentation exec wrangler login
 pnpm --filter @tobilg/valhalla-browser-documentation exec wrangler pages project create valhalla-browser-api --production-branch main
+pnpm --filter @tobilg/valhalla-browser-documentation exec wrangler pages project create valhalla-browser --production-branch main
 ```
 
 Add repository secrets `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`. The API
-token needs Cloudflare Pages Edit permission for that account. The static site
-uses no R2 bindings or storage credentials. Its default address is
-https://valhalla-browser-api.pages.dev; a custom domain can be configured later.
+token needs Cloudflare Pages Edit permission for that account. Both deployments
+reuse these secrets and the documentation package's pinned Wrangler installation.
+The sites use no R2 bindings or storage credentials. Their default addresses are
+https://valhalla-browser-api.gh.tobilg.com and https://valhalla-browser.gh.tobilg.com;
+custom domains can be configured later.
 See [Pages CI deployment](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/).
+
+### Configure the demo's R2 dataset
+
+In the GitHub repository, open **Settings → Secrets and variables → Actions →
+Variables → New repository variable** and set:
+
+| Name | Value |
+| --- | --- |
+| `VITE_DEMO_MANIFEST_URL` | Your public HTTPS URL for the Liechtenstein 2015 dataset's versioned `manifest.json` |
+
+For example, `https://routing.example.com/datasets/your-release-id/manifest.json`
+is a placeholder: replace it with your deployed R2 URL. Use the same historical
+Liechtenstein graph/configuration prepared by `pnpm run data:region`, with delivery
+validators adapted to R2. The release folder must match the manifest's `release`.
+This is a public build setting, not a storage credential; Vite embeds it in the
+browser JavaScript. Do not put R2 access keys or signed URLs in it.
+
+The Pages artifact includes the app, worker, WASM and all five Liechtenstein
+journey inputs from `fixtures/region/requests.json`. It defaults to Balzers–Ruggell
+and retains the preset selector, editable coordinates, both tile transports and
+OSM attribution. The browser downloads graph data directly from R2 and calculates
+routes with WASM. The site does not need `/manifest.json`, `/fixtures/`, `/public/`
+or a Vite data server. Graph bytes and precomputed route results are not bundled.
+Allow the demo's Pages/custom-domain origin in the R2 CORS policy; see
+[object-storage hosting](object-storage-hosting.md) for headers and validators.
+
+CI first runs the local/MinIO tests and a separate static-demo routing test with
+the same Liechtenstein graph on another HTTP origin. It then builds the demo with
+the repository variable and checks that artifact's startup/presets without
+contacting your public R2 deployment. The release job deploys that exact artifact.
+Tagged releases fail early if the variable is missing or is not a public HTTPS
+URL. Ordinary `main` pushes and manual verification can run without it, producing
+the local-development demo. Public R2/CORS availability remains a deployment check.
+
+Changing the variable requires a new build/deployment; setting a runtime variable
+in the Pages dashboard will not modify the already-built app.
 
 These are owner setup steps. Implementing the workspace does not execute them.
 
@@ -76,8 +122,9 @@ CDN-import and README tests against that exact tarball, and uploads it with a
 SHA-512 release manifest. It also verifies the demo, native corpora, fault/recovery
 suites, MinIO and TypeDoc. The publication job downloads the verified candidate,
 checks its checksum, and publishes it to npm's `latest` tag with provenance.
-Only after publication succeeds does Pages receive the matching documentation
-artifact. Deployment uses `--branch main` so tags produce production deployments.
+Only after publication succeeds do separate Pages jobs receive the matching
+documentation and demo artifacts. They deploy the tested output without rebuilding.
+Deployment uses `--branch main` so tags produce production deployments.
 
 The first bootstrap version can be tagged after configuring trust. Its published
 integrity must match the verified candidate; if it differs, do not replace the
@@ -86,14 +133,14 @@ published version. Investigate the difference and use a new version when needed.
 ## Retry and dry-run behavior
 
 An authoritative registry 404 means unpublished. If the version exists and its
-name/version/integrity match, publication is skipped and documentation deployment
+name/version/integrity match, publication is skipped and both site deployments
 can continue. A mismatch, registry access error or network failure stops the job.
 Rerun failed jobs after correcting the problem; never overwrite a published version.
 
 Manual workflow runs never publish or deploy, including when selecting a tag.
 They are suitable for the initial bootstrap and checking the pipeline without
 Cloudflare credentials or npm trust. Jobs retain reports and artifacts for 14 days.
-Action revisions are pinned. A successful local test is not proof of a hosted CI run.
+A successful local test is not proof of a hosted CI run.
 
 For explicit documentation-only deployment after account setup:
 
