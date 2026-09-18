@@ -111,13 +111,14 @@ npm run version:set -- 0.0.2
 ```
 
 Replace `0.0.2` with the desired stable `X.Y.Z` version, without a `v` prefix.
-The command validates the argument and all three manifests before writing them.
+The command validates the argument and reads all inputs before writing them.
 The demo and documentation stay private and share the SDK version. Workspace
 dependencies remain `workspace:*`, so the pnpm lockfile does not need an update.
-This only edits the package manifests; it does not build, commit, tag or publish.
+It also updates the pinned SDK CDN URLs, asset paths, tarball filenames and version
+text in `README.md` and `docs/development.md`. Historical verification reports and
+toolchain versions stay unchanged. It does not build, commit, tag or publish.
 
-Update the version-pinned README CDN/asset examples and other current release
-examples too. Run local verification, commit the change, and push a stable tag
+Run local verification, commit the change, and push a stable tag
 matching the SDK version exactly (for example, after setting `0.0.2`):
 
 ```sh

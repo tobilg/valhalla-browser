@@ -58,7 +58,7 @@ These copies are ignored; edit the root originals.
 ```sh
 pnpm run build
 pnpm run dev                 # http://localhost:8080
-pnpm run pack:sdk            # build/package/valhalla-browser-0.0.1.tgz
+pnpm run pack:sdk            # build/package/valhalla-browser-0.0.2.tgz
 ```
 
 `build` builds the SDK, demo and documentation. `build:sdk` builds just the SDK;
@@ -160,9 +160,9 @@ pnpm run test:data            # Requires data and data:region fixture archives.
 pnpm run test:data:build      # Fresh OSM build and Chromium/native route comparison.
 pnpm run test:docs
 pnpm run pack:sdk
-SDK_TARBALL=build/package/valhalla-browser-0.0.1.tgz pnpm run test:package
-SDK_TARBALL=build/package/valhalla-browser-0.0.1.tgz pnpm run test:cdn-import
-SDK_TARBALL=build/package/valhalla-browser-0.0.1.tgz pnpm run test:examples
+SDK_TARBALL=build/package/valhalla-browser-0.0.2.tgz pnpm run test:package
+SDK_TARBALL=build/package/valhalla-browser-0.0.2.tgz pnpm run test:cdn-import
+SDK_TARBALL=build/package/valhalla-browser-0.0.2.tgz pnpm run test:examples
 pnpm run test:browser
 BROWSER=firefox pnpm run test:browser
 BROWSER=webkit pnpm run test:browser

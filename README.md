@@ -10,7 +10,7 @@ tiles load on demand through HTTP ranges from an indexed TAR, or as individual
 [Source](https://github.com/tobilg/valhalla-browser) ·
 [Release setup](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
 
-The repository prepares version **0.0.1**. Publication happens through the tagged
+The repository prepares version **0.0.2**. Publication happens through the tagged
 release workflow after the initial npm setup; implementation alone does not
 publish the package. Until then, use the local tarball instructions below.
 
@@ -95,7 +95,7 @@ a browser; Node routing and server-side WASM execution are not supported.
 
 ## Use directly from a CDN
 
-After publishing version 0.0.1, save this as an HTML file and serve it over HTTP.
+After publishing version 0.0.2, save this as an HTML file and serve it over HTTP.
 No bundler is required. Keep the package version pinned in the import URL.
 
 <!-- example:cdn -->
@@ -107,7 +107,7 @@ No bundler is required. Keep the package version pinned in the import URL.
 <button id="route">Calculate route</button>
 <pre id="result"></pre>
 <script type="module">
-  import { createRouter } from 'https://cdn.jsdelivr.net/npm/valhalla-browser@0.0.1/dist/index.js';
+  import { createRouter } from 'https://cdn.jsdelivr.net/npm/valhalla-browser@0.0.2/dist/index.js';
   const output = document.querySelector('#result');
   const button = document.querySelector('#route');
   button.onclick = async () => {
@@ -227,8 +227,8 @@ const router = new Router({
   retries: 2,
   onProgress: event => console.log(event.phase),
   // Optional matching assets hosted on your application's origin:
-  // workerUrl: '/sdk/0.0.1/worker.js',
-  // wasmUrl: '/sdk/0.0.1/valhalla-browser.wasm',
+  // workerUrl: '/sdk/0.0.2/worker.js',
+  // wasmUrl: '/sdk/0.0.2/valhalla-browser.wasm',
 });
 try {
   await router.route({
@@ -285,9 +285,9 @@ pnpm build:docs               # No WASM, native toolchain or graph needed.
 pnpm preview:docs             # http://localhost:8081
 pnpm build                   # Requires existing verified native artifacts.
 pnpm dev                     # http://localhost:8080
-pnpm pack:sdk                # build/package/valhalla-browser-0.0.1.tgz
+pnpm pack:sdk                # build/package/valhalla-browser-0.0.2.tgz
 # In another application, before npm publication:
-pnpm add /absolute/path/to/valhalla-browser-0.0.1.tgz
+pnpm add /absolute/path/to/valhalla-browser-0.0.2.tgz
 ```
 
 A clean checkout needs the explicit native/data/WASM build steps in the
@@ -308,7 +308,9 @@ pnpm test:demo
 
 The root README is also the TypeDoc homepage and is copied into the npm package.
 Set all three package versions with `pnpm run version:set 0.0.2` (or
-`npm run version:set -- 0.0.2`), substituting your next stable version. See the
+`npm run version:set -- 0.0.2`), substituting your next stable version. The command
+also keeps the SDK version references in this README and the development guide
+in sync. See the
 [release guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
 for the remaining release steps.
 Guides and API comments are maintained with the source. Stable version tags

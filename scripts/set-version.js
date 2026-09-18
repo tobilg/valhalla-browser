@@ -6,6 +6,16 @@ const packages = [
   ['demo', '@tobilg/valhalla-browser-demo'],
   ['documentation', '@tobilg/valhalla-browser-documentation'],
 ];
+const documentation = ['README.md', 'docs/development.md'];
+
+function updateExamples(contents, version) {
+  // Match SDK references only: toolchain versions and historical reports stay intact.
+  return contents
+    .replace(/(\bvalhalla-browser[@-])\d+\.\d+\.\d+\b/g, (_, prefix) => `${prefix}${version}`)
+    .replace(/(\/sdk\/)\d+\.\d+\.\d+(?=\/)/g, (_, prefix) => `${prefix}${version}`)
+    .replace(/(The repository prepares version \*\*)\d+\.\d+\.\d+(?=\*\*)/g, (_, prefix) => `${prefix}${version}`)
+    .replace(/(After publishing version )\d+\.\d+\.\d+(?=,)/g, (_, prefix) => `${prefix}${version}`);
+}
 
 async function main() {
   const args = process.argv.slice(2);
@@ -15,7 +25,7 @@ async function main() {
     throw new Error('Usage: pnpm run version:set X.Y.Z (or npm run version:set -- X.Y.Z).');
   validateTag(`v${version}`, version);
 
-  // Read and validate every manifest before modifying any package.
+  // Read all inputs and validate every manifest before modifying any file.
   // Resolve against this script so invocation does not depend on the shell's cwd.
   const updates = await Promise.all(packages.map(async ([directory, name]) => {
     const file = new URL(`../packages/${directory}/package.json`, import.meta.url);
@@ -24,8 +34,14 @@ async function main() {
     pkg.version = version;
     return { file, pkg };
   }));
+  const docs = await Promise.all(documentation.map(async relative => {
+    const file = new URL(`../${relative}`, import.meta.url);
+    return { file, contents: updateExamples(await readFile(file, 'utf8'), version) };
+  }));
   for (const { file, pkg } of updates) await writeFile(file, JSON.stringify(pkg, null, 2) + '\n');
+  for (const { file, contents } of docs) await writeFile(file, contents);
   console.log(`Set all three packages to ${version}: ${updates.map(({ pkg }) => pkg.name).join(', ')}`);
+  console.log(`Updated SDK version references in ${documentation.join(' and ')}.`);
 }
 
 main().catch(error => {
