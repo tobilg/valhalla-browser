@@ -102,14 +102,27 @@ These are owner setup steps. Implementing the workspace does not execute them.
 
 ## Release a version
 
-Update the SDK package version, version-pinned README CDN/asset examples and other
-current release examples. The private demo/documentation packages have no separate
-release version. Run local verification, commit the change, and push a stable tag
-matching the SDK version exactly:
+Set the version of all three workspace packages together:
 
 ```sh
-git tag v0.0.1
-git push origin v0.0.1
+pnpm run version:set 0.0.2
+# Equivalent npm invocation:
+npm run version:set -- 0.0.2
+```
+
+Replace `0.0.2` with the desired stable `X.Y.Z` version, without a `v` prefix.
+The command validates the argument and all three manifests before writing them.
+The demo and documentation stay private and share the SDK version. Workspace
+dependencies remain `workspace:*`, so the pnpm lockfile does not need an update.
+This only edits the package manifests; it does not build, commit, tag or publish.
+
+Update the version-pinned README CDN/asset examples and other current release
+examples too. Run local verification, commit the change, and push a stable tag
+matching the SDK version exactly (for example, after setting `0.0.2`):
+
+```sh
+git tag v0.0.2
+git push origin v0.0.2
 ```
 
 Tags trigger validation, then the reusable browser-proof workflow. Malformed,

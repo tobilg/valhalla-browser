@@ -16,6 +16,7 @@
     "preview:docs": "pnpm --filter @tobilg/valhalla-browser-documentation preview",
     "deploy:docs": "pnpm run build:docs && pnpm --filter @tobilg/valhalla-browser-documentation run deploy",
     "pack:sdk": "pnpm --filter valhalla-browser pack --pack-destination build/package",
+    "version:set": "node scripts/set-version.js",
     "build:native": "bash scripts/build.sh native",
     "build:wasm": "bash scripts/build.sh wasm",
     "data": "bash scripts/data.sh",

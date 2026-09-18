@@ -307,6 +307,10 @@ pnpm test:demo
 ```
 
 The root README is also the TypeDoc homepage and is copied into the npm package.
+Set all three package versions with `pnpm run version:set 0.0.2` (or
+`npm run version:set -- 0.0.2`), substituting your next stable version. See the
+[release guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
+for the remaining release steps.
 Guides and API comments are maintained with the source. Stable version tags
 publish the verified SDK through npm trusted publishing, then deploy documentation
 to **valhalla-browser-api** and the demo to **valhalla-browser** on Cloudflare Pages. See
