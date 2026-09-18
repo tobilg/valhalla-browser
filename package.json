@@ -14,7 +14,7 @@
     "dev": "pnpm run build:sdk && pnpm --filter @tobilg/valhalla-browser-demo dev",
     "preview": "pnpm --filter @tobilg/valhalla-browser-demo preview",
     "preview:docs": "pnpm --filter @tobilg/valhalla-browser-documentation preview",
-    "deploy:docs": "pnpm run build:docs && pnpm --filter @tobilg/valhalla-browser-documentation deploy",
+    "deploy:docs": "pnpm run build:docs && pnpm --filter @tobilg/valhalla-browser-documentation run deploy",
     "pack:sdk": "pnpm --filter valhalla-browser pack --pack-destination build/package",
     "build:native": "bash scripts/build.sh native",
     "build:wasm": "bash scripts/build.sh wasm",
