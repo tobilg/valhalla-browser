@@ -6,6 +6,8 @@ import { chromium, firefox, webkit } from 'playwright';
 import { createRangeServer } from '../scripts/server.js';
 import { packedFixture, execute, readJSON, listen, closeHost, routeProof, writeReport, device } from './package-support.js';
 
+const engines = { chromium, firefox, webkit };
+if (process.env.BROWSER && !Object.hasOwn(engines, process.env.BROWSER)) throw new Error(`Unknown BROWSER: ${process.env.BROWSER}`);
 const fixture = await packedFixture();
 const consumer = path.join(fixture.directory, 'consumer');
 await mkdir(consumer);
@@ -59,26 +61,57 @@ try {
       host = await createServer({ ...config, server: { host: 'localhost', port: 0, fs: { strict: true, allow: [consumer] } } });
       await host.listen();
     }
-    for (const [engine, launcher] of Object.entries({ chromium, firefox, webkit })) {
+    for (const [engine, launcher] of Object.entries(engines)) {
+      if (process.env.BROWSER && process.env.BROWSER !== engine) continue;
       const browser = await launcher.launch();
       try {
-        const page = await browser.newPage();
-        const requests = [];
-        page.on('request', req => requests.push(req.url()));
-        await page.goto(host.resolvedUrls.local[0]);
-        await page.waitForFunction(() => !!window.sdk);
-        assert(!requests.some(url => url.includes('worker-') || url.endsWith('.wasm')), 'Import must not load the engine');
         for (const transport of ['indexed-tar', 'individual-tiles']) {
-          const mark = graph.records.length;
-          const result = await routeProof(page, { manifestUrl: `${graphOrigin}/datasets/${manifest.release}/manifest.json`, reference, transport });
-          const graphRecords = graph.records.slice(mark).filter(r => r.path.endsWith('graph.tar'));
-          assert(graphRecords.every(r => r.status === 206 && r.range && r.bodyBytes < Number(manifest.archive.size)));
-          const subsequent = await page.evaluate(async request => { window.router.cancel(); const next = await window.router.route(request); await window.router.dispose(); return next; }, reference.cases.find(c => c.name === 'cross-tile').request);
-          assert.deepEqual(subsequent.native, reference.cases.find(c => c.name === 'cross-tile').expected);
-          report.cases.push({ engine, browser: browser.version(), mode, transport, startup: result.startup, cold: result.cold.diagnostics, warm: result.warm.diagnostics });
-          console.log(`PASS installed package: ${engine} ${mode} ${transport}`);
+          // Isolate independent consumers, including their browser HTTP caches and
+          // worker lifetimes. Cancellation/recovery still uses this same page/Router.
+          const context = await browser.newContext();
+          const page = await context.newPage();
+          const entry = { engine, browser: browser.version(), mode, transport, stage: 'import', passed: false };
+          report.cases.push(entry);
+          const requests = [];
+          const browserErrors = [];
+          page.on('request', req => requests.push(req.url()));
+          page.on('pageerror', error => browserErrors.push(error.message));
+          page.on('console', message => { if (message.type() === 'error') browserErrors.push(message.text()); });
+          page.on('requestfailed', request => browserErrors.push(`${request.url()}: ${request.failure()?.errorText}`));
+          try {
+            await page.goto(host.resolvedUrls.local[0]);
+            await page.waitForFunction(() => !!window.sdk);
+            assert(!requests.some(url => url.includes('worker-') || url.endsWith('.wasm')), 'Import must not load the engine');
+            entry.stage = 'cold and warm routes';
+            const mark = graph.records.length;
+            const result = await routeProof(page, { manifestUrl: `${graphOrigin}/datasets/${manifest.release}/manifest.json`, reference, transport });
+            Object.assign(entry, { startup: result.startup, cold: result.cold.diagnostics, warm: result.warm.diagnostics });
+            entry.stage = 'cancellation recovery';
+            const subsequent = await page.evaluate(async request => {
+              window.router.cancel();
+              const next = await window.router.route(request);
+              const startup = window.router.startup;
+              await window.router.dispose();
+              return { next, startup };
+            }, reference.cases.find(c => c.name === 'cross-tile').request);
+            assert.deepEqual(subsequent.next.native, reference.cases.find(c => c.name === 'cross-tile').expected);
+            assert(subsequent.next.diagnostics.loader.tileDownloads >= 2, 'Recovery must use a new worker with an empty tile cache');
+            entry.recoveryStartup = subsequent.startup;
+            entry.recovery = subsequent.next.diagnostics;
+            const graphRecords = graph.records.slice(mark).filter(r => r.path.endsWith('graph.tar'));
+            assert(graphRecords.every(r => r.status === 206 && r.range && r.bodyBytes < Number(manifest.archive.size)));
+            assert(requests.filter(url => !url.startsWith(graphOrigin)).every(url => !url.includes('/src/') && !url.includes('/public/wasm/')));
+            entry.passed = true;
+            entry.stage = 'complete';
+            console.log(`PASS installed package: ${engine} ${mode} ${transport}`);
+          } catch (error) {
+            entry.error = error.stack;
+            entry.browserErrors = browserErrors;
+            entry.progress = await page.evaluate(() => window.events).catch(() => null);
+            console.error(`FAIL installed package: ${engine} ${mode} ${transport} (${entry.stage})`);
+            throw error;
+          } finally { await context.close(); }
         }
-        assert(requests.filter(url => !url.startsWith(graphOrigin)).every(url => !url.includes('/src/') && !url.includes('/public/wasm/')));
       } finally { await browser.close(); }
     }
     if (mode === 'production') await new Promise(resolve => host.httpServer.close(resolve));

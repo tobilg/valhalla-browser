@@ -144,6 +144,15 @@ suite serves the unpacked package, application and graph from separate origins.
 README TypeScript examples are extracted and typechecked, then all six examples
 run against the local regional graph; only data/SDK host URLs are substituted.
 
+Each installed-package transport case gets a fresh browser context, so independent
+consumers do not share page, HTTP-cache or worker state. Within each case, cold and
+warm routes use one worker; cancellation and recovery use the same page and Router,
+and the replacement worker must download tiles again and match the native result.
+`test-results/package.json` includes replacement-worker timings and records failed
+cases with their stage, progress events and browser errors. CI retains this report
+in the `browser-proof` artifact. To investigate one engine without skipping any of
+its development/production or transport cases, run `BROWSER=webkit pnpm run test:package`.
+
 The package and README consumers install with
 `--prefer-offline --no-frozen-lockfile --ignore-scripts`: cached packages are reused, missing registry metadata can be
 fetched, and only the temporary consumer gets a new lockfile. A fresh CI runner's
