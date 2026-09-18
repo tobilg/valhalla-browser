@@ -138,11 +138,19 @@ pnpm run test:demo:static     # Standalone build, bundled Liechtenstein presets,
 
 Without `SDK_TARBALL`, the package/CDN/example tests run `pnpm pack` themselves.
 With it, they test the supplied release candidate unchanged. Package tests use an
-isolated pnpm consumer and offline store populated by installation, strict typechecks,
+isolated pnpm consumer, strict typechecks,
 nested-base Vite builds, lazy asset loading and real WASM routing. The CDN-import
 suite serves the unpacked package, application and graph from separate origins.
 README TypeScript examples are extracted and typechecked, then all six examples
 run against the local regional graph; only data/SDK host URLs are substituted.
+
+The package and README consumers install with
+`--prefer-offline --no-frozen-lockfile --ignore-scripts`: cached packages are reused, missing registry metadata can be
+fetched, and only the temporary consumer gets a new lockfile. A fresh CI runner's
+frozen workspace install does not populate all metadata needed to resolve a new
+consumer, including its pinned pnpm version; strict `--offline` fails there with
+`ERR_PNPM_BAD_CONFIG_DEP`. The repository installation still uses
+`pnpm install --frozen-lockfile`, and consumer lifecycle scripts stay disabled.
 
 The docs test also builds an isolated source-only copy, audits internal links and
 anchors, and checks homepage, search, API and guide navigation in all three engines.

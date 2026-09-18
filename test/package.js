@@ -12,8 +12,10 @@ await mkdir(consumer);
 await writeFile(path.join(consumer, 'package.json'), JSON.stringify({ name: 'isolated-consumer', private: true, type: 'module', packageManager: 'pnpm@12.4.2',
   dependencies: { [fixture.pkg.name]: `file:${fixture.tarball}` },
   devDependencies: { vite: fixture.pkg.devDependencies.vite, typescript: fixture.pkg.devDependencies.typescript } }));
-// pnpm install --frozen-lockfile has already cached these exact toolchain versions. The SDK has no install hook.
-await execute('pnpm', ['install', '--offline', '--ignore-scripts'], { cwd: consumer, maxBuffer: 4 * 1024 * 1024 });
+// A frozen workspace install caches package bytes, but not all resolution metadata
+// needed by a new consumer (including pnpm's own version). Reuse cached data and
+// fetch missing metadata; only this temporary project may generate a new lockfile.
+await execute('pnpm', ['install', '--prefer-offline', '--no-frozen-lockfile', '--ignore-scripts'], { cwd: consumer, maxBuffer: 4 * 1024 * 1024 });
 await writeFile(path.join(consumer, 'index.html'), '<!doctype html><script type="module" src="./main.ts"></script>');
 await writeFile(path.join(consumer, 'main.ts'), `import * as sdk from 'valhalla-browser';
 import type { RouteRequest, RouterOptions, RouteResult, StartupResult, Diagnostics } from 'valhalla-browser';

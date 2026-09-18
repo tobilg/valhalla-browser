@@ -11,7 +11,8 @@ const examples = [...(await readFile('README.md', 'utf8')).matchAll(/<!-- exampl
 assert.equal(examples.length, 6, 'All README examples must be discovered');
 const consumer = path.join(fixture.directory, 'readme-consumer'); await mkdir(consumer);
 await writeFile(path.join(consumer, 'package.json'), JSON.stringify({ name: 'readme-consumer', private: true, type: 'module', packageManager: 'pnpm@12.4.2', dependencies: { 'valhalla-browser': `file:${fixture.tarball}` }, devDependencies: fixture.pkg.devDependencies }));
-await execute('pnpm', ['install', '--offline', '--ignore-scripts'], { cwd: consumer, maxBuffer: 4 * 1024 * 1024 });
+// Fresh consumers need registry metadata even if the workspace's packages are cached.
+await execute('pnpm', ['install', '--prefer-offline', '--no-frozen-lockfile', '--ignore-scripts'], { cwd: consumer, maxBuffer: 4 * 1024 * 1024 });
 const graph = createRangeServer({ faults: true }); const graphOrigin = await listen(graph);
 const manifest = await readJSON('fixtures/region/manifest.json');
 const reference = await readJSON('fixtures/region/reference.json');
