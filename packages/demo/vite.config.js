@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 import { createRangeServer } from '../../scripts/server.js';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -16,13 +17,21 @@ export function demoConfig(data = createRangeServer()) {
     root: `${root}packages/demo`, publicDir: false, base: './',
     plugins: [{
       name: 'graph-range-server', configureServer: configure, configurePreviewServer: configure,
+      generateBundle() {
+        this.emitFile({ type: 'asset', fileName: 'leaflet-LICENSE.txt',
+          source: readFileSync(new URL('../LICENSE', import.meta.resolve('leaflet')), 'utf8') });
+      },
       configResolved(config) {
-        const value = config.env.VITE_DEMO_MANIFEST_URL?.trim();
-        if (!value) return;
-        let url;
-        try { url = new URL(value); } catch { /* Report the setting, not its contents. */ }
-        if (!url || !['https:', 'http:'].includes(url.protocol) || url.username || url.password)
-          throw new Error('VITE_DEMO_MANIFEST_URL must be an absolute public HTTP(S) manifest URL without credentials.');
+        for (const name of ['VITE_DEMO_MANIFEST_URL', 'VITE_DEMO_BASEMAP_URL']) {
+          const value = config.env[name]?.trim();
+          if (!value) continue;
+          let url;
+          try { url = new URL(value); } catch { /* Report the setting, not its contents. */ }
+          if (!url || !['https:', 'http:'].includes(url.protocol) || url.username || url.password)
+            throw new Error(`${name} must be an absolute public HTTP(S) URL without credentials.`);
+          if (name === 'VITE_DEMO_BASEMAP_URL' && !['{z}', '{x}', '{y}'].every(part => value.includes(part)))
+            throw new Error('VITE_DEMO_BASEMAP_URL must include {z}, {x}, and {y} tile coordinates.');
+        }
       },
     }],
     server: { host: 'localhost', port: Number(process.env.PORT ?? 8080), strictPort: true, fs: { allow: [root] } },

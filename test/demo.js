@@ -4,6 +4,7 @@ import { createServer, preview } from 'vite';
 import { demoConfig } from '../packages/demo/vite.config.js';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createRangeServer } from '../scripts/server.js';
+import { mockBasemap, exerciseMap, restoreBasemap } from './demo-map.js';
 
 const host=createRangeServer({faults:true});
 const production=process.argv.includes('--preview');
@@ -13,12 +14,18 @@ const vite=production?await preview(config):await createServer(config);
 if(!production)await vite.listen();
 const browser=await chromium.launch();const page=await browser.newPage({viewport:{width:1120,height:1000}});
 try{
+  const tiles=await mockBasemap(page);
   await page.goto(vite.resolvedUrls.local[0]);
   await page.getByRole('button',{name:'Calculate route'}).click();
   await page.waitForFunction(()=>document.querySelector('#status').textContent==='Route calculated in your browser.');
   assert.match(await page.locator('#summary').textContent(),/5\.609 km/);
-  assert.equal(await page.locator('#geometry polyline').count(),1);
+  assert.equal(await page.locator('#geometry .route-line').count(),1);
   assert((await page.locator('#maneuvers li').count())>0);
+  await exerciseMap(page,tiles);
+  await page.getByRole('button',{name:'Calculate route'}).click();
+  await page.waitForFunction(()=>document.querySelector('#status').textContent==='Route calculated in your browser.');
+  assert.match(await page.locator('#summary').textContent(),/5\.609 km/);
+  await restoreBasemap(page,tiles);
   host.setFault({type:'delay',delayMs:1000,match:'.gph'});
   await page.locator('#transport').selectOption('individual-tiles');
   await page.getByRole('button',{name:'Calculate route'}).click();
@@ -30,7 +37,8 @@ try{
   await page.waitForFunction(()=>document.querySelector('#status').textContent==='Route calculated in your browser.');
   assert.match(await page.locator('#summary').textContent(),/5\.609 km/);
   await mkdir('test-results',{recursive:true});
-  const checks=['route controls and rendered geometry','cancel during tile fetch','subsequent route'];
+  const checks=['route controls and rendered geometry','basemap images, attribution, zoom, fit and toggle',
+    'routing succeeds with failed basemap tiles','cancel during tile fetch','subsequent route'];
   const remote = process.argv.includes('--r2') ? 'r2' : process.argv.includes('--minio') ? 'minio' : null;
   if (remote) {
     await page.locator('#dataset').selectOption(`${remote}-region`);
@@ -49,7 +57,7 @@ try{
   }
   const name=production?'demo-preview':'demo';
   await page.screenshot({path:`test-results/${name}.png`,fullPage:true});
-  await writeFile(`test-results/${name}.json`,JSON.stringify({passed:true,mode:production?'production':'development',browser:browser.version(),checks,originRecords:host.records},null,2));
+  await writeFile(`test-results/${name}.json`,JSON.stringify({passed:true,mode:production?'production':'development',browser:browser.version(),checks,originRecords:host.records,basemap:'local test images; no public OSM requests',basemapRequests:tiles.requests.length},null,2));
   console.log('PASS demo route, cancellation, recovery, and rendered geometry');
 }finally{
   await browser.close();

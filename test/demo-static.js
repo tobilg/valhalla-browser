@@ -7,6 +7,7 @@ import { preview } from 'vite';
 import { chromium, firefox, webkit } from 'playwright';
 import { createRangeServer } from '../scripts/server.js';
 import { root, execute, listen, closeHost, readJSON, writeReport } from './package-support.js';
+import { mockBasemap, assertBasemap, exerciseMap, restoreBasemap, isBasemapRequest } from './demo-map.js';
 
 const artifact = process.argv.includes('--artifact');
 const requests = await readJSON(path.join(root, 'fixtures/region/requests.json'));
@@ -15,7 +16,8 @@ const manifest = await readJSON(path.join(root, 'fixtures/region/manifest.json')
 const demoRoot = path.join(root, 'packages/demo');
 const host = artifact ? null : createRangeServer({ faults: true });
 let server;
-const report = { at: new Date().toISOString(), mode: artifact ? 'configured-artifact-startup' : 'static-cross-origin-routing', browsers: [], passed: false };
+const report = { at: new Date().toISOString(), mode: artifact ? 'configured-artifact-startup' : 'static-cross-origin-routing',
+  basemap: 'local test images; no public OSM requests', browsers: [], passed: false };
 try {
   const graphOrigin = host ? await listen(host) : null;
   const manifestUrl = artifact ? process.env.VITE_DEMO_MANIFEST_URL?.trim()
@@ -46,6 +48,7 @@ try {
         const seen = [], errors = [];
         context.on('request', request => seen.push(request.url()));
         const page = await context.newPage();
+        const tiles = await mockBasemap(page);
         page.on('pageerror', error => errors.push(error.message));
         try {
           await page.goto(base);
@@ -57,8 +60,9 @@ try {
           assert.equal(await page.locator('#from-lat').inputValue(), '47.0666667');
           assert.equal(await page.locator('#to-lat').inputValue(), '47.2397558');
           // Startup must not need the local discovery files, presets or R2.
-          assert(seen.every(url => new URL(url).origin === new URL(base).origin));
+          assert(seen.every(url => new URL(url).origin === new URL(base).origin || isBasemapRequest(url)));
           assert(!seen.some(url => /\/(manifest\.json|fixtures\/|public\/)/.test(new URL(url).pathname)));
+          await assertBasemap(page);
           checks.push(`${transport}: bundled regional presets, attribution and default coordinates`);
           if (!artifact) {
             await page.locator('#transport').selectOption(transport);
@@ -73,7 +77,7 @@ try {
               }
               assert.equal(await page.locator('#status').innerText(), 'Route calculated in your browser.');
               assert.equal(await page.locator('#summary').innerText(), `${expected.trip.summary.length.toFixed(3)} km · ${Math.round(expected.trip.summary.time)} seconds`);
-              assert.equal(await page.locator('#geometry polyline').count(), 1);
+              assert.equal(await page.locator('#geometry .route-line').count(), 1);
               assert.deepEqual(await page.locator('#maneuvers li').allTextContents(), expected.trip.legs.flatMap(leg => leg.maneuvers.map(m => m.instruction)));
               const diagnostics = JSON.parse(await page.locator('#diagnostics').textContent());
               assert.equal(diagnostics.dataset.release, reference.release);
@@ -83,6 +87,10 @@ try {
             assert(cold.route.loader.tileDownloads >= 2);
             const warm = await calculate('balzers-ruggell');
             assert.equal(warm.route.loader.requests, 0);
+            await exerciseMap(page, tiles);
+            await calculate('balzers-ruggell');
+            await restoreBasemap(page, tiles);
+            checks.push(`${transport}: basemap attribution, zoom/fit/toggle, and routing through image failures`);
             for (const request of requests) await calculate(request.name);
             checks.push(`${transport}: every regional preset matches native summary/directions; warm cache reuse`);
             // A transport change creates a new worker so the next route fetches tiles.
@@ -98,6 +106,16 @@ try {
             host.setFault(null);
             await calculate('balzers-ruggell');
             checks.push(`${transport}: cancellation and subsequent successful route`);
+            if (transport === 'indexed-tar') {
+              await mkdir(path.join(root, 'test-results'), { recursive: true });
+              await page.screenshot({ path: path.join(root, `test-results/demo-map-${engine}.png`), fullPage: true });
+              await page.setViewportSize({ width: 390, height: 844 });
+              await page.getByRole('button', { name: 'Fit route', exact: true }).click();
+              await assertBasemap(page);
+              assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Mobile map must not overflow the page');
+              await page.screenshot({ path: path.join(root, `test-results/demo-map-${engine}-mobile.png`), fullPage: true });
+              checks.push('mobile viewport retains map controls and attribution without horizontal overflow');
+            }
           }
           assert.deepEqual(errors, []);
           assert(!seen.some(url => new URL(url).origin === new URL(base).origin &&

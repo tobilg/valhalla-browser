@@ -91,6 +91,41 @@ it needs no local discovery/preset endpoints. Leave the variable unset for the
 local fixture/MinIO selectors. Repository CI uses the same variable under GitHub
 Actions **Variables**; see [release setup](releases.md#configure-the-demos-r2-dataset).
 
+### Demo basemap
+
+The demo uses Leaflet 1.9.4 and the public OSM raster layer at
+`https://tile.openstreetmap.org/{z}/{x}/{y}.png`. Leaflet is bundled only into the
+demo; the routing SDK has no new dependencies. The map fits the complete computed
+route, marks its endpoints, supports pan/zoom and provides a **Fit route** button.
+The **Show basemap** checkbox hides background images while retaining the route.
+Unavailable basemap tiles show a separate message and do not prevent routing.
+
+The raster layer uses a warm monochrome CSS filter for muted beige tones, with
+a dark green route, white outline and green/charcoal endpoints. The filter is
+scoped to `.demo-basemap` in `packages/demo/style.css`, so route overlays and
+controls retain their colors. This tones the complete tile image, including its
+labels; individual road, water and land colors are baked into the raster tiles.
+Remove or adjust that rule when using a provider with its own styled tiles.
+
+Map images are fetched from the tile provider for the visible viewport using
+normal browser HTTP caching. The demo preserves a Referer header and displays
+linked OSM attribution; it has no map-tile prefetch or offline download feature.
+Follow the [OSM tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
+when deploying the demo. These images show current OSM streets: the historical
+2015 routing graph can differ, and synthetic fixture roads do not follow real roads.
+
+To use another OSM-derived XYZ raster provider, set `VITE_DEMO_BASEMAP_URL` and,
+when required, `VITE_DEMO_BASEMAP_ATTRIBUTION` before running/building Vite. The URL
+must contain `{z}`, `{x}` and `{y}` placeholders. Additional attribution is plain
+text; the linked OSM credit remains visible. Commented examples are in
+`packages/demo/.env.example`. These settings are public build inputs, separate
+from the routing graph's `VITE_DEMO_MANIFEST_URL`. A deployment with a Content
+Security Policy must allow the tile provider in `img-src`.
+
+Automated demo checks intercept basemap image requests with local test tiles,
+including a tile failure case. They never exercise the public OSM tile service;
+Valhalla routes and graph downloads remain real.
+
 ## Clean native checkout
 
 Docker with a running daemon, Git, network access and build disk space are

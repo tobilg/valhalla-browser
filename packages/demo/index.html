@@ -3,10 +3,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Valhalla · browser routing</title>
-<link rel="stylesheet" href="./style.css">
 <main>
   <header><p>VALHALLA / LOCAL ROUTING LAB</p><h1>A route, computed here.</h1>
-    <p>Routes calculated in your browser from versioned road graphs. No route server or map credentials.</p></header>
+    <p>Routes calculated in your browser from versioned road graphs, with an OpenStreetMap basemap. No route server or map credentials.</p></header>
   <section class="workspace">
     <form id="route-form">
       <label>Dataset<select id="dataset"></select></label>
@@ -18,7 +17,12 @@
       <div class="actions"><button id="route" type="submit">Calculate route</button><button id="cancel" type="button" disabled>Cancel</button></div>
       <p id="status" role="status">Ready to initialize.</p>
     </form>
-    <div class="result"><svg id="geometry" viewBox="0 0 640 440" aria-label="Calculated route geometry" role="img"><text x="320" y="220" text-anchor="middle">Your route will appear here</text></svg><p id="summary">Select a test journey</p><ol id="maneuvers"></ol></div>
+    <div class="result">
+      <div class="map-actions"><label class="basemap-toggle"><input id="basemap" type="checkbox" checked>Show basemap</label><button id="fit-route" type="button" disabled>Fit route</button></div>
+      <div id="geometry" aria-label="Route map" aria-describedby="map-note" role="region"></div>
+      <p id="map-status" role="status"></p><p id="map-note"></p>
+      <p id="summary">Select a test journey</p><ol id="maneuvers"></ol>
+    </div>
   </section>
   <p id="attribution">Synthetic test data · not for navigation</p>
   <details><summary>Development diagnostics</summary><p>Graph responses appear in DevTools Network as 206 ranges or individual .gph objects. Repeat a route to inspect decoded tile reuse. Cancel terminates the worker; the next route creates a fresh instance.</p><button id="export" type="button">Export latest diagnostics</button><pre id="diagnostics">No measurements yet.</pre></details>

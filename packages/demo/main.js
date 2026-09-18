@@ -1,7 +1,10 @@
 import { Router } from 'valhalla-browser';
 import regionalRequests from '../../fixtures/region/requests.json';
+import { createRouteMap } from './route-map.js';
+import './style.css';
 
 const $ = id => document.getElementById(id);
+const routeMap = createRouteMap($('geometry'), { toggle: $('basemap'), fitButton: $('fit-route'), status: $('map-status') });
 const manifestUrl = import.meta.env.VITE_DEMO_MANIFEST_URL?.trim();
 const datasets = [];
 if (manifestUrl) {
@@ -32,11 +35,14 @@ async function selectDataset() {
     $('preset').replaceChildren(...fixtures.map(f => new Option(f.name, f.name)));
     $('preset').value = regional ? 'balzers-ruggell' : 'cross-tile';
     selectFixture();
-    $('geometry').replaceChildren(); $('maneuvers').replaceChildren();
+    $('maneuvers').replaceChildren();
     $('summary').textContent = 'Select a test journey';
     $('attribution').textContent = regional
       ? '© OpenStreetMap contributors · ODbL 1.0 · July 2015 historical benchmark extract · not for navigation'
       : 'Synthetic test roads · not for navigation';
+    $('map-note').textContent = regional
+      ? 'The basemap shows current streets. Routes use the July 2015 graph, so some roads may differ.'
+      : 'These synthetic test roads do not follow the real streets on the basemap.';
     $('status').textContent = 'Ready to initialize.';
     lastDiagnostics = undefined; $('diagnostics').textContent = 'No measurements yet.';
   } finally { $('route').disabled = false; $('dataset').disabled = false; }
@@ -45,6 +51,9 @@ function selectFixture() {
   const [from, to] = fixtures.find(f => f.name === $('preset').value).request.locations;
   $('from-lat').value = from.lat; $('from-lon').value = from.lon;
   $('to-lat').value = to.lat; $('to-lon').value = to.lon;
+  routeMap.preview([from, to]);
+  $('maneuvers').replaceChildren();
+  $('summary').textContent = 'Select a test journey';
 }
 $('preset').onchange = selectFixture;
 $('dataset').onchange = selectDataset;
@@ -65,18 +74,7 @@ function points(shape) {
 
 function draw(native) {
   const coordinates = native.trip.legs.flatMap(leg => points(leg.shape));
-  const xs = coordinates.map(p => p[0]), ys = coordinates.map(p => p[1]);
-  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-  const scale = Math.min(560 / Math.max(maxX - minX, .00001), 360 / Math.max(maxY - minY, .00001));
-  const xy = coordinates.map(([x,y]) => [320 + (x - (minX+maxX)/2)*scale, 220 - (y - (minY+maxY)/2)*scale]);
-  $('geometry').replaceChildren();
-  const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-  for (const [key,value] of Object.entries({ points: xy.map(p=>p.join(',')).join(' '), fill:'none', stroke:'#286c43', 'stroke-width':'4', 'stroke-linejoin':'round' })) line.setAttribute(key,value);
-  $('geometry').append(line);
-  for (const p of [xy[0],xy.at(-1)]) {
-    const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    circle.setAttribute('cx',p[0]);circle.setAttribute('cy',p[1]);circle.setAttribute('r','6');circle.setAttribute('fill','#183529');$('geometry').append(circle);
-  }
+  routeMap.draw(coordinates);
   $('summary').textContent = `${native.trip.summary.length.toFixed(3)} km · ${Math.round(native.trip.summary.time)} seconds`;
   $('maneuvers').replaceChildren(...native.trip.legs.flatMap(leg=>leg.maneuvers).map(m=>{const li=document.createElement('li');li.textContent=m.instruction;return li;}));
 }

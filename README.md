@@ -322,6 +322,13 @@ to your public R2 manifest URL for the Liechtenstein 2015 graph. The build bundl
 the same journey presets and downloads graph tiles from that URL. Locally, the
 same environment variable can be passed to `pnpm run dev` or `pnpm run build:demo`.
 
+The demo displays routes over an interactive OpenStreetMap basemap with pan/zoom,
+endpoint markers, a basemap toggle and a Fit route button. Background map images
+come from OSM; routing still runs locally in the WASM worker. The current basemap
+may differ from the historical 2015 graph, and synthetic fixture roads are fictional.
+See the [development guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/development.md#demo-basemap)
+for basemap configuration and hosting requirements.
+
 ## Limits and licensing
 
 Desktop Chromium, Firefox and WebKit are the verification targets. Physical
