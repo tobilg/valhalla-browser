@@ -123,6 +123,12 @@ export async function routeProof(page, { manifestUrl, reference, transport = 'in
   assert.equal(result.warm.diagnostics.loader.requests, 0);
   assert(result.warm.diagnostics.decodedCacheHits > 0);
   assert.equal(result.cold.dataset.release, reference.release);
+  for (const costing of ['bicycle', 'pedestrian', 'truck']) {
+    const profile = reference.cases.find(c => c.name === `${fixture.name}-${costing}`);
+    assert(profile, `Missing ${costing} package reference`);
+    const native = await page.evaluate(async request => (await window.router.route(request)).native, profile.request);
+    assert.deepEqual(native, profile.expected, `Packaged SDK profile ${costing}`);
+  }
   return result;
 }
 

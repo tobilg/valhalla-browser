@@ -41,7 +41,7 @@ await build({
   },
 });
 await build({ configFile: 'vite.config.ts' });
-execFileSync('pnpm', ['exec', 'tsc', '-p', 'tsconfig.json'], { stdio: 'inherit' });
+execFileSync('pnpm', ['exec', 'tsc', '-p', 'tsconfig.client.json'], { stdio: 'inherit' });
 await cp(fromRepo('public/wasm/licenses'), 'dist/licenses', { recursive: true });
 await cp(fromRepo('NOTICE.md'), 'dist/licenses/NOTICE.md');
 await cp(fromRepo('LICENSE'), 'dist/licenses/SDK.txt');

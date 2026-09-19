@@ -28,8 +28,15 @@ function check(router: sdk.Router) {
   const result: Promise<RouteResult> = router.route(request);
   const startup: Promise<StartupResult> = router.initialize();
   const diagnostics: Promise<Diagnostics> = router.diagnostics();
-  // @ts-expect-error Unvalidated costing must not be accepted.
-  router.route({ ...request, costing: 'bicycle' });
+  router.route({ ...request, costing: 'bicycle', costing_options: { bicycle: { cycling_speed: 20 } } });
+  router.route({ ...request, costing: 'pedestrian', costing_options: { pedestrian: { walking_speed: 4 } } });
+  router.route({ ...request, costing: 'truck', costing_options: { truck: { height: 3, hazmat: false } } });
+  // @ts-expect-error Transit remains unsupported.
+  router.route({ ...request, costing: 'transit' });
+  // @ts-expect-error Settings must match the selected profile.
+  router.route({ ...request, costing: 'bicycle', costing_options: { truck: { height: 3 } } });
+  // @ts-expect-error Arbitrary native options are not exposed.
+  router.route({ ...request, costing: 'truck', costing_options: { truck: { ignore_restrictions: true } } });
   // @ts-expect-error Latitude is numeric.
   router.route({ origin: {lat: '47', lon: 9}, destination: {lat: 48, lon: 9} });
   return { result, startup, diagnostics, options };

@@ -8,7 +8,7 @@ import { packedFixture, execute, readJSON, listen, closeHost, staticHost, writeR
 
 const fixture = await packedFixture();
 const examples = [...(await readFile('README.md', 'utf8')).matchAll(/<!-- example:([\w-]+) -->\s*```(ts|html)\n([\s\S]*?)\n```/g)].map(([, name, language, code]) => ({ name, language, code }));
-assert.equal(examples.length, 6, 'All README examples must be discovered');
+assert.equal(examples.length, 7, 'All README examples must be discovered');
 const consumer = path.join(fixture.directory, 'readme-consumer'); await mkdir(consumer);
 await writeFile(path.join(consumer, 'package.json'), JSON.stringify({ name: 'readme-consumer', private: true, type: 'module', packageManager: 'pnpm@12.4.2', dependencies: { 'valhalla-browser': `file:${fixture.tarball}` }, devDependencies: fixture.pkg.devDependencies }));
 // Fresh consumers need registry metadata even if the workspace's packages are cached.
@@ -51,6 +51,8 @@ try {
         if (name === 'typescript' || name === 'cancellation') assert.deepEqual(logs[0][0], expected.trip.summary);
         if (name === 'cache') { assert.equal(logs[0][0], 0); assert(logs[1][0] > 0); }
         if (name === 'errors') assert(logs.some(args => args[0] === 'routing'));
+        if (name === 'profiles') for (const [i, costing] of ['bicycle','pedestrian','truck'].entries())
+          assert.deepEqual(logs[i][0], reference.cases.find(c => c.name === `vaduz-short-${costing}-configured`).expected);
       } else {
         await page.goto(appOrigin); await page.getByRole('button', { name: 'Calculate route' }).click();
         await page.waitForFunction(() => document.querySelector('#result').textContent.startsWith('{'));

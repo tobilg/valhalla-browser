@@ -205,13 +205,14 @@ def main():
     if args.source_url:
         provenance['url'] = args.source_url
     archive_hash = digest(archive)
-    identity = {'archiveSha256': archive_hash, 'configSha256': sha(config_bytes), 'valhallaRevision': revision,
+    costings = ['auto', 'bicycle', 'pedestrian', 'truck']
+    identity = {'archiveSha256': archive_hash, 'configSha256': sha(config_bytes), 'valhallaRevision': revision, 'costings': costings,
                 'coverage': args.bbox, 'source': provenance, 'sourceDateEpoch': args.source_date_epoch}
     release = f'{args.name}-{sha(json_bytes(identity))[:16]}'
     with archive.open('rb') as stream:
         header_hash = sha(stream.read(512))
     manifest = {'schema': 1, 'release': release, 'valhallaRevision': revision, 'valhallaVersion': pins['valhallaRelease'],
-                'costings': ['auto'], 'coverage': args.bbox, 'source': provenance,
+                'costings': costings, 'coverage': args.bbox, 'source': provenance,
                 'build': {'includedModes': ['driving', 'bicycle', 'pedestrian'], 'sourceDateEpoch': args.source_date_epoch},
                 'config': {'url': 'config.json', 'sha256': sha(config_bytes)},
                 'archive': {'url': 'graph.tar', 'size': str(archive.stat().st_size), 'etag': f'"{archive_hash}"',

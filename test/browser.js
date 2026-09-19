@@ -104,6 +104,50 @@ try {
     host.setFault(null);await p.close();
   });
 
+  await check('mixed profiles serialize without option leakage and retain decoded tiles',async()=>{
+    const p=await page();
+    assert.deepEqual((await initialize(p)).supportedCostings,['auto','bicycle','pedestrian','truck']);
+    const names=['cross-tile-bicycle','short-bicycle-configured','cross-tile-pedestrian','short-pedestrian-configured','cross-tile-truck','truck-height-restricted','truck-height-allowed','cross-tile'];
+    const fixtures=names.map(name=>reference.cases.find(c=>c.name===name));
+    for(let repeat=0;repeat<2;repeat++){
+      const results=await p.evaluate(requests=>Promise.all(requests.map(request=>window.router.route(request))),fixtures.map(c=>c.request));
+      results.forEach((result,i)=>{equivalent({result},fixtures[i].expected);if(repeat)assert.equal(result.diagnostics.loader.requests,0);});
+    }
+    await p.close();
+  });
+
+  for(const costings of [['auto'],['bicycle'],['auto','future-profile']])await check(`dataset capabilities ${costings} reject unsupported routes without resetting the actor`,async()=>{
+    const p=await page();
+    await p.route(`**/datasets/${manifest.release}/manifest.json`,async intercepted=>{
+      const response=await intercepted.fetch();
+      const body=JSON.stringify({...await response.json(),costings});
+      await intercepted.fulfill({response,body,headers:{...response.headers(),'content-length':String(Buffer.byteLength(body))}});
+    });
+    assert.deepEqual((await initialize(p)).supportedCostings,costings.filter(c=>c!=='future-profile'));
+    const allowed=costings.includes('auto')?cross:reference.cases.find(c=>c.name==='cross-tile-bicycle');
+    equivalent(await route(p,allowed.request),allowed.expected);
+    const mark=host.records.length;
+    const rejected=await route(p,{...cross.request,costing:costings.includes('auto')?'bicycle':'auto'});
+    assert.equal(rejected.error?.code,'UNSUPPORTED_COSTING');
+    assert.equal(host.records.length,mark,'Capability rejection does not fetch or enter routing');
+    const recovered=await route(p,allowed.request);equivalent(recovered,allowed.expected);
+    assert.equal(recovered.result.diagnostics.loader.requests,0);
+    await p.close();
+  });
+
+  await check('cancel cycling tile loading, then route on foot in a fresh worker',async()=>{
+    const p=await page();await initialize(p);
+    const cancelled=await p.evaluate(async request=>{
+      window.router.options.onProgress=event=>{if(event.phase==='fetching-tile')window.router.cancel();};
+      try{await window.router.route({...request,costing:'bicycle'});return null;}
+      catch(error){return error.code;}
+      finally{window.router.options.onProgress=undefined;}
+    },cross.request);
+    assert.equal(cancelled,'CANCELLED');
+    const walking=reference.cases.find(c=>c.name==='cross-tile-pedestrian');
+    equivalent(await route(p,walking.request),walking.expected);await p.close();
+  });
+
   for(const [type,code] of [['ignore-range','RANGE_UNSUPPORTED'],['wrong-range','INVALID_RANGE'],['mismatch','DATASET_MISMATCH'],['transient','NETWORK'],['truncated',null],['drop','NETWORK'],['corrupt','CORRUPT_TILE'],['missing','INCOMPLETE_DATASET']]) {
     await check(`tile ${type} rejects and subsequent route succeeds in same actor`,async()=>{
       const p=await page('indexed-tar',{retries:0,timeoutMs:700});await initialize(p);
@@ -192,14 +236,23 @@ try {
   });
 
   await check('hard decoded-cache eviction retains correct tile buffer lifetimes',async()=>{
-    const p=await page('indexed-tar',{memoryBudgetBytes:5000});await initialize(p);
+    // Fit each tile, but not all tiles needed by the cross-tile route at once.
+    const budget=Math.max(...Object.values(manifest.tiles).map(tile=>Number(tile.size)));
+    const p=await page('indexed-tar',{memoryBudgetBytes:budget});await initialize(p);
     const first=await route(p,cross.request);equivalent(first,cross.expected);
     const second=await route(p,cross.request);equivalent(second,cross.expected);
-    assert(first.result.diagnostics.native.decodedCacheBytes<=5000);
-    assert(second.result.diagnostics.native.decodedCacheBytes<=5000);
+    assert(first.result.diagnostics.native.decodedCacheBytes<=budget);
+    assert(second.result.diagnostics.native.decodedCacheBytes<=budget);
     assert(second.result.diagnostics.loader.tileDownloads>0,'Evicted tiles must reload');
-    report.measurements.push({cacheEvictionBudgetBytes:5000,first:first.result.diagnostics,second:second.result.diagnostics});
+    report.measurements.push({cacheEvictionBudgetBytes:budget,first:first.result.diagnostics,second:second.result.diagnostics});
     await p.close();
+  });
+
+  await check('cache smaller than one tile rejects explicitly and initialization can recover',async()=>{
+    const p=await page('indexed-tar',{memoryBudgetBytes:1024});
+    assert.equal(await p.evaluate(()=>window.router.initialize().then(()=>null,e=>e.code)),'INVALID_REQUEST');
+    await p.evaluate(()=>{window.router.options.memoryBudgetBytes=32*1024*1024;});
+    equivalent(await route(p,cross.request),cross.expected);await p.close();
   });
 
   await check('cancel during suspended fetch terminates worker and subsequent route succeeds',async()=>{

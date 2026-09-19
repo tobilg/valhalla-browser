@@ -152,5 +152,975 @@
       "units": "kilometers",
       "language": "en-US"
     }
+  },
+  {
+    "name": "short-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.24,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.24,
+          "lon": 9.2395,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "cross-tile-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.235,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.265,
+          "lon": 9.2645,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "disconnected-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.24,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.3,
+          "lon": 9.305,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "outside-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 48.5,
+          "lon": 10.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 48.51,
+          "lon": 10.51,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "short-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.24,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.24,
+          "lon": 9.2395,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "cross-tile-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.235,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.265,
+          "lon": 9.2645,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "disconnected-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.24,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.3,
+          "lon": 9.305,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "outside-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 48.5,
+          "lon": 10.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 48.51,
+          "lon": 10.51,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "short-truck",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.24,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.24,
+          "lon": 9.2395,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "cross-tile-truck",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.235,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.265,
+          "lon": 9.2645,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "disconnected-truck",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.24,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.3,
+          "lon": 9.305,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "outside-truck",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 48.5,
+          "lon": 10.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 48.51,
+          "lon": 10.51,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "short-bicycle-configured",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.24,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.24,
+          "lon": 9.2395,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "bicycle": {
+          "bicycle_type": "road",
+          "cycling_speed": 24,
+          "use_roads": 0.2
+        }
+      }
+    }
+  },
+  {
+    "name": "short-pedestrian-configured",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.24,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.24,
+          "lon": 9.2395,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "pedestrian": {
+          "walking_speed": 4
+        }
+      }
+    }
+  },
+  {
+    "name": "short-truck-configured",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.24,
+          "lon": 9.2355,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.24,
+          "lon": 9.2395,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2.5,
+          "width": 2,
+          "length": 6,
+          "weight": 5,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "cycle-shortcut-auto",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.34,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.34,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "auto",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "cycle-shortcut-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.34,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.34,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "cycle-shortcut-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.34,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.34,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "walk-shortcut-auto",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.355,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.355,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "auto",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "walk-shortcut-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.355,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.355,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "walk-shortcut-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.355,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.355,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "cycle-contraflow-auto",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.37,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.37,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "auto",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "cycle-contraflow-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.37,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.37,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "cycle-contraflow-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.37,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.37,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "truck-height-allowed",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.385,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.385,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-height-restricted",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.385,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.385,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 4,
+          "width": 2,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-width-allowed",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.4,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.4,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-width-restricted",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.4,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.4,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 3,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-length-allowed",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.415,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.415,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-length-restricted",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.415,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.415,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 12,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-weight-allowed",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.43,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.43,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-weight-restricted",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.43,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.43,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 6,
+          "weight": 15,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-axle_load-allowed",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.445,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.445,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-axle_load-restricted",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.445,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.445,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 7,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-hazmat-allowed",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.46,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.46,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
+  },
+  {
+    "name": "truck-hazmat-restricted",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.46,
+          "lon": 9.350999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.46,
+          "lon": 9.360999999999999,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2,
+          "width": 2,
+          "length": 6,
+          "weight": 4,
+          "axle_load": 2,
+          "hazmat": true
+        }
+      }
+    }
   }
 ]

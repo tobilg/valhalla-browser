@@ -24,9 +24,10 @@ comparison when browser HTTP range caching differs. Neither transport changes
 routing behavior or the native graph format.
 
 The example release is historical Liechtenstein data from July 2015. Coverage
-bounds are not a guarantee of a connected road at every coordinate. Only driving
-with two locations is exposed; preserved bicycle/pedestrian graph data does not
-constitute SDK support for those profiles or multimodal timetables.
+bounds are not a guarantee of a connected road at every coordinate. Driving,
+cycling, walking and truck routing support two locations when advertised by the
+manifest. See [Travel profiles and options](travel-profiles.md) for settings and
+upgrading older driving-only datasets. Transit timetables are not included.
 
 For your own data, use the pinned native tools and indexed archive builder in
 [Build graph data from OpenStreetMap](../../../docs/building-graph-data.md).

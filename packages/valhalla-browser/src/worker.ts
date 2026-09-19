@@ -1,6 +1,7 @@
 import createModule from '../../../public/wasm/valhalla-browser.js';
 import { TileLoader, sha256, readMetadata } from './loader.js';
 import { RoutingError, asError } from './errors.js';
+import { SUPPORTED_COSTINGS, validateRequest } from './profiles.js';
 import type { DatasetManifest, NativeConfig } from './dataset.js';
 import type { NormalizedRequest, Operations, WorkerOptions, WorkerRequest, WorkerResponse } from './protocol.js';
 import type { Diagnostics, LoaderMetrics, NativeRoute, NativeStats, ProgressDetail } from './types.js';
@@ -66,6 +67,10 @@ async function initialize(options: WorkerOptions): Promise<Operations['initializ
   config.mjolnir.tile_url = loader.transport === 'indexed-tar' ? loader.archiveUrl : new URL('tiles/{tilePath}', manifestUrl).href.replace('%7BtilePath%7D', '{tilePath}');
   const budget = options.memoryBudgetBytes ?? 32 * 1024 * 1024;
   if (!Number.isSafeInteger(budget) || budget < 1024 || budget > 128 * 1024 * 1024) throw new RoutingError('INVALID_REQUEST', 'Memory budget must be between 1 KiB and 128 MiB.');
+  // The upstream hard LRU throws for an oversized single tile. Loki can swallow
+  // that exception as a failed correlation, so reject the configuration explicitly.
+  if ([...loader.byRange.values()].some(tile => tile.size > BigInt(budget)))
+    throw new RoutingError('INVALID_REQUEST', 'Memory budget must fit the largest individual tile in this dataset.');
   config.mjolnir.max_cache_size = budget;
   config.mjolnir.use_lru_mem_cache = true;
   config.mjolnir.lru_mem_cache_hard_control = true;
@@ -82,7 +87,7 @@ async function initialize(options: WorkerOptions): Promise<Operations['initializ
   const graphStart = performance.now();
   await call('vb_init', config);
   initialized = true;
-  return { release: manifest.release, configSha256: manifest.config.sha256, moduleStartupMs,
+  return { release: manifest.release, supportedCostings: SUPPORTED_COSTINGS.filter(costing => manifest.costings.includes(costing)), configSha256: manifest.config.sha256, moduleStartupMs,
     graphStartupMs: metadataMs + performance.now() - graphStart, loader: { ...loader.metrics },
     graphStartupRequests: metadata.requests + loader.metrics.requests, graphStartupBytes: metadata.bytes + loader.metrics.bytes,
     native: await call<NativeStats>('vb_stats'), memoryBudgetBytes: budget };
@@ -90,6 +95,9 @@ async function initialize(options: WorkerOptions): Promise<Operations['initializ
 
 async function route(request: NormalizedRequest): Promise<Operations['route']['result']> {
   if (!initialized) throw new RoutingError('NOT_INITIALIZED', 'Initialize the router first.');
+  request = validateRequest(request);
+  if (!manifest.costings.includes(request.costing))
+    throw new RoutingError('UNSUPPORTED_COSTING', `Dataset ${manifest.release} does not support ${request.costing}. Available profiles: ${SUPPORTED_COSTINGS.filter(costing => manifest.costings.includes(costing)).join(', ')}.`);
   const [west, south, east, north] = manifest.coverage;
   if (request.locations.some(p => p.lon < west || p.lon > east || p.lat < south || p.lat > north))
     throw new RoutingError('OUTSIDE_COVERAGE', 'A location is outside this dataset’s coverage.');

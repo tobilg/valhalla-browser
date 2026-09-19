@@ -1,11 +1,14 @@
 {
   "schema": 1,
-  "release": "liechtenstein-2015-v1-101d55d9c93febce",
+  "release": "liechtenstein-2015-v1-1a7e19879423fcaf",
   "created": "2026-09-17T00:00:00Z",
   "valhallaRevision": "a60c7cbfc83e073f50887cd27e0109d02e6b64e5",
   "valhallaVersion": "3.8.3",
   "costings": [
-    "auto"
+    "auto",
+    "bicycle",
+    "pedestrian",
+    "truck"
   ],
   "coverage": [
     9.471078,

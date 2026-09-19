@@ -65,7 +65,8 @@ if regional:
     runtime_config['mjolnir'].update(admin='', timezone='')
 config_bytes = (json.dumps(runtime_config, sort_keys=True, indent=2) + '\n').encode()
 config_hash = sha(config_bytes)
-identity = archive_hash + config_hash + revision
+costings = ['auto', 'bicycle', 'pedestrian', 'truck']
+identity = archive_hash + config_hash + revision + json.dumps(costings)
 if regional:
     build_metadata = {'configSha256': sha(config_file.read_bytes()), 'includedModes': ['driving', 'bicycle', 'pedestrian']}
     identity += json.dumps({'source': provenance, 'build': build_metadata}, sort_keys=True)
@@ -86,7 +87,7 @@ with tarfile.open(work / 'graph.tar') as tar:
     assert len(tiles) == len(members)
 manifest = {
     'schema': 1, 'release': release, 'created': '2026-09-17T00:00:00Z',
-    'valhallaRevision': revision, 'valhallaVersion': '3.8.3', 'costings': ['auto'],
+    'valhallaRevision': revision, 'valhallaVersion': '3.8.3', 'costings': costings,
     'coverage': [9.23, 47.23, 9.57, 47.57],
     'source': {'kind': 'synthetic-osm', 'file': 'fixtures/development.osm',
                'sha256': sha(Path('fixtures/development.osm').read_bytes()),

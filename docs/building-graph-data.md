@@ -81,7 +81,8 @@ The `example.com` URLs in this guide must be replaced with your deployment URLs.
    SDK's pins, then creates a new working directory under `build/osm-*`.
 2. Creates Valhalla's default configuration with the SDK's effective settings.
    It preserves all road hierarchy levels and driving, bicycle and pedestrian
-   access; the SDK currently exposes only driving (`auto`).
+   access; manifests advertise driving (`auto`), cycling (`bicycle`), walking
+   (`pedestrian`) and truck (`truck`). The costing list participates in release identity.
 3. Builds administrative boundaries with `valhalla_build_admins` from the same
    PBF. By default it downloads and checksum-verifies the pinned global timezone
    shapefile, importing it with upstream's `tz_world`/SpatiaLite schema and index.

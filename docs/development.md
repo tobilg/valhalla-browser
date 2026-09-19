@@ -26,6 +26,13 @@ release-age exceptions; other pnpm defaults remain active.
 | `@tobilg/valhalla-browser-demo` | `packages/demo/dist` | Vite application consuming workspace exports |
 | `@tobilg/valhalla-browser-documentation` | `packages/documentation/dist` | TypeDoc HTML with the root README as homepage |
 
+The SDK's `tsconfig.json` is an editor solution referencing separate client,
+Web Worker and Node/Vite configurations. This lets VS Code discover the worker's
+WebWorker globals and Emscripten declarations while keeping DOM and Node globals
+out of that runtime. `pnpm run typecheck` checks all three configurations; package
+declarations and TypeDoc use `tsconfig.client.json`. After pulling configuration
+changes, use **TypeScript: Restart TS Server** in VS Code if old diagnostics remain.
+
 ## Source-only documentation
 
 ```sh
@@ -53,12 +60,30 @@ them to update all cross-links.
 The SDK build copies the root README/LICENSE/NOTICE into its package for packing.
 These copies are ignored; edit the root originals.
 
+## Social previews
+
+Both sites use the shared `assets/og-image.jpg` (1200 × 631 pixels). Vite copies
+the shared assets into `packages/demo/dist/`; the TypeDoc theme copies the image
+into `packages/documentation/dist/`. Both serve it at `/og-image.jpg`, including
+local development/preview. Replace the source image and rebuild both sites to
+update it; if its dimensions change, update the image metadata too.
+
+Open Graph and Twitter/X large-image tags are rendered directly into HTML.
+The demo's metadata lives in `packages/demo/index.html`; documentation metadata
+comes from `packages/documentation/readme-theme.js`, with titles and canonical URLs
+for each API/guide page. Public URLs use the domains linked in the README:
+`https://valhalla-browser.gh.tobilg.com/` and
+`https://valhalla-browser-api.gh.tobilg.com/`. For another deployment, update the
+demo's absolute metadata URLs and TypeDoc's `hostedBaseUrl` in `typedoc.json`.
+Local previews retain those public URLs so shared links identify the deployed site.
+The documentation header link remains `/`.
+
 ## Existing native artifacts
 
 ```sh
 pnpm run build
 pnpm run dev                 # http://localhost:8080
-pnpm run pack:sdk            # build/package/valhalla-browser-0.0.2.tgz
+pnpm run pack:sdk            # build/package/valhalla-browser-0.1.0.tgz
 ```
 
 `build` builds the SDK, demo and documentation. `build:sdk` builds just the SDK;
@@ -160,9 +185,9 @@ pnpm run test:data            # Requires data and data:region fixture archives.
 pnpm run test:data:build      # Fresh OSM build and Chromium/native route comparison.
 pnpm run test:docs
 pnpm run pack:sdk
-SDK_TARBALL=build/package/valhalla-browser-0.0.2.tgz pnpm run test:package
-SDK_TARBALL=build/package/valhalla-browser-0.0.2.tgz pnpm run test:cdn-import
-SDK_TARBALL=build/package/valhalla-browser-0.0.2.tgz pnpm run test:examples
+SDK_TARBALL=build/package/valhalla-browser-0.1.0.tgz pnpm run test:package
+SDK_TARBALL=build/package/valhalla-browser-0.1.0.tgz pnpm run test:cdn-import
+SDK_TARBALL=build/package/valhalla-browser-0.1.0.tgz pnpm run test:examples
 pnpm run test:browser
 BROWSER=firefox pnpm run test:browser
 BROWSER=webkit pnpm run test:browser
@@ -176,7 +201,7 @@ With it, they test the supplied release candidate unchanged. Package tests use a
 isolated pnpm consumer, strict typechecks,
 nested-base Vite builds, lazy asset loading and real WASM routing. The CDN-import
 suite serves the unpacked package, application and graph from separate origins.
-README TypeScript examples are extracted and typechecked, then all six examples
+README TypeScript examples are extracted and typechecked, then all seven examples
 run against the local regional graph; only data/SDK host URLs are substituted.
 
 Each installed-package transport case gets a fresh browser context, so independent
@@ -203,7 +228,14 @@ tile headers and incompatible archives; they also check immutable publication.
 Public deployment-validator checks run with `pnpm test` using a local HTTP server.
 The browser suite preserves full native JSON comparison, actual Asyncify suspension,
 range faults, serialized calls, cache bounds and CPU/fetch cancellation recovery.
-It also injects worker-script HTTP failures during cancellation recovery. An
+The native corpora also cover cycling, walking, truck attributes and access
+restrictions. Mixed-profile requests share a worker without sharing costing
+settings. The matrix benchmarks all four profiles with five cold and twenty warm
+samples per transport/browser. `test/profiles.test.js` checks that native fixture
+paths actually demonstrate shortcuts, bicycle contraflow and truck detours.
+See [road profile verification](profile-verification.md) for the executed baseline
+and dataset migration details.
+The browser suite also injects worker-script HTTP failures during cancellation recovery. An
 opaque browser load error before the worker's first message gets one retry after
 100 ms; the failed worker is terminated first. `retries: 0` disables that retry.
 Persistent errors still reject, and cancellation/disposal stops the pending retry.

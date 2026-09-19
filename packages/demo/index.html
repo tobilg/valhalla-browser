@@ -1,8 +1,28 @@
 <!doctype html>
 <html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Valhalla · browser routing</title>
+<meta name="description" content="Calculate driving, cycling, walking and truck routes locally in your browser with Valhalla WebAssembly. Explore the interactive valhalla-browser demo.">
+<link rel="canonical" href="https://valhalla-browser.gh.tobilg.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="valhalla-browser">
+<meta property="og:title" content="Valhalla · browser routing">
+<meta property="og:description" content="Calculate driving, cycling, walking and truck routes locally in your browser with Valhalla WebAssembly. Explore the interactive valhalla-browser demo.">
+<meta property="og:url" content="https://valhalla-browser.gh.tobilg.com/">
+<meta property="og:image" content="https://valhalla-browser.gh.tobilg.com/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="631">
+<meta property="og:image:alt" content="A blue route across a riverside city, connecting green and red map pins.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Valhalla · browser routing">
+<meta name="twitter:description" content="Calculate driving, cycling, walking and truck routes locally in your browser with Valhalla WebAssembly. Explore the interactive valhalla-browser demo.">
+<meta name="twitter:image" content="https://valhalla-browser.gh.tobilg.com/og-image.jpg">
+<meta name="twitter:image:alt" content="A blue route across a riverside city, connecting green and red map pins.">
+</head>
+<body>
 <main>
   <header><p>VALHALLA / LOCAL ROUTING LAB</p><h1>A route, computed here.</h1>
     <p>Routes calculated in your browser from versioned road graphs, with an OpenStreetMap basemap. No route server or map credentials.</p></header>
@@ -13,7 +33,8 @@
       <fieldset><legend>Origin</legend><label>Latitude<input id="from-lat" type="number" step="any" required></label><label>Longitude<input id="from-lon" type="number" step="any" required></label></fieldset>
       <fieldset><legend>Destination</legend><label>Latitude<input id="to-lat" type="number" step="any" required></label><label>Longitude<input id="to-lon" type="number" step="any" required></label></fieldset>
       <label>Graph transport<select id="transport"><option value="indexed-tar">Indexed archive · byte ranges</option><option value="individual-tiles">Individual tile objects</option></select></label>
-      <label>Travel profile<select><option>Driving</option></select></label>
+      <label>Travel profile<select id="costing"><option value="auto">Driving</option><option value="bicycle">Cycling</option><option value="pedestrian">Walking</option><option value="truck">Truck</option></select></label>
+      <details id="profile-settings"><summary>Profile settings</summary><fieldset id="profile-options"></fieldset><button id="reset-profile" type="button">Reset to defaults</button></details>
       <div class="actions"><button id="route" type="submit">Calculate route</button><button id="cancel" type="button" disabled>Cancel</button></div>
       <p id="status" role="status">Ready to initialize.</p>
     </form>
@@ -28,4 +49,5 @@
   <details><summary>Development diagnostics</summary><p>Graph responses appear in DevTools Network as 206 ranges or individual .gph objects. Repeat a route to inspect decoded tile reuse. Cancel terminates the worker; the next route creates a fresh instance.</p><button id="export" type="button">Export latest diagnostics</button><pre id="diagnostics">No measurements yet.</pre></details>
 </main>
 <script type="module" src="./main.js"></script>
+</body>
 </html>

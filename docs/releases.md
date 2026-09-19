@@ -105,12 +105,12 @@ These are owner setup steps. Implementing the workspace does not execute them.
 Set the version of all three workspace packages together:
 
 ```sh
-pnpm run version:set 0.0.2
+pnpm run version:set 0.1.0
 # Equivalent npm invocation:
-npm run version:set -- 0.0.2
+npm run version:set -- 0.1.0
 ```
 
-Replace `0.0.2` with the desired stable `X.Y.Z` version, without a `v` prefix.
+Replace `0.1.0` with the desired stable `X.Y.Z` version, without a `v` prefix.
 The command validates the argument and reads all inputs before writing them.
 The demo and documentation stay private and share the SDK version. Workspace
 dependencies remain `workspace:*`, so the pnpm lockfile does not need an update.
@@ -119,7 +119,7 @@ text in `README.md` and `docs/development.md`. Historical verification reports a
 toolchain versions stay unchanged. It does not build, commit, tag or publish.
 
 Run local verification, commit the change, and push a stable tag
-matching the SDK version exactly (for example, after setting `0.0.2`):
+matching the SDK version exactly (for example, after setting `0.1.0`):
 
 ```sh
 git tag v0.0.2

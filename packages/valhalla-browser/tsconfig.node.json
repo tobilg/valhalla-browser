@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.client.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "files": ["vite.config.ts"]
+}

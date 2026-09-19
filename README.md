@@ -10,7 +10,7 @@ tiles load on demand through HTTP ranges from an indexed TAR, or as individual
 [Source](https://github.com/tobilg/valhalla-browser) ·
 [Release setup](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
 
-The repository prepares version **0.0.2**. Publication happens through the tagged
+The repository prepares version **0.1.0**. Publication happens through the tagged
 release workflow after the initial npm setup; implementation alone does not
 publish the package. Until then, use the local tarball instructions below.
 
@@ -61,6 +61,56 @@ in **seconds**, and leg shapes encoded as **polyline6**. Driving (`auto`), two
 locations, English directions, a 30 m correlation radius and minimum
 reachability 0 are the validated defaults.
 
+## Travel profiles
+
+The SDK supports **driving** (`auto`, the default), **cycling** (`bicycle`),
+**walking** (`pedestrian`), and **truck** (`truck`). Each dataset must advertise
+the requested profile in its manifest. `await router.initialize()` returns
+`supportedCostings`; older `auto`-only datasets continue to support driving only.
+Transit and combined bike-and-train journeys are not supported.
+
+Use `costing_options` for the selected profile. Omit settings to use Valhalla's
+defaults. This example uses the same historical Liechtenstein graph:
+
+<!-- example:profiles -->
+```ts
+import { Router, type RouteRequest } from 'valhalla-browser';
+
+const router = new Router({
+  // Replace with your deployment's multi-profile dataset manifest.
+  manifestUrl: 'https://routing.example.com/datasets/your-release-id/manifest.json',
+});
+const endpoints = {
+  origin: { lat: 47.1392862, lon: 9.5227962 },
+  destination: { lat: 47.1450, lon: 9.5168 },
+};
+const requests: RouteRequest[] = [
+  { ...endpoints, costing: 'bicycle',
+    costing_options: { bicycle: { bicycle_type: 'road', cycling_speed: 24, use_roads: 0.2 } } },
+  { ...endpoints, costing: 'pedestrian',
+    costing_options: { pedestrian: { walking_speed: 4 } } },
+  { ...endpoints, costing: 'truck',
+    costing_options: { truck: { height: 2.5, width: 2, length: 6, weight: 5, axle_load: 2, hazmat: false } } },
+];
+try {
+  for (const request of requests) {
+    const result = await router.route(request);
+    console.log(result.native);
+  }
+} finally {
+  await router.dispose();
+}
+```
+
+Speeds are km/h, vehicle dimensions are meters, and weights are metric tonnes.
+Profile changes reuse the same worker and tile cache. Unknown profiles or profiles
+absent from the dataset reject with `UNSUPPORTED_COSTING`; invalid settings reject
+with `INVALID_REQUEST`.
+
+See [Travel profiles and options](https://github.com/tobilg/valhalla-browser/blob/main/packages/documentation/guides/travel-profiles.md)
+for supported settings, defaults, dataset upgrades, and current limits. This guide
+is also included in the generated API documentation.
+
 ## Vite and TypeScript
 
 The package exports request, response, option, error and diagnostics types.
@@ -95,7 +145,7 @@ a browser; Node routing and server-side WASM execution are not supported.
 
 ## Use directly from a CDN
 
-After publishing version 0.0.2, save this as an HTML file and serve it over HTTP.
+After publishing version 0.1.0, save this as an HTML file and serve it over HTTP.
 No bundler is required. Keep the package version pinned in the import URL.
 
 <!-- example:cdn -->
@@ -107,7 +157,7 @@ No bundler is required. Keep the package version pinned in the import URL.
 <button id="route">Calculate route</button>
 <pre id="result"></pre>
 <script type="module">
-  import { createRouter } from 'https://cdn.jsdelivr.net/npm/valhalla-browser@0.0.2/dist/index.js';
+  import { createRouter } from 'https://cdn.jsdelivr.net/npm/valhalla-browser@0.1.0/dist/index.js';
   const output = document.querySelector('#result');
   const button = document.querySelector('#route');
   button.onclick = async () => {
@@ -227,8 +277,8 @@ const router = new Router({
   retries: 2,
   onProgress: event => console.log(event.phase),
   // Optional matching assets hosted on your application's origin:
-  // workerUrl: '/sdk/0.0.2/worker.js',
-  // wasmUrl: '/sdk/0.0.2/valhalla-browser.wasm',
+  // workerUrl: '/sdk/0.1.0/worker.js',
+  // wasmUrl: '/sdk/0.1.0/valhalla-browser.wasm',
 });
 try {
   await router.route({
@@ -257,7 +307,7 @@ receives at least ten seconds. Relative asset overrides resolve against the page
 Provide your own compatible OSM-derived graph dataset. The repository includes
 `pnpm run data:osm` to build standard tiles, Valhalla's native indexed `graph.tar`,
 and the SDK manifest/configuration from an `.osm.pbf` extract. It uses the pinned
-native Valhalla tools and preserves road access for future profiles.
+native Valhalla tools and preserves access for driving, cycling, walking, and truck routing.
 
 See [Build graph data from OpenStreetMap](https://github.com/tobilg/valhalla-browser/blob/main/docs/building-graph-data.md)
 for a reproducible small example, custom extracts, native/container invocation,
@@ -285,9 +335,9 @@ pnpm build:docs               # No WASM, native toolchain or graph needed.
 pnpm preview:docs             # http://localhost:8081
 pnpm build                   # Requires existing verified native artifacts.
 pnpm dev                     # http://localhost:8080
-pnpm pack:sdk                # build/package/valhalla-browser-0.0.2.tgz
+pnpm pack:sdk                # build/package/valhalla-browser-0.1.0.tgz
 # In another application, before npm publication:
-pnpm add /absolute/path/to/valhalla-browser-0.0.2.tgz
+pnpm add /absolute/path/to/valhalla-browser-0.1.0.tgz
 ```
 
 A clean checkout needs the explicit native/data/WASM build steps in the
@@ -307,8 +357,8 @@ pnpm test:demo
 ```
 
 The root README is also the TypeDoc homepage and is copied into the npm package.
-Set all three package versions with `pnpm run version:set 0.0.2` (or
-`npm run version:set -- 0.0.2`), substituting your next stable version. The command
+Set all three package versions with `pnpm run version:set 0.1.0` (or
+`npm run version:set -- 0.1.0`), substituting your next stable version. The command
 also keeps the SDK version references in this README and the development guide
 in sync. See the
 [release guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)

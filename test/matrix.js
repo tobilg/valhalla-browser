@@ -45,7 +45,7 @@ async function route(page, fixture, corpus) {
     try { return { result: await window.router.route(request) }; }
     catch (e) { return { error: { code: e.code, nativeCode: e.nativeCode, message: e.message } }; }
   }, fixture.request);
-  if (fixture.expected.nativeError === 171 && fixture.name === 'outside') assert.equal(actual.error?.code, 'OUTSIDE_COVERAGE');
+  if (fixture.expected.nativeError === 171 && fixture.name.startsWith('outside')) assert.equal(actual.error?.code, 'OUTSIDE_COVERAGE');
   else if (fixture.expected.nativeError !== undefined) assert.equal(actual.error?.nativeCode, fixture.expected.nativeError);
   else {
     assert(!actual.error, JSON.stringify(actual.error));
@@ -167,7 +167,8 @@ try {
           report.tests.push({ engine: engineName, name: 'cancel MinIO tile loading and route again', passed: true, recovery });
         } finally { await context.close(); }
       }
-      for (const transport of transports) {
+      for (const transport of transports) for (const costing of corpora[1].manifest.costings) {
+        const benchmarkRoute = corpora[1].reference.cases.find(c => c.name === (costing === 'auto' ? 'balzers-ruggell' : `balzers-ruggell-${costing}`));
         const cold = [], warm = [];
         for (let i = 0; i < report.sampleCounts.cold; i++) {
           const context = await browser.newContext();
@@ -175,21 +176,21 @@ try {
             const page = await setup(context, corpora[1], transport);
             await trace.flush(); const mark = trace.records.length;
             const startup = await page.evaluate(() => window.router.initialize());
-            const diagnostics = await route(page, long, corpora[1]);
+            const diagnostics = await route(page, benchmarkRoute, corpora[1]);
             assert(diagnostics.loader.tileDownloads >= 2);
             await trace.flush();
             const origin = trace.records.slice(mark).filter(r => r.path.includes(corpora[1].manifest.release));
             assert(origin.some(r => r.method === 'GET'), 'Cold HTTP sample must reach MinIO');
             cold.push({ startup, diagnostics, originRequests: origin.length, originBodyBytes: origin.reduce((n, r) => n + r.bodyBytes, 0) });
             if (i === 0) for (let w = 0; w < report.sampleCounts.warm; w++) {
-              const metrics = await route(page, long, corpora[1]);
+              const metrics = await route(page, benchmarkRoute, corpora[1]);
               assert.equal(metrics.loader.requests, 0);
               assert(metrics.decodedCacheHits > 0);
               warm.push(metrics);
             }
           } finally { await context.close(); }
         }
-        report.benchmarks.push({ engine: engineName, transport, release: corpora[1].manifest.release,
+        report.benchmarks.push({ engine: engineName, transport, costing, release: corpora[1].manifest.release,
           coldState: 'new worker and isolated browser context each sample; actual MinIO origin requests verified; WASM compilation cache uncontrolled; no CDN',
           coldHostMs: percentiles(cold.map(r => r.startup.workerReadyMs + r.diagnostics.hostRouteMs)),
           warmHostMs: percentiles(warm.map(r => r.hostRouteMs)), cold, warm });

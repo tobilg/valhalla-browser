@@ -11,6 +11,8 @@ requests/bytes, sequential fetch wait, decoded-cache hits and native statistics.
 
 The default decoded-tile budget is 32 MiB. Its hard LRU limit bounds retained
 tiles, not live references, routing search allocations or total worker memory.
+The budget must fit the largest individual tile listed in the manifest; a smaller
+budget rejects initialization with `INVALID_REQUEST` instead of a false routing failure.
 `wasmHeapCapacityHighWaterBytes` is linear-memory capacity, not live allocation
 or process RSS. The tested historical regional graph uses about 166 MiB capacity
 with this runtime even though its tile payload is about 1.5 MB.

@@ -10,6 +10,8 @@ await mkdir(path.join(root, 'build'), { recursive: true });
 const isolated = await mkdtemp(path.join(root, 'build/docs-source-only-'));
 await mkdir(path.join(isolated, 'packages'), { recursive: true });
 await cp(path.join(root, 'README.md'), path.join(isolated, 'README.md'));
+await mkdir(path.join(isolated, 'assets'));
+await cp(path.join(root, 'assets/og-image.jpg'), path.join(isolated, 'assets/og-image.jpg'));
 await mkdir(path.join(isolated, 'docs'));
 for (const guide of ['building-graph-data.md', 'object-storage-hosting.md'])
   await cp(path.join(root, 'docs', guide), path.join(isolated, 'docs', guide));
@@ -43,7 +45,7 @@ const host = { server: http.createServer(async (req, res) => {
     const file = path.resolve(output, '.' + relative);
     assert(file.startsWith(output + path.sep));
     const bytes = await readFile(file);
-    const type = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml' }[path.extname(file)] ?? 'application/octet-stream';
+    const type = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.jpg': 'image/jpeg' }[path.extname(file)] ?? 'application/octet-stream';
     res.writeHead(200, { 'Content-Type': type }); res.end(bytes);
   } catch { res.writeHead(404); res.end(); }
 }) };
@@ -87,7 +89,7 @@ try {
       await page.getByRole('heading', { name: 'Class Router', exact: false }).waitFor();
       assert.match(await page.locator('body').innerText(), /initialize/);
       for (const title of ['Cancellation and errors', 'CDN and CSP', 'Datasets and transports',
-        'Diagnostics and memory', 'Build graph data from OpenStreetMap', 'Host graph data on object storage']) {
+        'Diagnostics and memory', 'Travel profiles and options', 'Build graph data from OpenStreetMap', 'Host graph data on object storage']) {
         const link = page.locator('#tsd-nav-container').getByRole('link').filter({ hasText: new RegExp('^' + title + '$') });
         await link.click();
         await page.getByRole('heading', { name: new RegExp('^' + title) }).waitFor();

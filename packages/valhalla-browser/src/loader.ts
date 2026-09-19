@@ -1,6 +1,7 @@
 import { RoutingError, type RoutingErrorCode } from './errors.js';
 import type { DatasetManifest, TileEntry } from './dataset.js';
 import type { LoaderMetrics, ProgressDetail, TileTrace, TileTransport } from './types.js';
+import { SUPPORTED_COSTINGS } from './profiles.js';
 
 interface LoaderOptions { transport?: TileTransport; timeoutMs?: number; retries?: number; onProgress?: (event: ProgressDetail) => void }
 interface Tile extends Omit<TileEntry, 'offset' | 'size'> { id: string; offset: bigint; size: bigint; url: string; etag: string }
@@ -77,7 +78,11 @@ export class TileLoader {
         !Number.isInteger(retries) || retries < 0 || retries > 5) throw fail('INVALID_REQUEST', 'Invalid fetch limits.');
     if (manifest.schema !== 1 || manifest.valhallaRevision !== RUNTIME_REVISION || manifest.valhallaVersion !== '3.8.3')
       throw fail('INCOMPATIBLE_DATASET', 'Dataset does not match this runtime.');
-    if (!Array.isArray(manifest.costings) || !manifest.costings.includes('auto')) throw fail('INCOMPATIBLE_DATASET', 'Dataset does not support auto costing.');
+    if (!Array.isArray(manifest.costings) || !manifest.costings.length ||
+        manifest.costings.some(costing => typeof costing !== 'string' || !costing.length) ||
+        new Set(manifest.costings).size !== manifest.costings.length) throw fail('DATASET', 'Invalid dataset costing list.');
+    if (!SUPPORTED_COSTINGS.some(costing => manifest.costings.includes(costing)))
+      throw fail('INCOMPATIBLE_DATASET', 'Dataset has no profiles supported by this SDK.');
     if (typeof manifest.release !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/.test(manifest.release) ||
         new URL('.', manifestUrl).pathname.split('/').at(-2) !== manifest.release)
       throw fail('DATASET', 'Dataset URL parent directory must match its release.');

@@ -13,7 +13,8 @@ schema and spatial index as upstream's timezone builder. The source URL,
 checksums, coverage, enabled modes and configuration fingerprint accompany the
 release. The timezone input cache verifies both input and database receipts.
 All native hierarchy levels and driving/bicycle/pedestrian graph access remain
-enabled; only driving is exposed as a validated SDK costing.
+enabled. New manifests advertise `auto`, `bicycle`, `pedestrian`, and `truck`;
+older immutable manifests advertising only `auto` remain driving-only.
 
 The native audit reads actual graph nodes, not just the database files. It
 records **6,980 / 6,980 nodes with timezone and country assignments** across
@@ -38,8 +39,11 @@ proves that an unused tile is never downloaded.
 | Outside coverage | Native 171 / SDK OUTSIDE_COVERAGE | Declared coverage rejection |
 
 `fixtures/region/requests.json[l]`, `reference.json`, and `manifest.json` record
-the exact requests/results and identities. The existing seven-case synthetic
-corpus supplies isolated one-way, restriction, disconnected and outside checks.
+the exact requests/results and identities. The regional corpus has 17 requests,
+including short/cross-tile/outside requests for all four profiles and configured
+settings for each new profile. The synthetic corpus has 43 requests, preserving
+the original seven driving cases and adding access, contraflow, truck restrictions,
+profile settings, disconnected pairs and outside-coverage checks.
 Native/browser comparisons retain the entire response and require exact JSON
 equality: no numerical tolerance or route-alternative exception was needed.
 Coverage is the extract's declared bounding box, not a guarantee that every
@@ -55,8 +59,9 @@ reference byte-for-byte. Raw build reports are not committed.
 SpatiaLite creation/history metadata makes SQLite **file** hashes vary between
 builds. Database hashes are retained in `build/reports/region-audit.json` as build evidence,
 not used as immutable graph metadata. Graph release identity includes the
-reproducible source/build inputs, effective runtime configuration, revision and
-archive hash. The actual graph/archive/reference bytes reproduced exactly.
+reproducible source/build inputs, effective runtime configuration, revision,
+advertised costings and archive hash. The actual graph/archive/reference bytes
+reproduced exactly.
 
 Attribution: © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright),
 ODbL 1.0; timezone polygons from

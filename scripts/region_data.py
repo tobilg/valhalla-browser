@@ -3,6 +3,7 @@ import hashlib
 import json
 import subprocess
 import zipfile
+from profile_corpus import extend
 from pathlib import Path
 
 PBF_SHA = 'b8b6c7f2122bd46a65b1d1c669b47c20df4f784a501ace3221d5ea6053121ecc'
@@ -65,6 +66,7 @@ def requests(out):
         'locations': [{'lat': p[0], 'lon': p[1], 'radius': 30, 'minimum_reachability': 0} for p in [start, end]],
         'costing': 'auto', 'units': 'kilometers', 'language': 'en-US'
     }} for name, start, end in cases]
+    extend(corpus, ['vaduz-short', 'balzers-ruggell', 'outside'])
     out.mkdir(parents=True, exist_ok=True)
     (out / 'requests.json').write_text(json.dumps(corpus, indent=2) + '\n')
     (out / 'requests.jsonl').write_text(''.join(json.dumps(c['request']) + '\n' for c in corpus))

@@ -1,6 +1,7 @@
 import { Router } from 'valhalla-browser';
 import regionalRequests from '../../fixtures/region/requests.json';
 import { createRouteMap } from './route-map.js';
+import { profileSettings } from './profile-settings.js';
 import './style.css';
 
 const $ = id => document.getElementById(id);
@@ -22,15 +23,20 @@ if (manifestUrl) {
   if (r2) datasets.push({ ...r2, id: 'r2-region' });
 }
 let router, active, lastDiagnostics, fixtures, selected;
+const profile = profileSettings($('costing'), $('profile-options'), $('profile-settings'), $('reset-profile'), () => {
+  clearResult();
+});
 for (const dataset of datasets) $('dataset').add(new Option(dataset.name, dataset.id));
 const requestedDataset = new URL(location.href).searchParams.get('dataset');
 if (datasets.some(d => d.id === requestedDataset)) $('dataset').value = requestedDataset;
 async function selectDataset() {
   $('route').disabled = true; $('dataset').disabled = true;
+  profile.busy(true);
   try {
     await router?.dispose(); router = undefined;
     selected = datasets.find(d => d.id === $('dataset').value);
-    fixtures = selected.requests ?? await (await fetch(selected.requestsUrl)).json();
+    fixtures = (selected.requests ?? await (await fetch(selected.requestsUrl)).json()).filter(item => !item.profileCase);
+    profile.capabilities(null);
     const regional = selected.regional ?? selected.requestsUrl.includes('/region/');
     $('preset').replaceChildren(...fixtures.map(f => new Option(f.name, f.name)));
     $('preset').value = regional ? 'balzers-ruggell' : 'cross-tile';
@@ -45,15 +51,21 @@ async function selectDataset() {
       : 'These synthetic test roads do not follow the real streets on the basemap.';
     $('status').textContent = 'Ready to initialize.';
     lastDiagnostics = undefined; $('diagnostics').textContent = 'No measurements yet.';
-  } finally { $('route').disabled = false; $('dataset').disabled = false; }
+  } finally { profile.busy(false); $('route').disabled = false; $('dataset').disabled = false; }
 }
 function selectFixture() {
   const [from, to] = fixtures.find(f => f.name === $('preset').value).request.locations;
   $('from-lat').value = from.lat; $('from-lon').value = from.lon;
   $('to-lat').value = to.lat; $('to-lon').value = to.lon;
-  routeMap.preview([from, to]);
+  clearResult();
+}
+function clearResult() {
+  const points = [{lat: +$('from-lat').value, lon: +$('from-lon').value}, {lat: +$('to-lat').value, lon: +$('to-lon').value}];
+  routeMap.preview(points.filter(point => Number.isFinite(point.lat) && Math.abs(point.lat) <= 90 && Number.isFinite(point.lon) && Math.abs(point.lon) <= 180));
   $('maneuvers').replaceChildren();
   $('summary').textContent = 'Select a test journey';
+  lastDiagnostics = undefined; $('diagnostics').textContent = 'No measurements yet.';
+  $('status').textContent = 'Ready to calculate.';
 }
 $('preset').onchange = selectFixture;
 $('dataset').onchange = selectDataset;
@@ -83,19 +95,22 @@ $('route-form').onsubmit = async event => {
   event.preventDefault();
   if (active) return;
   active = new AbortController();
+  const profileRequest = profile.request();
+  profile.busy(true); $('preset').disabled = true;
   $('status').textContent = 'Preparing the routing engine…';
   $('cancel').disabled = false; $('route').disabled = true; $('transport').disabled = true; $('dataset').disabled = true;
   try {
     router ??= new Router({ manifestUrl: selected.manifestUrl, transport: $('transport').value,
       onProgress: event => { $('status').textContent = event.phase === 'fetching-tile' ? 'Loading road data…' : event.phase === 'routing' ? 'Calculating…' : 'Preparing the routing engine…'; } });
     const startup = await router.initialize();
-    const result = await router.route({ origin: {lat: +$('from-lat').value, lon: +$('from-lon').value}, destination: {lat: +$('to-lat').value, lon: +$('to-lon').value} }, { signal: active.signal });
+    profile.capabilities(startup.supportedCostings);
+    const result = await router.route({ ...profileRequest, origin: {lat: +$('from-lat').value, lon: +$('from-lon').value}, destination: {lat: +$('to-lat').value, lon: +$('to-lon').value} }, { signal: active.signal });
     draw(result.native);
-    lastDiagnostics = { startup, route: result.diagnostics, dataset: result.dataset, session: await router.diagnostics() };
+    lastDiagnostics = { request: profileRequest, startup, route: result.diagnostics, dataset: result.dataset, session: await router.diagnostics() };
     $('diagnostics').textContent = JSON.stringify(lastDiagnostics,null,2);
     $('status').textContent = 'Route calculated in your browser.';
   } catch (error) { $('status').textContent = `${error.code ?? 'ERROR'}: ${error.message}`; }
-  finally { $('cancel').disabled = true; $('route').disabled = false; $('transport').disabled = false; $('dataset').disabled = false; active = undefined; }
+  finally { profile.busy(false); $('preset').disabled = false; $('cancel').disabled = true; $('route').disabled = false; $('transport').disabled = false; $('dataset').disabled = false; active = undefined; }
 };
 $('cancel').onclick = () => { active?.abort(); router?.cancel(); };
 $('export').onclick = () => {

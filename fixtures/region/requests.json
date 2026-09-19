@@ -108,5 +108,303 @@
       "units": "kilometers",
       "language": "en-US"
     }
+  },
+  {
+    "name": "vaduz-short-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.1392862,
+          "lon": 9.5227962,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.145,
+          "lon": 9.5168,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "balzers-ruggell-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.0666667,
+          "lon": 9.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.2397558,
+          "lon": 9.5262874,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "outside-bicycle",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 48.5,
+          "lon": 10.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 48.51,
+          "lon": 10.51,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "vaduz-short-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.1392862,
+          "lon": 9.5227962,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.145,
+          "lon": 9.5168,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "balzers-ruggell-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.0666667,
+          "lon": 9.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.2397558,
+          "lon": 9.5262874,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "outside-pedestrian",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 48.5,
+          "lon": 10.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 48.51,
+          "lon": 10.51,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "vaduz-short-truck",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.1392862,
+          "lon": 9.5227962,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.145,
+          "lon": 9.5168,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "balzers-ruggell-truck",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.0666667,
+          "lon": 9.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.2397558,
+          "lon": 9.5262874,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "outside-truck",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 48.5,
+          "lon": 10.5,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 48.51,
+          "lon": 10.51,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US"
+    }
+  },
+  {
+    "name": "vaduz-short-bicycle-configured",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.1392862,
+          "lon": 9.5227962,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.145,
+          "lon": 9.5168,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "bicycle",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "bicycle": {
+          "bicycle_type": "road",
+          "cycling_speed": 24,
+          "use_roads": 0.2
+        }
+      }
+    }
+  },
+  {
+    "name": "vaduz-short-pedestrian-configured",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.1392862,
+          "lon": 9.5227962,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.145,
+          "lon": 9.5168,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "pedestrian",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "pedestrian": {
+          "walking_speed": 4
+        }
+      }
+    }
+  },
+  {
+    "name": "vaduz-short-truck-configured",
+    "profileCase": true,
+    "request": {
+      "locations": [
+        {
+          "lat": 47.1392862,
+          "lon": 9.5227962,
+          "radius": 30,
+          "minimum_reachability": 0
+        },
+        {
+          "lat": 47.145,
+          "lon": 9.5168,
+          "radius": 30,
+          "minimum_reachability": 0
+        }
+      ],
+      "costing": "truck",
+      "units": "kilometers",
+      "language": "en-US",
+      "costing_options": {
+        "truck": {
+          "height": 2.5,
+          "width": 2,
+          "length": 6,
+          "weight": 5,
+          "axle_load": 2,
+          "hazmat": false
+        }
+      }
+    }
   }
 ]

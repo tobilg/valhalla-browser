@@ -41,6 +41,7 @@
   ],
   "treatWarningsAsErrors": true,
   "titleLink": "/",
+  "hostedBaseUrl": "https://valhalla-browser-api.gh.tobilg.com/",
   "sourceLinkTemplate": "https://github.com/tobilg/valhalla-browser/blob/{gitRevision}/{path}#L{line}",
   "navigationLinks": {
     "GitHub": "https://github.com/tobilg/valhalla-browser",

@@ -14,7 +14,8 @@ export function demoConfig(data = createRangeServer()) {
     });
   };
   return defineConfig({
-    root: `${root}packages/demo`, publicDir: false, base: './',
+    // Shared site assets are served at / in development and copied into dist.
+    root: `${root}packages/demo`, publicDir: `${root}assets`, base: './',
     plugins: [{
       name: 'graph-range-server', configureServer: configure, configurePreviewServer: configure,
       generateBundle() {

@@ -1,5 +1,5 @@
 import type { SerializedRoutingError } from './errors.js';
-import type { Coordinates, Diagnostics, ProgressDetail, RouteResult, RouterOptions, StartupResult } from './types.js';
+import type { Coordinates, Costing, CostingOptions, Diagnostics, ProgressDetail, RouteResult, RouterOptions, StartupResult } from './types.js';
 
 /** Validated request with explicit correlation radius, reachability, units and language defaults. */
 export interface NormalizedRequest {
@@ -10,8 +10,10 @@ export interface NormalizedRequest {
     /** Minimum connected-node reachability; the SDK sets 0. */
     minimum_reachability: number;
   }>;
-  /** Validated driving profile. */
-  costing: 'auto';
+  /** Validated road profile. */
+  costing: Costing;
+  /** Validated options belonging to the selected profile. Unspecified values use native defaults. */
+  costing_options?: CostingOptions;
   /** Native response distance units. */
   units: 'kilometers';
   /** Native instruction language. */

@@ -10,7 +10,7 @@ import { root, execute, listen, closeHost, readJSON, writeReport } from './packa
 import { mockBasemap, assertBasemap, exerciseMap, restoreBasemap, isBasemapRequest } from './demo-map.js';
 
 const artifact = process.argv.includes('--artifact');
-const requests = await readJSON(path.join(root, 'fixtures/region/requests.json'));
+const requests = (await readJSON(path.join(root, 'fixtures/region/requests.json'))).filter(item => !item.profileCase);
 const reference = await readJSON(path.join(root, 'fixtures/region/reference.json'));
 const manifest = await readJSON(path.join(root, 'fixtures/region/manifest.json'));
 const demoRoot = path.join(root, 'packages/demo');
@@ -93,17 +93,46 @@ try {
             checks.push(`${transport}: basemap attribution, zoom/fit/toggle, and routing through image failures`);
             for (const request of requests) await calculate(request.name);
             checks.push(`${transport}: every regional preset matches native summary/directions; warm cache reuse`);
+            for (const costing of ['bicycle','pedestrian','truck']) {
+              await page.locator('#costing').selectOption(costing);
+              await page.locator('#preset').selectOption('balzers-ruggell');
+              await page.getByRole('button', { name: 'Calculate route' }).click();
+              await page.waitForFunction(() => !document.querySelector('#route').disabled);
+              assert.equal(await page.locator('#status').innerText(), 'Route calculated in your browser.');
+              const expected = reference.cases.find(item => item.name === `balzers-ruggell-${costing}`).expected;
+              assert.equal(await page.locator('#summary').innerText(), `${expected.trip.summary.length.toFixed(3)} km · ${Math.round(expected.trip.summary.time)} seconds`);
+              assert.equal(JSON.parse(await page.locator('#diagnostics').textContent()).request.costing, costing);
+            }
+            await page.locator('#from-lat').fill('47.14');
+            await page.locator('#costing').selectOption('pedestrian');
+            assert.equal(await page.locator('#from-lat').inputValue(),'47.14','Profile changes preserve custom coordinates');
+            await page.locator('#profile-settings').evaluate(element => {element.open=true;});
+            await page.locator('[name=walking_speed]').fill('4');
+            await page.locator('#preset').selectOption('vaduz-short');
+            await page.getByRole('button', { name: 'Calculate route' }).click();
+            await page.waitForFunction(() => !document.querySelector('#route').disabled);
+            const configured = reference.cases.find(item => item.name === 'vaduz-short-pedestrian-configured').expected;
+            assert.equal(await page.locator('#summary').innerText(), `${configured.trip.summary.length.toFixed(3)} km · ${Math.round(configured.trip.summary.time)} seconds`);
+            await page.getByRole('button', { name: 'Reset to defaults' }).click();
+            assert.equal(await page.locator('[name=walking_speed]').inputValue(), '');
+            await page.locator('#costing').selectOption('auto');
+            checks.push(`${transport}: all profiles, typed settings and reset`);
             // A transport change creates a new worker so the next route fetches tiles.
             await page.locator('#transport').selectOption(transport === 'indexed-tar' ? 'individual-tiles' : 'indexed-tar');
             await page.locator('#transport').selectOption(transport);
+            await page.locator('#costing').selectOption('pedestrian');
             host.setFault({ type: 'delay', delayMs: 1500, tileOnly: true,
               match: transport === 'indexed-tar' ? 'graph.tar' : '.gph' });
             await page.locator('#preset').selectOption('balzers-ruggell');
             await page.getByRole('button', { name: 'Calculate route' }).click();
             await page.waitForFunction(() => document.querySelector('#status').textContent === 'Loading road data…');
+            assert(await page.locator('#costing').isDisabled());
+            assert(await page.locator('[name=walking_speed]').isDisabled());
+            assert(await page.locator('#reset-profile').isDisabled());
             await page.getByRole('button', { name: 'Cancel', exact: true }).click();
             await page.waitForFunction(() => document.querySelector('#status').textContent.includes('CANCELLED'));
             host.setFault(null);
+            await page.locator('#costing').selectOption('auto');
             await calculate('balzers-ruggell');
             checks.push(`${transport}: cancellation and subsequent successful route`);
             if (transport === 'indexed-tar') {
@@ -116,6 +145,26 @@ try {
               await page.screenshot({ path: path.join(root, `test-results/demo-map-${engine}-mobile.png`), fullPage: true });
               checks.push('mobile viewport retains map controls and attribution without horizontal overflow');
             }
+            // An old deployment remains driving-only, and cannot silently fall back.
+            await page.route(manifestUrl,async intercepted=>{
+              const response=await intercepted.fetch();
+              const body=JSON.stringify({...await response.json(),costings:['auto']});
+              await intercepted.fulfill({response,body,headers:{...response.headers(),'content-length':String(Buffer.byteLength(body))}});
+            });
+            await page.reload();
+            await page.waitForFunction(()=>document.querySelector('#preset').value==='balzers-ruggell');
+            await page.locator('#costing').selectOption('bicycle');
+            await page.getByRole('button',{name:'Calculate route'}).click();
+            await page.waitForFunction(()=>!document.querySelector('#route').disabled);
+            assert.match(await page.locator('#status').innerText(),/UNSUPPORTED_COSTING/);
+            // Playwright's isDisabled follows the wrapping label to its select;
+            // inspect the individual option's native state instead.
+            assert(await page.locator('#costing option[value=bicycle]').evaluate(option=>option.disabled),
+              await page.locator('#costing').evaluate(select=>select.outerHTML));
+            assert.equal(await page.locator('#geometry .route-line').count(),0);
+            await page.locator('#costing').selectOption('auto');
+            await calculate('balzers-ruggell');
+            checks.push('legacy dataset capabilities disable unsupported profiles; driving remains usable');
           }
           assert.deepEqual(errors, []);
           assert(!seen.some(url => new URL(url).origin === new URL(base).origin &&

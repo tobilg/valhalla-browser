@@ -1,30 +1,12 @@
 import { workerUrl as defaultWorkerUrl, wasmUrl as defaultWasmUrl } from 'virtual:runtime-assets';
 import { RoutingError, cancelled } from './errors.js';
-import type { NormalizedRequest, Operations, WorkerRequest, WorkerResponse } from './protocol.js';
-import type { Coordinates, Diagnostics, RouteRequest, RouteResult, RouterOptions, StartupResult } from './types.js';
+import type { Operations, WorkerRequest, WorkerResponse } from './protocol.js';
+import type { Diagnostics, RouteRequest, RouteResult, RouterOptions, StartupResult } from './types.js';
+import { validateRequest } from './profiles.js';
 export { RoutingError } from './errors.js';
 export type { RoutingErrorCode, RoutingErrorOptions, SerializedRoutingError } from './errors.js';
 export type * from './types.js';
 export type { NormalizedRequest } from './protocol.js';
-
-/**
- * Validate and normalize the supported two-location driving request without loading WASM.
- * @param request - Unknown input to validate as a {@link RouteRequest}.
- * @returns A copied request with explicit correlation, unit and language defaults.
- * @throws {@link RoutingError} with `INVALID_REQUEST` or `UNSUPPORTED_COSTING`.
- */
-export function validateRequest(request: unknown): NormalizedRequest {
-  if (!request || typeof request !== 'object') throw new RoutingError('INVALID_REQUEST', 'A route request is required.');
-  const input = request as Record<string, unknown>;
-  if (input.costing !== undefined && input.costing !== 'auto') throw new RoutingError('UNSUPPORTED_COSTING', 'Only auto costing is validated.');
-  const locations = input.locations ?? [input.origin, input.destination];
-  if (!Array.isArray(locations) || locations.length !== 2) throw new RoutingError('INVALID_REQUEST', 'Exactly two locations are required.');
-  for (const point of locations) {
-    if (!point || !Number.isFinite(point.lat) || Math.abs(point.lat) > 90 || !Number.isFinite(point.lon) || Math.abs(point.lon) > 180)
-      throw new RoutingError('INVALID_REQUEST', 'Coordinates must be finite latitude/longitude values.');
-  }
-  return { locations: (locations as Coordinates[]).map(({ lat, lon }) => ({ lat, lon, radius: 30, minimum_reachability: 0 })), costing: 'auto', units: 'kilometers', language: 'en-US' };
-}
 
 interface Pending {
   resolve: (value: unknown) => void;
@@ -192,8 +174,8 @@ export class Router {
   }
 
   /**
-   * Calculate a driving route, initializing lazily and queuing behind other native operations.
-   * @param request - Start/end coordinates and the optional validated driving profile.
+   * Calculate a road route with the selected profile, initializing lazily and queuing behind other native operations.
+   * @param request - Start/end coordinates and the optional profile and matching settings.
    * @returns Complete native JSON, dataset identity and per-route measurements.
    * @throws {@link RoutingError} for invalid input, coverage/no-route, transport or lifecycle failures.
    * @remarks Aborting the signal terminates the worker and rejects all pending operations,

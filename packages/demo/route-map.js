@@ -39,10 +39,11 @@ export function createRouteMap(element, { toggle, fitButton, status }) {
   return {
     preview(locations) {
       geometry.clearLayers();
+      fitButton.disabled = true;
+      if (locations.length !== 2) { bounds = undefined; return; }
       const coordinates = locations.map(({ lat, lon }) => [lat, lon]);
       bounds = latLngBounds(coordinates);
       endpoints(coordinates);
-      fitButton.disabled = true;
       fit();
     },
     draw(coordinates) {

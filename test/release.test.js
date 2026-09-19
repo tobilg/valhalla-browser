@@ -13,7 +13,7 @@ test('publication recovery verifies identity and exact tarball integrity', () =>
   const candidate = { name: 'valhalla-browser', version: '0.0.1', integrity: integrity(Buffer.from('verified candidate')) };
   const metadata = { name: candidate.name, version: candidate.version, dist: { integrity: candidate.integrity } };
   verifyPublished(metadata, candidate);
-  for (const changed of [{ ...metadata, name: 'other' }, { ...metadata, version: '0.0.2' }, { ...metadata, dist: { integrity: integrity(Buffer.from('changed')) } }])
+  for (const changed of [{ ...metadata, name: 'other' }, { ...metadata, version: '0.1.0' }, { ...metadata, dist: { integrity: integrity(Buffer.from('changed')) } }])
     assert.throws(() => verifyPublished(changed, candidate));
 });
 test('only authoritative npm 404 means unpublished; registry errors cannot permit publication', async () => {
