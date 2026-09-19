@@ -41,7 +41,7 @@ test('manual release runs cannot publish or deploy, and production deployment de
 test('demo deployment consumes the verified artifact and targets its own Pages project', async () => {
   const proof = parse(await readFile('.github/workflows/browser-proof.yml', 'utf8'));
   const workflow = parse(await readFile('.github/workflows/release.yml', 'utf8'));
-  const uploads = proof.jobs['source-build-and-proof'].steps;
+  const uploads = proof.jobs['minio-and-demo'].steps;
   const upload = uploads.find(step => step.uses?.startsWith('actions/upload-artifact@') && step.with.name === 'demo');
   assert.equal(upload.with.path, 'packages/demo/dist/');
   assert.equal(upload.with['if-no-files-found'], 'error');
@@ -66,6 +66,73 @@ test('demo deployment consumes the verified artifact and targets its own Pages p
   const deploy = steps.find(step => step.run?.includes('wrangler pages deploy'));
   assert.match(deploy.run, /pages deploy dist --cwd \.\.\/demo --project-name valhalla-browser --branch main/);
   assert(!steps.some(step => /pnpm run build/.test(step.run ?? '')), 'Deploy the tested build without rebuilding');
+});
+
+test('parallel verification preserves every suite and tests one shared release candidate', async () => {
+  const proof = parse(await readFile('.github/workflows/browser-proof.yml', 'utf8'));
+  const release = parse(await readFile('.github/workflows/release.yml', 'utf8'));
+  const { jobs } = proof;
+  for (const name of ['documentation', 'native-build', 'wasm-build']) assert.equal(jobs[name].needs, undefined);
+  assert.equal(jobs['wasm-build'].outputs.tarball, '${{ steps.candidate.outputs.tarball }}');
+  assert.deepEqual(jobs.browsers.strategy, { 'fail-fast': false, matrix: { browser: ['chromium', 'firefox', 'webkit'] } });
+  assert.equal(jobs.browsers.env.BROWSER, '${{ matrix.browser }}');
+  assert.equal(jobs.browsers.env.SDK_TARBALL, 'build/package/${{ needs.wasm-build.outputs.tarball }}');
+  for (const name of ['browsers', 'osm-verification', 'minio-and-demo']) {
+    assert.deepEqual(jobs[name].needs, ['native-build', 'wasm-build']);
+    assert(jobs[name].steps.some(step => step.with?.name === 'browser-runtime' && step.uses?.startsWith('actions/download-artifact@')));
+    assert(!jobs[name].steps.some(step => /build:wasm|build:sdk|pack:sdk/.test(step.run ?? '')), 'Consumers must use the shared build');
+  }
+  const runs = Object.values(jobs).flatMap(job => job.steps).filter(step => step.run).map(step => step.run);
+  for (const command of ['build:docs', 'test:docs', 'build:native', 'data', 'data:region', 'build:wasm', 'test:data',
+    'pack:sdk', 'test:package', 'test:cdn-import', 'test:examples', 'test:browser', 'test:demo:static', 'test:matrix',
+    'test:demo --minio', 'test:demo --preview --minio', 'test:data:build --prepare build/osm-proof',
+    'test:data:build --verify build/osm-proof']) assert(runs.includes(`pnpm run ${command}`), `Missing suite: ${command}`);
+  assert(runs.includes('pnpm test'));
+  assert.equal(runs.filter(run => run === 'pnpm run pack:sdk').length, 1);
+  const examples = jobs.browsers.steps.find(step => step.run === 'pnpm run test:examples');
+  assert.equal(examples.if, "matrix.browser == 'chromium'");
+  const uploads = Object.values(jobs).flatMap(job => job.steps).filter(step => step.uses?.startsWith('actions/upload-artifact@'));
+  const names = uploads.map(step => step.with.name);
+  assert.equal(new Set(names).size, names.length, 'Artifact producers must not overwrite one another');
+  for (const [name, job] of Object.entries(jobs)) {
+    assert(!job['continue-on-error'], `${name}: job failures must fail verification`);
+    for (const download of job.steps.filter(step => step.uses?.startsWith('actions/download-artifact@'))) {
+      const producer = Object.entries(jobs).find(([, other]) => other.steps.some(step =>
+        step.uses?.startsWith('actions/upload-artifact@') && step.with.name === download.with.name));
+      assert(producer, `${name}: no producer for ${download.with.name}`);
+      assert(job.needs.includes(producer[0]), `${name}: must wait for ${download.with.name}`);
+    }
+    for (const step of job.steps.filter(step => /^pnpm (run test:|test$)/.test(step.run ?? ''))) {
+      assert(!step['continue-on-error'], `${name}: test failures must fail verification`);
+    }
+  }
+  assert(jobs.browsers.steps.some(step => step.with?.name === 'browser-proof-${{ matrix.browser }}'));
+  assert.equal(release.jobs.verify.uses, './.github/workflows/browser-proof.yml');
+  assert.equal(release.jobs.publish.needs, 'verify');
+});
+
+test('final verification gate rejects failed, cancelled or skipped jobs before exposing release outputs', async () => {
+  const { jobs, on: triggers } = parse(await readFile('.github/workflows/browser-proof.yml', 'utf8'));
+  const gate = jobs['source-build-and-proof'];
+  assert.equal(gate.if, 'always()');
+  assert.deepEqual([...gate.needs].sort(), Object.keys(jobs).filter(name => name !== 'source-build-and-proof').sort());
+  for (const key of ['version', 'tarball']) {
+    assert.equal(gate.outputs[key], `\${{ needs.wasm-build.outputs.${key} }}`);
+    assert.equal(triggers.workflow_call.outputs[key].value, `\${{ jobs.source-build-and-proof.outputs.${key} }}`);
+  }
+  const check = gate.steps.find(step => step.env?.JOB_RESULTS);
+  assert.equal(check.env.JOB_RESULTS, '${{ toJSON(needs) }}');
+  const results = Object.fromEntries(gate.needs.map(name => [name, { result: 'success' }]));
+  const execute = input => spawnSync('bash', ['-c', check.run], {
+    encoding: 'utf8', env: { ...process.env, JOB_RESULTS: JSON.stringify(input) },
+  });
+  assert.equal(execute(results).status, 0);
+  assert.notEqual(execute({}).status, 0);
+  for (const name of gate.needs) for (const result of ['failure', 'cancelled', 'skipped']) {
+    const failed = execute({ ...results, [name]: { result } });
+    assert.equal(failed.status, 1, `${name}: ${result}`);
+    assert(failed.stderr.includes(`${name}: ${result}`));
+  }
 });
 
 test('tagged releases reject missing or invalid demo URLs before verification', async () => {

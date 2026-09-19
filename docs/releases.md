@@ -131,10 +131,14 @@ prerelease and mismatched tags fail before publication. The workflow uses the
 pinned source container on an ARM runner and a frozen pnpm lockfile. It does not
 change versions or commit build output.
 
-The source job packs a single candidate, checks its contents, runs installed-package,
-CDN-import and README tests against that exact tarball, and uploads it with a
-SHA-512 release manifest. It also verifies the demo, native corpora, fault/recovery
-suites, MinIO and TypeDoc. The publication job downloads the verified candidate,
+Native/data, WASM/package and documentation jobs run in parallel. The WASM job
+packs one candidate and uploads it with a SHA-512 release manifest. Browser jobs
+test that exact tarball across Chromium, Firefox and WebKit, while separate jobs
+verify the fresh OSM archive and the MinIO/demo behavior. README examples,
+native corpora, fault/recovery suites and TypeDoc remain required checks.
+The final `source-build-and-proof` gate rejects failed, cancelled and skipped
+prerequisites. Downloaded artifacts are candidates until the entire gate passes.
+The publication job downloads the verified candidate,
 checks its checksum, and publishes it to npm's `latest` tag with provenance.
 Only after publication succeeds do separate Pages jobs receive the matching
 documentation and demo artifacts. They deploy the tested output without rebuilding.

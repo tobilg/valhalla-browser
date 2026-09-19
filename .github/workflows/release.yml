@@ -39,6 +39,8 @@ jobs:
           JS
   verify:
     needs: validate
+    # The reusable workflow runs builds and suites in parallel. Its final
+    # source-build-and-proof gate requires every job, including each browser.
     uses: ./.github/workflows/browser-proof.yml
   publish:
     needs: verify

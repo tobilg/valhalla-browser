@@ -12,15 +12,12 @@ on:
         value: ${{ jobs.source-build-and-proof.outputs.tarball }}
 permissions:
   contents: read
+env:
+  WRANGLER_SEND_METRICS: 'false'
 jobs:
-  source-build-and-proof:
+  documentation:
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 120
-    outputs:
-      version: ${{ steps.candidate.outputs.version }}
-      tarball: ${{ steps.candidate.outputs.tarball }}
-    env:
-      WRANGLER_SEND_METRICS: 'false'
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -29,44 +26,217 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # Prove documentation has no native build prerequisite.
+      # Prove documentation has no native or WASM build prerequisite.
       - run: pnpm run build:docs
       - run: pnpm exec playwright install --with-deps chromium firefox webkit
       - run: pnpm run test:docs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: documentation
+          path: packages/documentation/dist/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: browser-proof-documentation
+          path: |
+            test-results/*.json
+            test-results/*.png
+          retention-days: 14
+
+  native-build:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run build:native
       - run: pnpm run data
       - run: pnpm run data:region
-      - run: pnpm run build:wasm
       - name: Restore runner ownership of container outputs
         run: sudo chown -R "$(id -u):$(id -g)" build public fixtures
       - run: pnpm run test:data
-      - run: pnpm run build
-      - run: pnpm run test:data:build
       - run: pnpm test
+      # The fresh OSM build stays beside its native tools. Only its data and
+      # reference results cross to the browser verification job.
+      - run: pnpm run test:data:build --prepare build/osm-proof
+      - uses: actions/upload-artifact@v7
+        with:
+          name: native-fixtures
+          path: |
+            public/datasets/
+            public/manifest.json
+            public/region.json
+            fixtures/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        with:
+          name: osm-proof-input
+          path: build/osm-proof/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: browser-proof-native
+          path: |
+            test-results/*.json
+            test-results/*.png
+            build/reports/
+          retention-days: 14
+
+  wasm-build:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    outputs:
+      version: ${{ steps.candidate.outputs.version }}
+      tarball: ${{ steps.candidate.outputs.tarball }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Separate checkout: build scripts mutate build/sources and build/reports.
+      - run: pnpm run build:wasm
+      - run: sudo chown -R "$(id -u):$(id -g)" build public
+      # prepack typechecks and builds the SDK once. Consumers never repack it.
       - run: pnpm run pack:sdk
       - id: candidate
         run: node scripts/release.js candidate
+      - name: SDK candidate (publication requires the final verification gate)
+        uses: actions/upload-artifact@v7
+        with:
+          name: sdk-release
+          path: |
+            build/package/${{ steps.candidate.outputs.tarball }}
+            build/package/release.json
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        with:
+          name: browser-runtime
+          path: |
+            packages/valhalla-browser/dist/
+            public/wasm/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: browser-proof-wasm
+          path: build/reports/
+          retention-days: 14
+
+  browsers:
+    needs: [native-build, wasm-build]
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      BROWSER: ${{ matrix.browser }}
+      SDK_TARBALL: build/package/${{ needs.wasm-build.outputs.tarball }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-fixtures
+      - uses: actions/download-artifact@v7
+        with:
+          name: browser-runtime
+      - uses: actions/download-artifact@v7
+        with:
+          name: sdk-release
+          path: build/package
+      - run: pnpm exec playwright install --with-deps "$BROWSER"
       - run: pnpm run test:package
-        env:
-          SDK_TARBALL: build/package/${{ steps.candidate.outputs.tarball }}
       - run: pnpm run test:cdn-import
-        env:
-          SDK_TARBALL: build/package/${{ steps.candidate.outputs.tarball }}
+      - run: pnpm run test:browser
+      - run: pnpm run test:demo:static
       - run: pnpm run test:examples
-        env:
-          SDK_TARBALL: build/package/${{ steps.candidate.outputs.tarball }}
-      - run: pnpm run test:browser
-      - run: pnpm run test:browser
-        env:
-          BROWSER: firefox
-      - run: pnpm run test:browser
-        env:
-          BROWSER: webkit
+        if: matrix.browser == 'chromium'
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: browser-proof-${{ matrix.browser }}
+          path: |
+            test-results/*.json
+            test-results/*.png
+          retention-days: 14
+
+  osm-verification:
+    needs: [native-build, wasm-build]
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v7
+        with:
+          name: browser-runtime
+      - uses: actions/download-artifact@v7
+        with:
+          name: osm-proof-input
+          path: build/osm-proof
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm run test:data:build --verify build/osm-proof
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: browser-proof-osm
+          path: |
+            test-results/*.json
+            test-results/*.png
+          retention-days: 14
+
+  minio-and-demo:
+    needs: [native-build, wasm-build]
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-fixtures
+      - uses: actions/download-artifact@v7
+        with:
+          name: browser-runtime
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - run: pnpm --filter @tobilg/valhalla-browser-demo build
       - run: pnpm run minio:start
       - run: pnpm run minio:publish
       - run: pnpm run test:demo --minio
       - run: pnpm run test:demo --preview --minio
-      - run: pnpm run test:demo:static
+      # Keep benchmarks on their own runner, with no concurrent browser tests.
       - run: pnpm run test:matrix
       - name: Build demo with the public R2 manifest
         if: vars.VITE_DEMO_MANIFEST_URL != ''
@@ -78,39 +248,45 @@ jobs:
         env:
           VITE_DEMO_MANIFEST_URL: ${{ vars.VITE_DEMO_MANIFEST_URL }}
         run: pnpm run test:demo:static --artifact
-      - name: Verified SDK release candidate
-        uses: actions/upload-artifact@v7
-        with:
-          name: sdk-release
-          path: |
-            build/package/${{ steps.candidate.outputs.tarball }}
-            build/package/release.json
-          if-no-files-found: error
-          retention-days: 14
-      - name: Verified documentation
-        uses: actions/upload-artifact@v7
-        with:
-          name: documentation
-          path: packages/documentation/dist/
-          if-no-files-found: error
-          retention-days: 14
-      - name: Verified demo
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7
         with:
           name: demo
           path: packages/demo/dist/
           if-no-files-found: error
           retention-days: 14
-      - name: Preserve executed results
+      - uses: actions/upload-artifact@v7
         if: always()
-        uses: actions/upload-artifact@v7
         with:
-          name: browser-proof
+          name: browser-proof-minio
           path: |
             test-results/*.json
             test-results/*.png
-            build/reports/
           retention-days: 14
       - run: pnpm run minio:stop
         if: always()
         continue-on-error: true
+
+  # Keep the existing check name for branch protection and expose release outputs
+  # only from this gate. Failed, cancelled and skipped prerequisites all fail it.
+  source-build-and-proof:
+    needs: [documentation, native-build, wasm-build, browsers, osm-verification, minio-and-demo]
+    if: always()
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 5
+    outputs:
+      version: ${{ needs.wasm-build.outputs.version }}
+      tarball: ${{ needs.wasm-build.outputs.tarball }}
+    steps:
+      - name: Require every verification job to succeed
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node --input-type=module <<'JS'
+          const jobs = JSON.parse(process.env.JOB_RESULTS);
+          const failed = Object.entries(jobs).filter(([, job]) => job.result !== 'success');
+          if (!Object.keys(jobs).length || failed.length) {
+            console.error('Verification did not pass:', failed.map(([name, job]) => `${name}: ${job.result}`).join(', '));
+            process.exit(1);
+          }
+          console.log('All build, documentation, browser, OSM and MinIO checks passed.');
+          JS

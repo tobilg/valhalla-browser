@@ -210,7 +210,7 @@ warm routes use one worker; cancellation and recovery use the same page and Rout
 and the replacement worker must download tiles again and match the native result.
 `test-results/package.json` includes replacement-worker timings and records failed
 cases with their stage, progress events and browser errors. CI retains this report
-in the `browser-proof` artifact. To investigate one engine without skipping any of
+in the `browser-proof-<browser>` artifacts. To investigate one engine without skipping any of
 its development/production or transport cases, run `BROWSER=webkit pnpm run test:package`.
 
 The package and README consumers install with
@@ -312,6 +312,36 @@ suites across Chromium, Firefox and WebKit. Reports and verified artifacts are
 retained for 14 days. Public-CDN probes (`test:cdn`, `test:cdn:cors` and
 `test:cdn:objects`) remain manual because they require your deployment URL and data;
 CI uses local HTTP servers and MinIO for transport verification.
+
+Native graph preparation, WASM compilation/SDK packaging, and documentation run
+on separate runners in parallel. The native job also runs the unit/data tests.
+Once the build artifacts are available, Chromium, Firefox and WebKit each run
+their package, CDN-import, worker and static-demo checks on a separate runner;
+the Chromium job also runs the README examples. A separate MinIO/demo job runs
+the benchmarks sequentially, without competing browser tests on that runner.
+The OSM browser proof consumes a fresh archive and native results from the native
+job, so it needs neither a native toolchain nor a Docker image.
+
+To reproduce that OSM handoff locally (use a new bundle directory each time):
+
+```sh
+pnpm run test:data:build --prepare build/osm-proof
+pnpm run test:data:build --verify build/osm-proof
+```
+
+Preparation requires `build:native` and `data:region`; verification requires
+`build:sdk` and Playwright Chromium. The existing `pnpm run test:data:build`
+command still runs both phases together. The portable bundle contains the actual
+generated dataset and native results, and refuses to overwrite an existing directory.
+
+CI passes `native-fixtures`, `browser-runtime`, `osm-proof-input` and the exact
+`sdk-release` candidate between jobs. Reports use distinct `browser-proof-*`
+artifact names. All artifacts are retained for 14 days. The final
+`source-build-and-proof` check retains its previous name for branch protection
+and fails if any prerequisite failed, was cancelled or was skipped. Artifacts
+uploaded earlier in the run are candidates until this check passes. Parallel
+jobs increase concurrent runner use; compare complete hosted run durations before
+claiming a speedup.
 
 Pushes to `main` only verify and upload artifacts. Tagged releases publish the
 same workflow's exact SDK tarball and deploy its matching documentation and demo
