@@ -32,6 +32,7 @@
     "test:data": "python3 test/dataset_test.py",
     "test:data:build": "node test/dataset-build.js",
     "test:browser": "node test/browser.js",
+    "test:worker-recovery": "node test/worker-recovery.js",
     "test:demo": "node test/demo.js",
     "test:demo:static": "node test/demo-static.js",
     "test:matrix": "node test/matrix.js",

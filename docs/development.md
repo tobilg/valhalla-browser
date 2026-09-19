@@ -203,6 +203,26 @@ tile headers and incompatible archives; they also check immutable publication.
 Public deployment-validator checks run with `pnpm test` using a local HTTP server.
 The browser suite preserves full native JSON comparison, actual Asyncify suspension,
 range faults, serialized calls, cache bounds and CPU/fetch cancellation recovery.
+It also injects worker-script HTTP failures during cancellation recovery. An
+opaque browser load error before the worker's first message gets one retry after
+100 ms; the failed worker is terminated first. `retries: 0` disables that retry.
+Persistent errors still reject, and cancellation/disposal stops the pending retry.
+Errors after the first worker message do not replay native operations. This covers
+an intermittent Linux WebKit failure when loading a replacement worker immediately
+after termination. The matrix report retains browser errors, failed request URLs
+and local asset-server records alongside the MinIO origin trace for diagnosis.
+To repeat the exact immediate-cancellation sequence with real regional routes:
+
+```sh
+pnpm run test:worker-recovery # 10 WebKit cycles against the local graph
+# After minio:start and minio:publish:
+BROWSER=webkit RECOVERY_CYCLES=100 pnpm run test:worker-recovery --minio
+```
+
+Each cycle uses a fresh browser context, then cancels and recovers on the same
+Router without test-level retries. Results and browser/network errors are saved
+in `test-results/worker-recovery.json`.
+
 The static-demo test compiles an isolated build with the manifest environment
 variable, serves only its output, and verifies all regional presets, selective
 tile loading, warm reuse and cancellation/recovery in all three browsers. It

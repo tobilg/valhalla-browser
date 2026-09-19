@@ -51,9 +51,9 @@ export interface RouterOptions {
   transport?: TileTransport;
   /** Retained decoded-tile cache budget in bytes: 1 KiB–128 MiB, default 32 MiB. This is not a total-worker memory limit. */
   memoryBudgetBytes?: number;
-  /** Fetch/worker-load deadline in integer ms, 1–60,000; default 10,000. WASM startup receives at least 10 seconds. */
+  /** Fetch/worker-load deadline per attempt in integer ms, 1–60,000; default 10,000. WASM startup receives at least 10 seconds. */
   timeoutMs?: number;
-  /** Additional attempts for transient fetch failures, integer 0–5; defaults to 2. */
+  /** Additional attempts for transient fetch failures, integer 0–5; defaults to 2. Zero also disables the single retry for opaque worker-load failures before startup acknowledgement. */
   retries?: number;
   /** Receives worker progress on the main thread. Callback exceptions are ignored; avoid blocking UI work. */
   onProgress?: (event: ProgressEvent) => void;
@@ -61,7 +61,7 @@ export interface RouterOptions {
   workerUrl?: string | URL;
   /** Optional matching WASM binary. Relative URLs resolve against the page. Defaults to the package's bundled binary. */
   wasmUrl?: string | URL;
-  /** Takes precedence over workerUrl. Each call must return a fresh worker implementing this SDK version's protocol. Advanced integration only. */
+  /** Takes precedence over workerUrl. Each call must return a fresh worker implementing this SDK version's protocol. Disables automatic worker-startup retries. Advanced integration only. */
   workerFactory?: () => Worker;
 }
 

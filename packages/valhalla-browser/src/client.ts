@@ -80,6 +80,9 @@ export class Router {
    * @returns Initialization timings and dataset/native identity.
    * @throws {@link RoutingError} for asset, dataset, network, cancellation or disposed-session failures.
    * @remarks A failed initialization can be retried on the same Router.
+   * An opaque browser worker-load failure is retried once before its first message,
+   * unless `retries` is zero or a custom `workerFactory` is used.
+   * Cancellation also stops this startup recovery.
    */
   async initialize(): Promise<StartupResult> {
     if (this.disposed) throw new RoutingError('DISPOSED', 'Router is disposed.');
@@ -94,47 +97,75 @@ export class Router {
       this.releaseBootstrap();
       throw new RoutingError('WORKER_FAILED', 'Cannot create routing worker. Check asset URLs and CSP.', { cause });
     }
-    this.worker = worker;
-    worker.onmessage = ({ data }: MessageEvent<WorkerResponse>) => {
-      if (worker !== this.worker) return;
-      this.releaseBootstrap();
-      if (data.type === 'ready') return;
-      const entry = this.pending.get(data.id);
-      if (!entry) return;
-      if (data.type === 'progress') {
-        if (data.detail.phase === 'loading-runtime') {
-          this.bootTimer = setTimeout(() => {
-            if (worker === this.worker) this.reset(new RoutingError('TIMEOUT', 'WASM runtime initialization timed out.', { retryable: true }));
-          // Small tile-fetch budgets must not abort healthy WASM compilation.
-          }, Math.max(10000, this.options.timeoutMs ?? 10000));
-        }
-        try { this.options.onProgress?.({ requestId: data.id, ...data.detail }); } catch { /* Diagnostics must not break routing. */ }
-        return;
-      }
-      this.pending.delete(data.id);
-      entry.cleanup();
-      if (data.type === 'error') {
-        const error = new RoutingError(data.error.code, data.error.message, data.error);
-        entry.reject(error);
-        if (['RUNTIME', 'WORKER_FAILED'].includes(error.code)) this.reset(error);
-      } else entry.resolve(data.result);
-    };
-    worker.onerror = event => {
-      event.preventDefault();
-      if (worker === this.worker) this.reset(new RoutingError('WORKER_FAILED', event.message || 'Worker failed. Check asset URLs and CSP.'));
-    };
-    worker.onmessageerror = () => {
-      if (worker === this.worker) this.reset(new RoutingError('WORKER_FAILED', 'Invalid worker message.'));
-    };
-    // Some browsers report blocked module imports only through the console.
-    // Custom workerFactory implementations retain the original protocol without a ready handshake.
-    if (!this.options.workerFactory) {
-      this.bootTimer = setTimeout(() => {
-        if (worker === this.worker) this.reset(new RoutingError('WORKER_FAILED', 'Routing worker did not start. Check asset URLs, CORS, and CSP.'));
-      }, this.options.timeoutMs ?? 10000);
-    }
     const { manifestUrl, transport, timeoutMs, retries, memoryBudgetBytes } = this.options;
-    const ready: Promise<StartupResult> = this.send('initialize', { options: { manifestUrl, transport, timeoutMs, retries, memoryBudgetBytes, wasmUrl } }).then(result => {
+    const payload = { options: { manifestUrl, transport, timeoutMs, retries, memoryBudgetBytes, wasmUrl } };
+    const initializeId = ++this.sequence;
+    let bootRetries = 0;
+    const attach = (worker: Worker): void => {
+      this.worker = worker;
+      let acknowledged = false;
+      worker.onmessage = ({ data }: MessageEvent<WorkerResponse>) => {
+        if (worker !== this.worker) return;
+        acknowledged = true;
+        this.releaseBootstrap();
+        if (data.type === 'ready') return;
+        const entry = this.pending.get(data.id);
+        if (!entry) return;
+        if (data.type === 'progress') {
+          if (data.detail.phase === 'loading-runtime') {
+            this.bootTimer = setTimeout(() => {
+              if (worker === this.worker) this.reset(new RoutingError('TIMEOUT', 'WASM runtime initialization timed out.', { retryable: true }));
+            // Small tile-fetch budgets must not abort healthy WASM compilation.
+            }, Math.max(10000, this.options.timeoutMs ?? 10000));
+          }
+          try { this.options.onProgress?.({ requestId: data.id, ...data.detail }); } catch { /* Diagnostics must not break routing. */ }
+          return;
+        }
+        this.pending.delete(data.id);
+        entry.cleanup();
+        if (data.type === 'error') {
+          const error = new RoutingError(data.error.code, data.error.message, data.error);
+          entry.reject(error);
+          if (['RUNTIME', 'WORKER_FAILED'].includes(error.code)) this.reset(error);
+        } else entry.resolve(data.result);
+      };
+      worker.onerror = event => {
+        event.preventDefault();
+        if (worker !== this.worker) return;
+        // An opaque module-load failure can be transient (including immediately
+        // after termination). Retry once, before the worker has acknowledged any
+        // message. Never replay routing/native operations or custom worker protocols.
+        if (!acknowledged && !event.message && !this.options.workerFactory && retries !== 0 && bootRetries++ === 0) {
+          worker.onmessage = worker.onerror = worker.onmessageerror = null;
+          worker.terminate();
+          this.releaseBootstrap();
+          this.bootTimer = setTimeout(() => {
+            if (worker !== this.worker) return;
+            try {
+              const replacement = this.createWorker();
+              attach(replacement);
+              replacement.postMessage({ id: initializeId, type: 'initialize', ...payload } satisfies WorkerRequest);
+            } catch (cause) {
+              this.reset(new RoutingError('WORKER_FAILED', 'Cannot restart routing worker.', { cause }));
+            }
+          }, 100);
+          return;
+        }
+        this.reset(new RoutingError('WORKER_FAILED', event.message || 'Worker failed. Check asset URLs and CSP.'));
+      };
+      worker.onmessageerror = () => {
+        if (worker === this.worker) this.reset(new RoutingError('WORKER_FAILED', 'Invalid worker message.'));
+      };
+      // Some browsers report blocked module imports only through the console.
+      // Custom workerFactory implementations retain the original protocol without a ready handshake.
+      if (!this.options.workerFactory) {
+        this.bootTimer = setTimeout(() => {
+          if (worker === this.worker) this.reset(new RoutingError('WORKER_FAILED', 'Routing worker did not start. Check asset URLs, CORS, and CSP.'));
+        }, this.options.timeoutMs ?? 10000);
+      }
+    };
+    attach(worker);
+    const ready: Promise<StartupResult> = this.send('initialize', payload, undefined, initializeId).then(result => {
       const startup = { ...result, workerReadyMs: performance.now() - started };
       this.startup = startup;
       return startup;
@@ -146,8 +177,7 @@ export class Router {
     return ready;
   }
 
-  private send<K extends keyof Operations>(type: K, payload: Operations[K]['payload'], signal?: AbortSignal): Promise<Operations[K]['result']> {
-    const id = ++this.sequence;
+  private send<K extends keyof Operations>(type: K, payload: Operations[K]['payload'], signal?: AbortSignal, id = ++this.sequence): Promise<Operations[K]['result']> {
     return new Promise((resolve, reject) => {
       const abort = () => this.cancel();
       this.pending.set(id, { resolve: value => resolve(value as Operations[K]['result']), reject, cleanup: () => signal?.removeEventListener('abort', abort) });

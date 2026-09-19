@@ -18,13 +18,20 @@ const trace = await startTrace();
 const report = { at: new Date().toISOString(), device: { platform: os.platform(), arch: os.arch(), cpu: os.cpus()[0].model, memoryBytes: os.totalmem() },
   distribution: 'Direct cross-origin MinIO on loopback; no proxy or CDN',
   browserTransferSizes: null, browserTransferSizeReason: 'MinIO does not provide Timing-Allow-Origin; cross-origin Resource Timing zeros are not evidence of cache hits.',
-  cases: [], benchmarks: [], cache: [], tests: [], browsers: [], sampleCounts: { cold: 5, warm: 20 } };
+  cases: [], benchmarks: [], cache: [], tests: [], browsers: [], browserErrors: [], requestFailures: [], sampleCounts: { cold: 5, warm: 20 } };
 const transports = ['indexed-tar', 'individual-tiles'];
 const long = corpora[1].reference.cases.find(c => c.name === 'balzers-ruggell');
 const manifestUrl = corpus => discovery.datasets.find(d => d.manifestUrl.includes(`/${corpus.manifest.release}/`)).manifestUrl;
 
 async function setup(context, corpus, transport, delivery = 'minio') {
   const page = await context.newPage();
+  const engine = context.browser()?.browserType().name();
+  page.on('pageerror', error => report.browserErrors.push({ engine, transport, delivery, message: error.message }));
+  page.on('console', message => {
+    if (message.type() === 'error') report.browserErrors.push({ engine, transport, delivery, message: message.text() });
+  });
+  page.on('requestfailed', request => report.requestFailures.push({ engine, transport, delivery,
+    url: request.url(), error: request.failure()?.errorText }));
   await page.goto(base);
   await page.evaluate(async options => {
     const { Router } = await import('/dist/index.js');
@@ -233,6 +240,7 @@ try {
   report.passed = false; report.failure = { message: error.message, stack: error.stack }; throw error;
 } finally {
   report.originRecords = trace.records;
+  report.localOriginRecords = host.records;
   await mkdir('test-results', { recursive: true });
   await writeFile('test-results/matrix.json', JSON.stringify(report, null, 2) + '\n');
   trace.stop(); host.server.closeAllConnections(); await new Promise(resolve => host.server.close(resolve));

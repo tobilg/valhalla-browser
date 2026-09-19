@@ -126,6 +126,58 @@ try {
     await initialize(p);equivalent(await route(p,cross.request),cross.expected);await p.close();
   });
 
+  await check('cancel then recover from one failed replacement worker script with concurrent submissions',async()=>{
+    const p=await page();await initialize(p);
+    const cancelled=await p.evaluate(async request=>{
+      window.router.options.onProgress=event=>{if(event.phase==='fetching-tile')window.router.cancel();};
+      try{await window.router.route(request);return 'unexpected success';}
+      catch(error){return error.code;}
+      finally{window.router.options.onProgress=undefined;}
+    },cross.request);
+    assert.equal(cancelled,'CANCELLED');
+    const mark=host.records.length;
+    host.setFault({type:'transient',match:'/dist/worker.js'});
+    const results=await p.evaluate(async request=>Promise.all([
+      window.router.route(request),window.router.route(request),
+    ]),cross.request);
+    for(const result of results)equivalent({result},cross.expected);
+    const boots=host.records.slice(mark).filter(r=>r.path==='/dist/worker.js');
+    assert.equal(boots.length,2,'Exactly one shared replacement startup retry');
+    assert.equal(boots[0].status,503);
+    assert([200,304].includes(boots[1].status));
+    assert.equal(results[1].diagnostics.loader.requests,0,'Concurrent recovery still serializes actor calls');
+    await p.close();
+  });
+
+  for(const retries of [0,2])await check(`persistent worker-load failure rejects after ${retries===0?'one attempt':'one retry'}`,async()=>{
+    const p=await page('indexed-tar',{retries});
+    const mark=host.records.length;
+    host.setFault({type:'transient',match:'/dist/worker.js',remaining:20});
+    assert.equal(await p.evaluate(()=>window.router.initialize().then(()=>null,error=>error.code)),'WORKER_FAILED');
+    assert.equal(host.records.slice(mark).filter(r=>r.path==='/dist/worker.js').length,retries===0?1:2);
+    host.setFault(null);
+    equivalent(await route(p,cross.request),cross.expected);
+    await p.close();
+  });
+
+  for(const operation of ['cancel','dispose'])await check(`${operation} interrupts worker startup recovery`,async()=>{
+    const p=await page();
+    // Interrupt the backoff after a real HTTP script failure, before its replacement starts.
+    await p.evaluate(operation=>{
+      const Original=Worker;
+      window.Worker=class extends Original{
+        constructor(...args){super(...args);this.addEventListener('error',()=>setTimeout(()=>window.router[operation](),10));}
+      };
+    },operation);
+    const mark=host.records.length;
+    host.setFault({type:'transient',match:'/dist/worker.js'});
+    assert.equal(await p.evaluate(()=>window.router.initialize().then(()=>null,error=>error.code)),operation==='cancel'?'CANCELLED':'DISPOSED');
+    await new Promise(resolve=>setTimeout(resolve,150));
+    assert.equal(host.records.slice(mark).filter(r=>r.path==='/dist/worker.js').length,1,'No worker may restart after cancellation/disposal');
+    if(operation==='cancel')equivalent(await route(p,cross.request),cross.expected);
+    await p.close();
+  });
+
   await check('AbortSignal interrupts route-triggered initialization and recovers',async()=>{
     const p=await page();
     host.setFault({type:'delay',delayMs:1500,match:'graph.tar'});
