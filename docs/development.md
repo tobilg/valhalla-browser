@@ -236,13 +236,20 @@ paths actually demonstrate shortcuts, bicycle contraflow and truck detours.
 See [road profile verification](profile-verification.md) for the executed baseline
 and dataset migration details.
 The browser suite also injects worker-script HTTP failures during cancellation recovery. An
-opaque browser load error before the worker's first message gets one retry after
-100 ms; the failed worker is terminated first. `retries: 0` disables that retry.
+opaque browser load error before the worker's first message, or a WASM startup
+timeout during initialization, gets at most one shared retry after 100 ms; the
+failed worker is terminated first. Concurrent callers share the replacement.
+`retries: 0` or a custom `workerFactory` disables that retry.
 Persistent errors still reject, and cancellation/disposal stops the pending retry.
-Errors after the first worker message do not replay native operations. This covers
+Native routing operations are never replayed. This covers
 an intermittent Linux WebKit failure when loading a replacement worker immediately
 after termination. The matrix report retains browser errors, failed request URLs
 and local asset-server records alongside the MinIO origin trace for diagnosis.
+The browser suite delays real WASM responses past the startup watchdog to verify
+bounded recovery, capability errors after recovery, and persistent timeout rejection.
+The static demo report retains the failing engine/transport, completed checks,
+UI status and pending/failed requests. `BROWSER=webkit pnpm run test:demo:static`
+isolates that browser without changing assertions or retrying test cases.
 To repeat the exact immediate-cancellation sequence with real regional routes:
 
 ```sh

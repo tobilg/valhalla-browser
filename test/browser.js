@@ -193,6 +193,45 @@ try {
     await p.close();
   });
 
+  await check('stalled WASM startup shares one fresh-worker retry before validating capabilities',async()=>{
+    const p=await page();
+    await p.route(`**/datasets/${manifest.release}/manifest.json`,async intercepted=>{
+      const response=await intercepted.fetch();
+      const body=JSON.stringify({...await response.json(),costings:['auto']});
+      await intercepted.fulfill({response,body,headers:{...response.headers(),'content-length':String(Buffer.byteLength(body))}});
+    });
+    const mark=host.records.length;
+    host.setFault({type:'delay',match:'.wasm',delayMs:12000});
+    const result=await p.evaluate(async request=>{
+      const rejected=window.router.route({...request,costing:'bicycle'}).then(()=>null,e=>e.code);
+      const startups=await Promise.all([window.router.initialize(),window.router.initialize()]);
+      return {startups,code:await rejected};
+    },cross.request);
+    assert.equal(result.code,'UNSUPPORTED_COSTING');
+    assert.deepEqual(result.startups[0],result.startups[1]);
+    assert.deepEqual(result.startups[0].supportedCostings,['auto']);
+    const boots=host.records.slice(mark).filter(r=>r.path==='/dist/worker.js');
+    const downloads=host.records.slice(mark).filter(r=>r.path.endsWith('.wasm'));
+    assert.equal(boots.length,2,'Concurrent initialization uses exactly one replacement');
+    assert.equal(downloads.length,2,'The replacement must make a fresh WASM request');
+    assert.equal(downloads[0].fault,'delay');
+    equivalent(await route(p,cross.request),cross.expected);
+    assert.equal((await route(p,cross.request)).result.diagnostics.loader.requests,0);
+    report.measurements.push({startupRecovery:'stalled WASM',startup:result.startups[0],runtimeRequests:downloads});
+    host.setFault(null);await p.close();
+  });
+
+  await check('persistent WASM startup stall stops after one retry and the Router remains reusable',async()=>{
+    const p=await page();
+    const mark=host.records.length;
+    host.setFault({type:'delay',match:'.wasm',delayMs:12000,remaining:10});
+    assert.equal(await p.evaluate(()=>window.router.initialize().then(()=>null,e=>e.code)),'TIMEOUT');
+    assert.equal(host.records.slice(mark).filter(r=>r.path==='/dist/worker.js').length,2);
+    assert.equal(host.records.slice(mark).filter(r=>r.path.endsWith('.wasm')).length,2);
+    host.setFault(null);
+    equivalent(await route(p,cross.request),cross.expected);await p.close();
+  });
+
   for(const retries of [0,2])await check(`persistent worker-load failure rejects after ${retries===0?'one attempt':'one retry'}`,async()=>{
     const p=await page('indexed-tar',{retries});
     const mark=host.records.length;

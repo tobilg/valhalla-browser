@@ -34,6 +34,9 @@ SDK JS/WASM can be compressed; graph TAR and tiles must retain exact byte offset
 For graph hosting, follow [the object-storage guide](../../../docs/object-storage-hosting.md)
 for bucket CORS, cache policies and selective-range checks.
 
-Missing assets, blocked CORS/CSP and startup timeouts reject initialization. Fix
+Missing assets, blocked CORS/CSP and persistent startup timeouts reject initialization. Fix
 the configuration and retry the same Router. Worker loading uses `timeoutMs`;
-WASM download/compilation receives at least ten seconds.
+WASM download/compilation receives at least ten seconds per attempt. Opaque worker
+load failures and WASM initialization timeouts share one automatic retry in a
+fresh worker. `retries: 0` or `workerFactory` disables it. Cancellation stops the
+retry, and native routing operations are never replayed.

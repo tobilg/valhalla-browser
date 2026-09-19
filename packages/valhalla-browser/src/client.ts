@@ -62,8 +62,9 @@ export class Router {
    * @returns Initialization timings and dataset/native identity.
    * @throws {@link RoutingError} for asset, dataset, network, cancellation or disposed-session failures.
    * @remarks A failed initialization can be retried on the same Router.
-   * An opaque browser worker-load failure is retried once before its first message,
-   * unless `retries` is zero or a custom `workerFactory` is used.
+   * An opaque browser worker-load failure or WASM initialization timeout gets at
+   * most one shared startup retry in a fresh worker, unless `retries` is zero or
+   * a custom `workerFactory` is used. Native routing operations are never replayed.
    * Cancellation also stops this startup recovery.
    */
   async initialize(): Promise<StartupResult> {
@@ -83,6 +84,28 @@ export class Router {
     const payload = { options: { manifestUrl, transport, timeoutMs, retries, memoryBudgetBytes, wasmUrl } };
     const initializeId = ++this.sequence;
     let bootRetries = 0;
+    const retryStartup = (worker: Worker): boolean => {
+      if (worker !== this.worker || !this.pending.has(initializeId) ||
+          this.options.workerFactory || retries === 0 || bootRetries >= 1) return false;
+      bootRetries++;
+      // Only initialization is pending here. Terminate before creating a fresh
+      // instance, and invalidate old handlers immediately (including during backoff).
+      this.worker = undefined;
+      worker.onmessage = worker.onerror = worker.onmessageerror = null;
+      worker.terminate();
+      this.releaseBootstrap();
+      this.bootTimer = setTimeout(() => {
+        if (!this.pending.has(initializeId) || this.disposed) return;
+        try {
+          const replacement = this.createWorker();
+          attach(replacement);
+          replacement.postMessage({ id: initializeId, type: 'initialize', ...payload } satisfies WorkerRequest);
+        } catch (cause) {
+          this.reset(new RoutingError('WORKER_FAILED', 'Cannot restart routing worker.', { cause }));
+        }
+      }, 100);
+      return true;
+    };
     const attach = (worker: Worker): void => {
       this.worker = worker;
       let acknowledged = false;
@@ -96,7 +119,8 @@ export class Router {
         if (data.type === 'progress') {
           if (data.detail.phase === 'loading-runtime') {
             this.bootTimer = setTimeout(() => {
-              if (worker === this.worker) this.reset(new RoutingError('TIMEOUT', 'WASM runtime initialization timed out.', { retryable: true }));
+              if (worker !== this.worker || retryStartup(worker)) return;
+              this.reset(new RoutingError('TIMEOUT', 'WASM runtime initialization timed out.', { retryable: true }));
             // Small tile-fetch budgets must not abort healthy WASM compilation.
             }, Math.max(10000, this.options.timeoutMs ?? 10000));
           }
@@ -117,22 +141,7 @@ export class Router {
         // An opaque module-load failure can be transient (including immediately
         // after termination). Retry once, before the worker has acknowledged any
         // message. Never replay routing/native operations or custom worker protocols.
-        if (!acknowledged && !event.message && !this.options.workerFactory && retries !== 0 && bootRetries++ === 0) {
-          worker.onmessage = worker.onerror = worker.onmessageerror = null;
-          worker.terminate();
-          this.releaseBootstrap();
-          this.bootTimer = setTimeout(() => {
-            if (worker !== this.worker) return;
-            try {
-              const replacement = this.createWorker();
-              attach(replacement);
-              replacement.postMessage({ id: initializeId, type: 'initialize', ...payload } satisfies WorkerRequest);
-            } catch (cause) {
-              this.reset(new RoutingError('WORKER_FAILED', 'Cannot restart routing worker.', { cause }));
-            }
-          }, 100);
-          return;
-        }
+        if (!acknowledged && !event.message && retryStartup(worker)) return;
         this.reset(new RoutingError('WORKER_FAILED', event.message || 'Worker failed. Check asset URLs and CSP.'));
       };
       worker.onmessageerror = () => {

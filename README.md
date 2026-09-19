@@ -300,7 +300,10 @@ Errors distinguish invalid input, coverage, no-route, transport, integrity,
 compatibility and cancellation failures. Transient download errors are never
 converted into missing tiles or false no-route results. Initialization can be
 retried after failure. `timeoutMs` bounds fetches and worker loading; WASM startup
-receives at least ten seconds. Relative asset overrides resolve against the page.
+receives at least ten seconds per attempt. An opaque worker-load failure or WASM
+initialization timeout gets at most one startup retry in a fresh worker;
+`retries: 0` or a custom `workerFactory` disables this recovery. Native routes are
+never replayed. Relative asset overrides resolve against the page.
 
 ## Build graph data from OpenStreetMap
 

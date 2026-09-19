@@ -10,6 +10,8 @@ import { root, execute, listen, closeHost, readJSON, writeReport } from './packa
 import { mockBasemap, assertBasemap, exerciseMap, restoreBasemap, isBasemapRequest } from './demo-map.js';
 
 const artifact = process.argv.includes('--artifact');
+const engines = { chromium, firefox, webkit };
+assert(!process.env.BROWSER || Object.hasOwn(engines, process.env.BROWSER), `Unknown BROWSER: ${process.env.BROWSER}`);
 const requests = (await readJSON(path.join(root, 'fixtures/region/requests.json'))).filter(item => !item.profileCase);
 const reference = await readJSON(path.join(root, 'fixtures/region/reference.json'));
 const manifest = await readJSON(path.join(root, 'fixtures/region/manifest.json'));
@@ -39,14 +41,26 @@ try {
   server = await preview({ configFile: false, root: demoRoot, publicDir: false,
     build: { outDir: output }, preview: { host: 'localhost', port: 0, strictPort: true } });
   const base = server.resolvedUrls.local[0];
-  for (const [engine, launcher] of Object.entries({ chromium, firefox, webkit })) {
+  for (const [engine, launcher] of Object.entries(engines)) {
+    if (process.env.BROWSER && process.env.BROWSER !== engine) continue;
     const browser = await launcher.launch();
     const checks = [];
+    const browserResult = { engine, version: browser.version(), checks, passed: false };
+    report.browsers.push(browserResult);
     try {
       for (const transport of artifact ? ['indexed-tar'] : ['indexed-tar', 'individual-tiles']) {
         const context = await browser.newContext();
-        const seen = [], errors = [];
-        context.on('request', request => seen.push(request.url()));
+        const seen = [], errors = [], requestFailures = [];
+        const pendingRequests = new Map();
+        context.on('request', request => {
+          seen.push(request.url());
+          pendingRequests.set(request, performance.now());
+        });
+        context.on('requestfinished', request => pendingRequests.delete(request));
+        context.on('requestfailed', request => {
+          pendingRequests.delete(request);
+          requestFailures.push({ url: request.url(), error: request.failure()?.errorText });
+        });
         const page = await context.newPage();
         const tiles = await mockBasemap(page);
         page.on('pageerror', error => errors.push(error.message));
@@ -169,9 +183,16 @@ try {
           assert.deepEqual(errors, []);
           assert(!seen.some(url => new URL(url).origin === new URL(base).origin &&
             /\/(manifest\.json|datasets\/|fixtures\/|public\/)/.test(new URL(url).pathname)));
+        } catch (error) {
+          report.failure = { engine, transport, message: error.message, stack: error.stack,
+            status: await page.locator('#status').textContent({ timeout: 1000 }).catch(() => null),
+            pendingRequests: [...pendingRequests].map(([request, start]) => ({ url: request.url(), elapsedMs: performance.now() - start })),
+            requestFailures, browserErrors: errors };
+          report.originRecords = host?.records;
+          throw error;
         } finally { await context.close(); }
       }
-      report.browsers.push({ engine, version: browser.version(), checks, passed: true });
+      browserResult.passed = true;
       console.log(`PASS static demo: ${engine} (${report.mode})`);
     } finally { await browser.close(); }
   }

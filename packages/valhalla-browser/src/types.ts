@@ -136,7 +136,7 @@ export interface RouterOptions {
   memoryBudgetBytes?: number;
   /** Fetch/worker-load deadline per attempt in integer ms, 1–60,000; default 10,000. WASM startup receives at least 10 seconds. */
   timeoutMs?: number;
-  /** Additional attempts for transient fetch failures, integer 0–5; defaults to 2. Zero also disables the single retry for opaque worker-load failures before startup acknowledgement. */
+  /** Additional attempts for transient fetch failures, integer 0–5; defaults to 2. Zero also disables the single shared startup retry for opaque worker-load failures or WASM initialization timeouts. */
   retries?: number;
   /** Receives worker progress on the main thread. Callback exceptions are ignored; avoid blocking UI work. */
   onProgress?: (event: ProgressEvent) => void;
