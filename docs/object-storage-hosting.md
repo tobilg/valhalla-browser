@@ -77,7 +77,7 @@ versioning. Finalize validators before publishing the immutable manifest.
 ## 3. Bucket CORS policy
 
 For public datasets, this policy allows any application origin without cookies.
-The repository's [R2 CORS JSON](https://github.com/tobilg/valhalla-browser/blob/main/docs/r2-cors.json)
+The repository's [R2 CORS JSON](https://github.com/tobilg/valhalla-wasm/blob/main/docs/r2-cors.json)
 is the same policy and can also be pasted into the S3 console:
 
 ```json
@@ -244,7 +244,7 @@ See [CloudFront range behavior](https://docs.aws.amazon.com/AmazonCloudFront/lat
 
 ## 6. MinIO and other providers
 
-The repository includes [local MinIO setup and verification](https://github.com/tobilg/valhalla-browser/blob/main/docs/minio.md).
+The repository includes [local MinIO setup and verification](https://github.com/tobilg/valhalla-wasm/blob/main/docs/minio.md).
 `pnpm run minio:start` and `pnpm run minio:publish` configure the pinned local
 service, upload both test datasets, set cache metadata, and capture real ETags.
 Follow that guide for its build prerequisites and tests.

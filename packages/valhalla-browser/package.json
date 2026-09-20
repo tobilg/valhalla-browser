@@ -30,7 +30,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tobilg/valhalla-browser.git",
+    "url": "git+https://github.com/tobilg/valhalla-wasm.git",
     "directory": "packages/valhalla-browser"
   },
   "module": "./dist/index.js",

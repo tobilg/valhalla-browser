@@ -215,7 +215,7 @@ Serve graph data without gzip/Brotli/content encoding. Support GET, HEAD and
 single HTTP byte ranges; expose Content-Range, Content-Length, Content-Encoding,
 ETag and Last-Modified through CORS. Public immutable release objects should use
 `Cache-Control: public, max-age=31536000, immutable`; discovery metadata should
-revalidate. See the [repository's R2 CORS policy](https://github.com/tobilg/valhalla-browser/blob/main/docs/r2-cors.json)
+revalidate. See the [repository's R2 CORS policy](https://github.com/tobilg/valhalla-wasm/blob/main/docs/r2-cors.json)
 for an example.
 
 The initial manifest uses SHA-256 ETags, matching the local range server.

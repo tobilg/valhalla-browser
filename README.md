@@ -7,8 +7,8 @@ tiles load on demand through HTTP ranges from an indexed TAR, or as individual
 
 [Demo](https://valhalla-browser.gh.tobilg.com)
 [API documentation](https://valhalla-browser-api.gh.tobilg.com)
-[Source](https://github.com/tobilg/valhalla-browser) ·
-[Release setup](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
+[Source](https://github.com/tobilg/valhalla-wasm) ·
+[Release setup](https://github.com/tobilg/valhalla-wasm/blob/main/docs/releases.md)
 
 The repository prepares version **0.2.1**. Publication happens through the tagged
 release workflow after the initial npm setup; implementation alone does not
@@ -28,7 +28,7 @@ placeholders, not a hosted dataset service. Replace the complete manifest URL
 with your deployment's actual URL, including its immutable release directory.
 That directory must match the manifest's `release` value. Choose route coordinates
 inside your dataset's coverage. See the
-[data preparation guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/building-graph-data.md)
+[data preparation guide](https://github.com/tobilg/valhalla-wasm/blob/main/docs/building-graph-data.md)
 to build compatible graph data.
 
 Use this in a browser module or Vite application:
@@ -92,7 +92,7 @@ try {
 }
 ```
 
-See [Node.js and Cloudflare Workers](https://github.com/tobilg/valhalla-browser/blob/main/docs/server-routing.md)
+See [Node.js and Cloudflare Workers](https://github.com/tobilg/valhalla-wasm/blob/main/docs/server-routing.md)
 for R2 bindings, per-request contexts, queue limits, cancellation and resource
 constraints. Cloudflare support has a local workerd proof; it remains experimental
 and is not a production capacity guarantee. The demo and docs stay on Pages.
@@ -143,7 +143,7 @@ Profile changes reuse the same worker and tile cache. Unknown profiles or profil
 absent from the dataset reject with `UNSUPPORTED_COSTING`; invalid settings reject
 with `INVALID_REQUEST`.
 
-See [Travel profiles and options](https://github.com/tobilg/valhalla-browser/blob/main/packages/documentation/guides/travel-profiles.md)
+See [Travel profiles and options](https://github.com/tobilg/valhalla-wasm/blob/main/packages/documentation/guides/travel-profiles.md)
 for supported settings, defaults, dataset upgrades, and current limits. This guide
 is also included in the generated API documentation.
 
@@ -186,8 +186,8 @@ memory limits. The defaults override the dataset's large A* reservations without
 changing its tiles, costing, or configuration file. Existing hosted datasets need
 no changes. `initialize()` reports the effective `searchMemory` settings and an
 `effectiveConfigSha256`, alongside the original dataset configuration hash.
-See [Diagnostics and memory](https://github.com/tobilg/valhalla-browser/blob/main/packages/documentation/guides/diagnostics.md)
-for tuning and [measured reservation results](https://github.com/tobilg/valhalla-browser/blob/main/docs/search-memory.md)
+See [Diagnostics and memory](https://github.com/tobilg/valhalla-wasm/blob/main/packages/documentation/guides/diagnostics.md)
+for tuning and [measured reservation results](https://github.com/tobilg/valhalla-wasm/blob/main/docs/search-memory.md)
 for the native-equivalence checks and memory baseline.
 
 ## Use directly from a CDN
@@ -370,14 +370,14 @@ Provide your own compatible OSM-derived graph dataset. The repository includes
 and the SDK manifest/configuration from an `.osm.pbf` extract. It uses the pinned
 native Valhalla tools and preserves access for driving, cycling, walking, and truck routing.
 
-See [Build graph data from OpenStreetMap](https://github.com/tobilg/valhalla-browser/blob/main/docs/building-graph-data.md)
+See [Build graph data from OpenStreetMap](https://github.com/tobilg/valhalla-wasm/blob/main/docs/building-graph-data.md)
 for a reproducible small example, custom extracts, native/container invocation,
 coverage bounds, timezone/admin inputs, static hosting and deployment validators.
 The same guide is included in the API documentation site's navigation.
 
 ## Host graph data on object storage
 
-Use the [object-storage hosting guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/object-storage-hosting.md)
+Use the [object-storage hosting guide](https://github.com/tobilg/valhalla-wasm/blob/main/docs/object-storage-hosting.md)
 to deploy datasets on S3, R2, MinIO or another compatible provider. It covers
 dashboard setup without AWS CLI, bucket CORS, cache rules for entire prefixes,
 HTTP metadata, byte ranges, deployment ETags and browser verification. It also
@@ -404,7 +404,7 @@ pnpm add /absolute/path/to/valhalla-browser-0.2.1.tgz
 ```
 
 A clean checkout needs the explicit native/data/WASM build steps in the
-[development guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/development.md).
+[development guide](https://github.com/tobilg/valhalla-wasm/blob/main/docs/development.md).
 The native pins remain Valhalla **3.8.3** at
 `a60c7cbfc83e073f50887cd27e0109d02e6b64e5`, Emscripten **6.0.0**,
 Protobuf **21.12** and zlib **1.3.1**. Package consumers do not need this toolchain.
@@ -424,12 +424,12 @@ Set all five package versions with `pnpm run version:set 0.1.0` (or
 `npm run version:set -- 0.1.0`), substituting your next stable version. The command
 also keeps the SDK version references in this README and the development guide
 in sync. See the
-[release guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
+[release guide](https://github.com/tobilg/valhalla-wasm/blob/main/docs/releases.md)
 for the remaining release steps.
 Guides and API comments are maintained with the source. Stable version tags
 publish both verified SDKs through npm trusted publishing, then deploy documentation
 to **valhalla-browser-api** and the demo to **valhalla-browser** on Cloudflare Pages. See
-[release setup](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
+[release setup](https://github.com/tobilg/valhalla-wasm/blob/main/docs/releases.md)
 for the initial npm publication, trust configuration, Pages setup and dry runs.
 
 For the hosted demo, set the GitHub repository variable `VITE_DEMO_MANIFEST_URL`
@@ -441,7 +441,7 @@ The demo displays routes over an interactive OpenStreetMap basemap with pan/zoom
 endpoint markers, a basemap toggle and a Fit route button. Background map images
 come from OSM; routing still runs locally in the WASM worker. The current basemap
 may differ from the historical 2015 graph, and synthetic fixture roads are fictional.
-See the [development guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/development.md#demo-basemap)
+See the [development guide](https://github.com/tobilg/valhalla-wasm/blob/main/docs/development.md#demo-basemap)
 for basemap configuration and hosting requirements.
 
 ## Limits and licensing
@@ -451,9 +451,9 @@ mobile devices, other bundlers and worldwide coverage are not established.
 There is no OPFS, IndexedDB, service-worker cache, offline guarantee or external
 routing fallback. Bike-and-train routing remains separate discovery work.
 
-See [verification](https://github.com/tobilg/valhalla-browser/blob/main/docs/package-verification.md),
-[MinIO testing](https://github.com/tobilg/valhalla-browser/blob/main/docs/minio.md),
-and [R2 CORS policy](https://github.com/tobilg/valhalla-browser/blob/main/docs/r2-cors.json).
+See [verification](https://github.com/tobilg/valhalla-wasm/blob/main/docs/package-verification.md),
+[MinIO testing](https://github.com/tobilg/valhalla-wasm/blob/main/docs/minio.md),
+and [R2 CORS policy](https://github.com/tobilg/valhalla-wasm/blob/main/docs/r2-cors.json).
 
 The SDK is MIT licensed. Compiled dependencies' license texts are included under
 `dist/licenses/`; preserve these notices when redistributing the runtime.

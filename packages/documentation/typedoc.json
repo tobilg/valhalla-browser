@@ -49,9 +49,9 @@
   "treatWarningsAsErrors": true,
   "titleLink": "/",
   "hostedBaseUrl": "https://valhalla-browser-api.gh.tobilg.com/",
-  "sourceLinkTemplate": "https://github.com/tobilg/valhalla-browser/blob/{gitRevision}/{path}#L{line}",
+  "sourceLinkTemplate": "https://github.com/tobilg/valhalla-wasm/blob/{gitRevision}/{path}#L{line}",
   "navigationLinks": {
-    "GitHub": "https://github.com/tobilg/valhalla-browser",
+    "GitHub": "https://github.com/tobilg/valhalla-wasm",
     "npm": "https://www.npmjs.com/package/valhalla-browser"
   }
 }

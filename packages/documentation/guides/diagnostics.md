@@ -68,7 +68,7 @@ memory; both fixed native-reference corpora stayed within that allocation in
 Chromium, Firefox and WebKit.
 The previous reservations reached about 166 MiB on the longer regional route and
 314 MiB across its corpus, despite only about 1.5 MB of regional tile payload.
-See the [reservation investigation](https://github.com/tobilg/valhalla-browser/blob/main/docs/search-memory.md)
+See the [reservation investigation](https://github.com/tobilg/valhalla-wasm/blob/main/docs/search-memory.md)
 for exact configurations, timings, and reproduction commands. Larger graphs can
 still grow beyond 64 MiB. Neither reservation counts nor `memoryBudgetBytes`
 bound total worker memory. `wasmMemory` separately controls the hard linear-memory
@@ -90,6 +90,6 @@ must remain unknown. CF-Cache-Status may itself be replayed from browser cache.
 The SDK has no telemetry. Explicit diagnostics contain tile URLs/IDs; applications
 should choose what to record and avoid including user route coordinates by default.
 
-Run the [benchmark commands](https://github.com/tobilg/valhalla-browser/blob/main/docs/development.md)
+Run the [benchmark commands](https://github.com/tobilg/valhalla-wasm/blob/main/docs/development.md)
 for your graph, browsers and network. Historical measurements are engineering
 baselines, not approved performance budgets or production coverage claims.

@@ -45,6 +45,6 @@ native heap, stack and static data; it excludes JavaScript and other isolate
 overhead. Increasing it does not raise Cloudflare's platform memory limit.
 The effective values are returned in `router.startup.wasmMemory`.
 
-[Server setup, cancellation, limits and R2 guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/server-routing.md) ·
+[Server setup, cancellation, limits and R2 guide](https://github.com/tobilg/valhalla-wasm/blob/main/docs/server-routing.md) ·
 [API documentation](https://valhalla-browser-api.gh.tobilg.com/) ·
-[Build compatible graph data](https://github.com/tobilg/valhalla-browser/blob/main/docs/building-graph-data.md)
+[Build compatible graph data](https://github.com/tobilg/valhalla-wasm/blob/main/docs/building-graph-data.md)

@@ -62,7 +62,7 @@ It does not depend on browser Workers, `node:worker_threads`, or dynamic WASM
 compilation. Node compatibility can remain enabled in your application.
 
 The complete local example is in
-[`examples/cloudflare`](https://github.com/tobilg/valhalla-browser/tree/main/examples/cloudflare).
+[`examples/cloudflare`](https://github.com/tobilg/valhalla-wasm/tree/main/examples/cloudflare).
 Its Wrangler configuration is illustrative; replace the bucket name and manifest
 key before deploying. The demo and API documentation continue to use Pages.
 
@@ -212,7 +212,7 @@ four profiles. Reports are generated under `test-results/`. The benchmark uses
 five cold sessions and twenty warm repetitions per profile/backend; local R2
 measurements are not CDN or deployed-platform results.
 
-See the [local verification and benchmark report](https://github.com/tobilg/valhalla-browser/blob/main/docs/server-verification.md) for measured
+See the [local verification and benchmark report](https://github.com/tobilg/valhalla-wasm/blob/main/docs/server-verification.md) for measured
 results and provisional regression budgets.
 
 Platform references: [WASM](https://developers.cloudflare.com/workers/runtime-apis/webassembly/),
