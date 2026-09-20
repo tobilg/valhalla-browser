@@ -28,8 +28,8 @@ const reportValue = (key, value) => value?.name?.startsWith(new URL(manifestUrl)
     sizeNote: 'Cross-origin Resource Timing sizes unavailable without Timing-Allow-Origin.' } : value;
 const report = { at: new Date().toISOString(), manifestUrl, versions,
   device: { platform: os.platform(), arch: os.arch(), cpu: os.cpus()[0].model, memoryBytes: os.totalmem() },
-  runtime: { wasmBytes: (await readFile('public/wasm/valhalla-browser.wasm')).length,
-    wasmSha256: await sha256(await readFile('public/wasm/valhalla-browser.wasm')) },
+  runtime: { wasmBytes: (await readFile('public/wasm/valhalla.wasm')).length,
+    wasmSha256: await sha256(await readFile('public/wasm/valhalla.wasm')) },
   scope: 'Direct public HTTPS fetches from local browser workers; no proxy, interception, cache-busting, CDN purge or network throttling by this runner.',
   originRequests: null, originBytes: null,
   originReason: 'No R2/provider logs. Client ranges do not establish the edge-to-origin transfer size.',

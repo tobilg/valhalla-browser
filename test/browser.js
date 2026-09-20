@@ -55,6 +55,30 @@ async function check(name,body) {
 }
 
 try {
+  await check('imported memory enforces native and engine limits', async () => {
+    const p = await page();
+    const result = await p.evaluate(() => new Promise((resolve, reject) => {
+      const worker = new Worker('/test/wasm-memory-worker.js', { type: 'module' });
+      worker.onmessage = ({ data }) => { worker.terminate(); resolve(data); };
+      worker.onerror = error => { worker.terminate(); reject(new Error(error.message)); };
+      worker.postMessage({ initialMiB: 64, maximumMiB: 80 });
+    }));
+    assert(!result.error, result.error);
+    assert(result.result.engineRejected && result.result.nativeAllocationRejected && result.result.recovered);
+    report.measurements.push({ importedMemory: result.result });
+    await p.close();
+  });
+  await check('custom memory survives allocation failure and worker replacement', async () => {
+    const p = await page('indexed-tar', { wasmMemory: { initialMiB: 72, maximumMiB: 80 }, searchMemory: { bidirectionalAstar: 1000000 } });
+    const startup = await initialize(p);
+    assert.deepEqual(startup.wasmMemory, { initialMiB: 72, maximumMiB: 80 });
+    assert.equal(startup.native.wasmHeapCapacityHighWaterBytes, 72 * 1048576);
+    assert.equal((await route(p, cross.request)).error?.code, 'RESOURCE_LIMIT');
+    const short = reference.cases.find(c => c.name === 'short');
+    equivalent(await route(p, short.request), short.expected);
+    assert.deepEqual(await p.evaluate(() => window.router.startup.wasmMemory), startup.wasmMemory);
+    await p.close();
+  });
   await check('M1: actual WASM worker with local memory files matches native corpus',async()=>{
     const p=await page();
     const result=await p.evaluate(async ({requests,manifestUrl})=>{
@@ -73,6 +97,8 @@ try {
       const p=await page(transport);
       const mark=host.records.length;
       const startup=await initialize(p);
+      assert.deepEqual(startup.wasmMemory, { initialMiB: 128, maximumMiB: 512 });
+      assert.equal(startup.native.wasmHeapCapacityHighWaterBytes, 128 * 1048576);
       report.measurements.push({transport,state:'new worker, new browser context; HTTP cache not explicitly cleared',startup});
       const cold=await route(p,cross.request);equivalent(cold,cross.expected);
       assert(cold.result.diagnostics.loader.tileDownloads>=2,'Cold route must fetch multiple tiles');

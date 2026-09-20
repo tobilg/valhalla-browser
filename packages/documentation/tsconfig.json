@@ -1,5 +1,18 @@
 {
   "extends": "../valhalla-browser/tsconfig.client.json",
-  "compilerOptions": { "noEmit": true },
-  "files": ["../valhalla-browser/src/client.ts", "../valhalla-browser/src/assets.d.ts"]
+  "compilerOptions": {
+    "noEmit": true,
+    "types": [
+      "node",
+      "@cloudflare/workers-types"
+    ],
+    "skipLibCheck": true
+  },
+  "files": [
+    "../valhalla-browser/src/client.ts",
+    "../valhalla-browser/src/assets.d.ts",
+    "../valhalla-server/src/node.ts",
+    "../valhalla-server/src/cloudflare.ts",
+    "../valhalla-server/src/runtime.d.ts"
+  ]
 }

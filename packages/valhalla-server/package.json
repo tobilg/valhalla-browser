@@ -1,0 +1,55 @@
+{
+  "name": "valhalla-server",
+  "version": "0.2.1",
+  "type": "module",
+  "description": "Valhalla WASM routing for Node.js and experimental Cloudflare Workers, with on-demand graph tiles.",
+  "engines": {
+    "node": ">=22.22.2"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js"
+    },
+    "./cloudflare": {
+      "types": "./dist/cloudflare.d.ts",
+      "import": "./dist/cloudflare.js"
+    },
+    "./runtime.json": "./dist/runtime.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE.md"
+  ],
+  "license": "MIT",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tobilg/valhalla-browser.git",
+    "directory": "packages/valhalla-server"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.cloudflare.json --noEmit",
+    "build": "pnpm run typecheck && node scripts/build-package.js",
+    "prepack": "pnpm run build"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260920.1",
+    "@tobilg/valhalla-core": "workspace:*",
+    "@types/node": "22.20.3",
+    "@types/webassembly-js-api": "0.0.3",
+    "miniflare": "5.20260917.0-alpha",
+    "typescript": "7.0.2",
+    "vite": "8.3.0",
+    "wrangler": "4.134.0"
+  }
+}

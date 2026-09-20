@@ -13,14 +13,21 @@ await cp(path.join(root, 'README.md'), path.join(isolated, 'README.md'));
 await mkdir(path.join(isolated, 'assets'));
 await cp(path.join(root, 'assets/og-image.jpg'), path.join(isolated, 'assets/og-image.jpg'));
 await mkdir(path.join(isolated, 'docs'));
-for (const guide of ['building-graph-data.md', 'object-storage-hosting.md'])
+for (const guide of ['building-graph-data.md', 'object-storage-hosting.md', 'server-routing.md'])
   await cp(path.join(root, 'docs', guide), path.join(isolated, 'docs', guide));
-for (const dir of ['documentation', 'valhalla-browser']) {
+for (const dir of ['documentation', 'valhalla-browser', 'valhalla-core', 'valhalla-server']) {
   await cp(path.join(root, 'packages', dir), path.join(isolated, 'packages', dir), {
     recursive: true, filter: source => !['node_modules', 'dist', 'build'].includes(path.basename(source)),
   });
 }
 const sourceOnlyDocs = path.join(isolated, 'packages/documentation');
+// Recreate the SDKs' workspace links to the copied core source, keeping this
+// check independent of generated declarations and the original source tree.
+for (const sdk of ['valhalla-browser', 'valhalla-server']) {
+  const scope = path.join(isolated, 'packages', sdk, 'node_modules/@tobilg');
+  await mkdir(scope, { recursive: true });
+  await symlink(path.join(isolated, 'packages/valhalla-core'), path.join(scope, 'valhalla-core'), 'dir');
+}
 await symlink(path.join(root, 'packages/documentation/node_modules'), path.join(sourceOnlyDocs, 'node_modules'), 'dir');
 await execute(process.execPath, [path.join(root, 'packages/documentation/node_modules/typedoc/bin/typedoc'), '--disableSources'], { cwd: sourceOnlyDocs, maxBuffer: 4 * 1024 * 1024 });
 assert((await stat(path.join(sourceOnlyDocs, 'dist/index.html'))).isFile());

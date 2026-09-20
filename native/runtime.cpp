@@ -11,6 +11,12 @@
 using namespace valhalla;
 using namespace valhalla::baldr;
 
+EM_JS(int, has_interrupt, (), { return typeof Module.interrupt === 'function'; });
+EM_ASYNC_JS(int, check_interrupt, (), {
+  try { await Module.interrupt(); return 0; }
+  catch (error) { Module.bridgeError = error; return 1; }
+});
+
 EM_JS(int, object_size, (const char* url), {
   return Module.tileLoader.objectSize(UTF8ToString(url));
 });
@@ -108,7 +114,12 @@ const char* vb_init(const char* json) {
 const char* vb_route(const char* json) {
   try {
     if (!actor) throw std::runtime_error("Actor not initialized");
-    output = actor->route(json);
+    const std::function<void()> interrupt = []() {
+      if (check_interrupt()) throw std::runtime_error("Routing interrupted");
+    };
+    output = actor->route(json, has_interrupt() ? &interrupt : nullptr);
+  } catch (const std::bad_alloc&) {
+    output = "{\"runtimeError\":\"MEMORY\"}";
   } catch (const valhalla_exception_t& error) {
     output = "{\"nativeError\":" + std::to_string(error.code) + "}";
   } catch (const std::exception&) {
@@ -121,7 +132,7 @@ const char* vb_stats() {
   output = "{\"decodedCacheBytes\":" + std::to_string(reader ? reader->bytes() : 0) +
            ",\"decodedCacheHits\":" + std::to_string(reader ? reader->hits : 0) +
            ",\"wasmHeapCapacityHighWaterBytes\":" + std::to_string(emscripten_get_heap_size()) +
-           ",\"valhallaVersion\":\"" VALHALLA_VERSION "\",\"sourceRevision\":\"" VB_SOURCE_REVISION "\",\"abi\":1}";
+           ",\"valhallaVersion\":\"" VALHALLA_VERSION "\",\"sourceRevision\":\"" VB_SOURCE_REVISION "\",\"abi\":3}";
   return output.c_str();
 }
 }

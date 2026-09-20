@@ -20,13 +20,18 @@ await writeFile(path.join(consumer, 'package.json'), JSON.stringify({ name: 'iso
 await execute('pnpm', ['install', '--prefer-offline', '--no-frozen-lockfile', '--ignore-scripts'], { cwd: consumer, maxBuffer: 4 * 1024 * 1024 });
 await writeFile(path.join(consumer, 'index.html'), '<!doctype html><script type="module" src="./main.ts"></script>');
 await writeFile(path.join(consumer, 'main.ts'), `import * as sdk from 'valhalla-browser';
-import type { RouteRequest, RouterOptions, RouteResult, StartupResult, Diagnostics } from 'valhalla-browser';
+import type { RouteRequest, RouterOptions, RouteResult, StartupResult, Diagnostics, SearchMemoryOptions, EffectiveSearchMemory } from 'valhalla-browser';
 (globalThis as unknown as { sdk: typeof sdk }).sdk = sdk;
 const request: RouteRequest = { origin: {lat: 47, lon: 9}, destination: {lat: 47.1, lon: 9.1} };
-const options: RouterOptions = { manifestUrl: '/graph/manifest.json', workerUrl: new URL('/worker.js', location.href), wasmUrl: '/runtime.wasm' };
+const searchMemory: SearchMemoryOptions = { astar: 4096, bidirectionalAstar: 8192, clearReservedMemory: false };
+const options: RouterOptions = { manifestUrl: '/graph/manifest.json', workerUrl: new URL('/worker.js', location.href), wasmUrl: '/runtime.wasm', searchMemory, wasmMemory: { initialMiB: 64, maximumMiB: 256 } };
+// @ts-expect-error Reservation counts are numeric.
+const invalidSearch: SearchMemoryOptions = { astar: '4096' };
+void invalidSearch;
 function check(router: sdk.Router) {
   const result: Promise<RouteResult> = router.route(request);
   const startup: Promise<StartupResult> = router.initialize();
+  void startup.then(value => { const effective: EffectiveSearchMemory = value.searchMemory; return effective.astar + value.effectiveConfigSha256.length; });
   const diagnostics: Promise<Diagnostics> = router.diagnostics();
   router.route({ ...request, costing: 'bicycle', costing_options: { bicycle: { cycling_speed: 20 } } });
   router.route({ ...request, costing: 'pedestrian', costing_options: { pedestrian: { walking_speed: 4 } } });

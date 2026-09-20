@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": [
+      "@cloudflare/workers-types"
+    ],
+    "lib": [
+      "ES2022"
+    ]
+  },
+  "files": [
+    "src/cloudflare.ts",
+    "src/runtime.d.ts"
+  ]
+}

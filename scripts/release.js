@@ -27,24 +27,41 @@ async function output(values) {
 }
 async function main() {
   const [command, argument] = process.argv.slice(2);
-  const sdk = JSON.parse(await readFile(path.join(root, 'packages/valhalla-browser/package.json')));
-  if (sdk.name !== 'valhalla-browser') throw new Error('Unexpected SDK package name.');
+  const names = ['valhalla-browser', 'valhalla-server'];
+  const packages = await Promise.all(names.map(async name => {
+    const pkg = JSON.parse(await readFile(path.join(root, 'packages', name, 'package.json')));
+    if (pkg.name !== name) throw new Error('Unexpected SDK package name.');
+    return pkg;
+  }));
+  const version = packages[0].version;
+  for (const directory of ['valhalla-core', 'demo', 'documentation'])
+    packages.push(JSON.parse(await readFile(path.join(root, 'packages', directory, 'package.json'))));
+  if (packages.some(pkg => pkg.version !== version)) throw new Error('All five workspace packages must have the same version.');
+  const filenames = Object.fromEntries(names.map(name => [name, `${name}-${version}.tgz`]));
   if (command === 'validate') {
-    validateTag(argument, sdk.version);
-    await output({ version: sdk.version, tarball: `${sdk.name}-${sdk.version}.tgz` });
+    validateTag(argument, version);
+    await output({ version, tarball: filenames['valhalla-browser'], server_tarball: filenames['valhalla-server'] });
   } else if (command === 'candidate') {
-    validateTag(`v${sdk.version}`, sdk.version);
-    const filename = `${sdk.name}-${sdk.version}.tgz`;
-    const bytes = await readFile(path.join(root, 'build/package', filename));
-    const candidate = { name: sdk.name, version: sdk.version, filename, integrity: integrity(bytes) };
-    await writeFile(path.join(root, 'build/package/release.json'), JSON.stringify(candidate, null, 2) + '\n');
-    await output({ version: sdk.version, tarball: filename });
+    validateTag(`v${version}`, version);
+    const candidates = await Promise.all(names.map(async name => {
+      const filename = filenames[name];
+      const bytes = await readFile(path.join(root, 'build/package', filename));
+      return { name, version, filename, integrity: integrity(bytes) };
+    }));
+    await writeFile(path.join(root, 'build/package/release.json'), JSON.stringify({ version, packages: candidates }, null, 2) + '\n');
+    await output({ version, tarball: filenames['valhalla-browser'], server_tarball: filenames['valhalla-server'] });
   } else if (command === 'published') {
-    const candidate = JSON.parse(await readFile(path.join(root, 'build/package/release.json')));
-    if (candidate.name !== sdk.name || candidate.version !== sdk.version || candidate.filename !== `${sdk.name}-${sdk.version}.tgz`)
-      throw new Error('Release manifest does not match this source version.');
-    if (candidate.integrity !== integrity(await readFile(path.join(root, 'build/package', candidate.filename)))) throw new Error('Release tarball integrity mismatch.');
-    await output({ published: await publishedState(candidate) });
-  } else throw new Error('Usage: node scripts/release.js validate vX.Y.Z | candidate | published');
+    if (!names.includes(argument)) throw new Error('Specify valhalla-browser or valhalla-server.');
+    const manifest = JSON.parse(await readFile(path.join(root, 'build/package/release.json')));
+    if (manifest.version !== version || manifest.packages?.length !== names.length ||
+        manifest.packages.some((entry, index) => entry.name !== names[index]))
+      throw new Error('Release manifest does not match the source packages.');
+    for (const candidate of manifest.packages) {
+      if (candidate.version !== version || candidate.filename !== filenames[candidate.name] ||
+          candidate.integrity !== integrity(await readFile(path.join(root, 'build/package', candidate.filename))))
+        throw new Error('Release tarball identity or integrity mismatch.');
+    }
+    await output({ published: await publishedState(manifest.packages.find(candidate => candidate.name === argument)) });
+  } else throw new Error('Usage: node scripts/release.js validate vX.Y.Z | candidate | published PACKAGE');
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();

@@ -97,3 +97,6 @@ packages/valhalla-browser/NOTICE.md
 .dev.vars*
 .env.local
 .env.*.local
+
+/packages/valhalla-server/LICENSE
+/packages/valhalla-server/NOTICE.md

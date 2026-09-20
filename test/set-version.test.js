@@ -8,7 +8,7 @@ import os from 'node:os';
 
 const execute = promisify(execFile);
 const root = new URL('../', import.meta.url);
-const manifests = ['packages/valhalla-browser/package.json', 'packages/demo/package.json', 'packages/documentation/package.json'];
+const manifests = ['packages/valhalla-browser/package.json', 'packages/valhalla-server/package.json', 'packages/valhalla-core/package.json', 'packages/demo/package.json', 'packages/documentation/package.json'];
 const documentation = ['README.md', 'docs/development.md'];
 const history = 'docs/workspace-verification.md';
 const tracked = ['package.json', 'pnpm-lock.yaml', ...manifests, ...documentation, history];

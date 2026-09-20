@@ -111,6 +111,7 @@ jobs:
       - run: sudo chown -R "$(id -u):$(id -g)" build public
       # prepack typechecks and builds the SDK once. Consumers never repack it.
       - run: pnpm run pack:sdk
+      - run: pnpm run pack:server
       - id: candidate
         run: node scripts/release.js candidate
       - name: SDK candidate (publication requires the final verification gate)
@@ -118,7 +119,7 @@ jobs:
         with:
           name: sdk-release
           path: |
-            build/package/${{ steps.candidate.outputs.tarball }}
+            build/package/*.tgz
             build/package/release.json
           if-no-files-found: error
           retention-days: 14
@@ -127,6 +128,7 @@ jobs:
           name: browser-runtime
           path: |
             packages/valhalla-browser/dist/
+            packages/valhalla-server/dist/
             public/wasm/
           if-no-files-found: error
           retention-days: 14
@@ -170,6 +172,7 @@ jobs:
       - run: pnpm run test:package
       - run: pnpm run test:cdn-import
       - run: pnpm run test:browser
+      - run: pnpm run test:search-memory
       - run: pnpm run test:demo:static
         env:
           # Exercise warmed WASM compilation across reloads in the same context.
@@ -183,6 +186,45 @@ jobs:
           path: |
             test-results/*.json
             test-results/*.png
+          retention-days: 14
+
+  servers:
+    needs: [native-build, wasm-build]
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [node, cloudflare]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v7
+        with:
+          name: native-fixtures
+      - uses: actions/download-artifact@v7
+        with:
+          name: browser-runtime
+      - uses: actions/download-artifact@v7
+        with:
+          name: sdk-release
+          path: build/package
+      - run: pnpm run test:server:${{ matrix.host }}
+      - run: pnpm run test:server:package
+        if: matrix.host == 'cloudflare'
+      # No other suite runs concurrently on this runner while measuring.
+      - run: pnpm run benchmark:server
+        if: matrix.host == 'cloudflare'
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: server-proof-${{ matrix.host }}
+          path: test-results/*.json
           retention-days: 14
 
   osm-verification:
@@ -272,7 +314,7 @@ jobs:
   # Keep the existing check name for branch protection and expose release outputs
   # only from this gate. Failed, cancelled and skipped prerequisites all fail it.
   source-build-and-proof:
-    needs: [documentation, native-build, wasm-build, browsers, osm-verification, minio-and-demo]
+    needs: [documentation, native-build, wasm-build, browsers, servers, osm-verification, minio-and-demo]
     if: always()
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 5

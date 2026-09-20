@@ -197,6 +197,12 @@ importers:
 
   packages/documentation:
     devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260920.1
+        version: 5.20260920.1
+      '@types/node':
+        specifier: 22.20.3
+        version: 22.20.3
       typedoc:
         specifier: 0.28.20
         version: 0.28.20(typescript@6.0.3)
@@ -208,16 +214,52 @@ importers:
         version: link:../valhalla-browser
       wrangler:
         specifier: 4.134.0
-        version: 4.134.0(@types/node@22.20.3)
+        version: 4.134.0(@cloudflare/workers-types@5.20260920.1)(@types/node@22.20.3)
 
   packages/valhalla-browser:
     devDependencies:
+      '@tobilg/valhalla-core':
+        specifier: workspace:*
+        version: link:../valhalla-core
       typescript:
         specifier: 7.0.2
         version: 7.0.2
       vite:
         specifier: 8.3.0
         version: 8.3.0(@types/node@22.20.3)(esbuild@0.28.2)(tsx@4.23.13)(yaml@2.9.0)
+
+  packages/valhalla-core:
+    devDependencies:
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+
+  packages/valhalla-server:
+    devDependencies:
+      '@cloudflare/workers-types':
+        specifier: 5.20260920.1
+        version: 5.20260920.1
+      '@tobilg/valhalla-core':
+        specifier: workspace:*
+        version: link:../valhalla-core
+      '@types/node':
+        specifier: 22.20.3
+        version: 22.20.3
+      '@types/webassembly-js-api':
+        specifier: 0.0.3
+        version: 0.0.3
+      miniflare:
+        specifier: 5.20260917.0-alpha
+        version: 5.20260917.0-alpha(@types/node@22.20.3)
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vite:
+        specifier: 8.3.0
+        version: 8.3.0(@types/node@22.20.3)(esbuild@0.28.2)(tsx@4.23.13)(yaml@2.9.0)
+      wrangler:
+        specifier: 4.134.0
+        version: 4.134.0(@cloudflare/workers-types@5.20260920.1)(@types/node@22.20.3)
 
 packages:
 
@@ -263,6 +305,9 @@ packages:
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
+
+  '@cloudflare/workers-types@5.20260920.1':
+    resolution: {integrity: sha512-wP7wbKqfQjFRGhE/tvu7bwvmBBTqJjvrETTvNzF4u5oolVEXt0gy6JxbqcUC2Khz0Cy+M/q7rhOOODng8VpnPw==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -900,6 +945,9 @@ packages:
   '@types/unist@3.0.3':
     resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
 
+  '@types/webassembly-js-api@0.0.3':
+    resolution: {integrity: sha512-9c8QN9vJKF8PYeMeh459PbCfNJVF7rJN9F7AAv7zrLvkmFC8/9OhUTEDZnFl8JzyHDArqbEWaNh72EpmzBKo9Q==}
+
   '@typescript/typescript-aix-ppc64@7.0.2':
     resolution: {integrity: sha512-MTKKkWB7p/0E9xi1d1tHtZ5PiLkGEMIq88pK2CubZjOsLtYTLqhgIgi6zepFa+9GHZ6h05NMCkQxGKiPXMxXtQ==}
     engines: {node: '>=16.20.0'}
@@ -1386,6 +1434,8 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20260917.1':
     optional: true
 
+  '@cloudflare/workers-types@5.20260920.1': {}
+
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
@@ -1768,6 +1818,8 @@ snapshots:
       undici-types: 6.21.0
 
   '@types/unist@3.0.3': {}
+
+  '@types/webassembly-js-api@0.0.3': {}
 
   '@typescript/typescript-aix-ppc64@7.0.2':
     optional: true
@@ -2163,7 +2215,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20260917.1
       '@cloudflare/workerd-windows-64': 1.20260917.1
 
-  wrangler@4.134.0(@types/node@22.20.3):
+  wrangler@4.134.0(@cloudflare/workers-types@5.20260920.1)(@types/node@22.20.3):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
       '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260917.1)
@@ -2174,6 +2226,7 @@ snapshots:
       unenv: 2.0.0-rc.24
       workerd: 1.20260917.1
     optionalDependencies:
+      '@cloudflare/workers-types': 5.20260920.1
       fsevents: 2.3.3
     transitivePeerDependencies:
       - '@types/node'

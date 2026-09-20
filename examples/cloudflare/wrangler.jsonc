@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "valhalla-routing-example",
+  "main": "index.ts",
+  "compatibility_date": "2026-09-20",
+  "compatibility_flags": ["nodejs_compat"],
+  "dev": { "ip": "localhost" },
+  "r2_buckets": [
+    { "binding": "GRAPH_DATA", "bucket_name": "replace-with-your-graph-bucket" }
+  ],
+  "vars": { "MANIFEST_KEY": "datasets/your-release-id/manifest.json" },
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 }
+}

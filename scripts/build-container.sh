@@ -58,8 +58,10 @@ if [ "$stage" = wasm ] || [ "$stage" = all ]; then
     -DProtobuf_LITE_LIBRARY="$prefix/lib/libprotobuf-lite.a" \
     -Dpkgcfg_lib_ZLIB_z="$prefix/lib/libz.a" \
     -DProtobuf_PROTOC_EXECUTABLE=/usr/bin/protoc
-  cmake --build build/wasm --target valhalla-browser -j "$jobs"
+  cmake --build build/wasm --target valhalla-runtime -j "$jobs"
   mkdir -p public/wasm
-  cp build/wasm/valhalla-browser.{js,wasm} public/wasm/
+  cp build/wasm/valhalla.{js,wasm} public/wasm/
+  # Discard obsolete generated targets from previous builds.
+  rm -f public/wasm/valhalla-{browser,node,cloudflare}.{js,wasm}
   python3 scripts/collect-licenses.py
 fi

@@ -39,7 +39,15 @@ export async function packedFixture() {
     for (const item of await readdir(dir, { withFileTypes: true })) {
       const relative = prefix + item.name;
       if (item.isDirectory()) await inventory(path.join(dir, item.name), `${relative}/`);
-      else { assert(item.isFile(), 'Package must contain ordinary files'); entries.push({ path: relative, size: (await stat(path.join(dir, item.name))).size }); }
+      else {
+        assert(item.isFile(), 'Package must contain ordinary files');
+        entries.push({ path: relative, size: (await stat(path.join(dir, item.name))).size });
+        if (relative.endsWith('.js') || relative.endsWith('.d.ts')) {
+          assert.doesNotMatch(await readFile(path.join(dir, item.name), 'utf8'),
+            /['"](?:@tobilg\/valhalla-core(?:['"/])|(?:\.\.\/)+valhalla-core\/src\/)/,
+            `Private workspace import in published file: ${relative}`);
+        }
+      }
     }
   }
   await inventory(packageRoot);
@@ -54,7 +62,7 @@ export async function packedFixture() {
   assert(!files.some(file => /\.cjs$|graph\.tar$|\.gph$|\.env/.test(file)));
   const wasm = await readFile(path.join(packageRoot, 'dist/valhalla-browser.wasm'));
   const provenance = await readJSON(path.join(packageRoot, 'dist/runtime.json'));
-  assert.equal(sha256(wasm), provenance.artifacts['public/wasm/valhalla-browser.wasm'].sha256);
+  assert.equal(sha256(wasm), provenance.artifacts['public/wasm/valhalla.wasm'].sha256);
   const client = await readFile(path.join(packageRoot, 'dist/index.js'), 'utf8');
   assert(!client.includes('data:application/wasm') && !client.includes('/public/wasm/') && !client.includes('/src/'));
   return { directory, tarball, packageRoot, pkg, pack, wasmBytes: wasm.length, wasmSha256: sha256(wasm) };

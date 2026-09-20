@@ -1,6 +1,6 @@
 {
   "name": "valhalla-browser",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
@@ -23,7 +23,8 @@
   },
   "devDependencies": {
     "typescript": "7.0.2",
-    "vite": "8.3.0"
+    "vite": "8.3.0",
+    "@tobilg/valhalla-core": "workspace:*"
   },
   "description": "Browser-local Valhalla routing in a Web Worker, with on-demand graph tiles and bundled WebAssembly.",
   "license": "MIT",

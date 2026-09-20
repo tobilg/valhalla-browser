@@ -33,6 +33,12 @@ test('manual release runs cannot publish or deploy, and production deployment de
     assert.deepEqual(workflow.jobs[name].needs, ['verify', 'publish']);
   }
   assert.equal(workflow.jobs.publish.permissions['id-token'], 'write');
+  assert.deepEqual(workflow.jobs.publish.strategy, { 'fail-fast': false, matrix: { package: ['valhalla-browser', 'valhalla-server'] } });
+  const registry = workflow.jobs.publish.steps.find(step => step.id === 'registry');
+  assert.equal(registry.run, 'node scripts/release.js published "${{ matrix.package }}"');
+  const publish = workflow.jobs.publish.steps.find(step => step.name === 'Publish verified tarball with npm OIDC');
+  assert.equal(publish.if, "steps.registry.outputs.published != 'true'");
+  assert.equal(publish.env.SDK_TARBALL, 'build/package/${{ matrix.package }}-${{ needs.verify.outputs.version }}.tgz');
   const serialized = JSON.stringify(workflow);
   assert(!serialized.includes('NPM_TOKEN') && !serialized.includes('NODE_AUTH_TOKEN'));
   assert(serialized.includes('valhalla-browser-api'));
@@ -90,6 +96,11 @@ test('parallel verification preserves every suite and tests one shared release c
     'test:demo --minio', 'test:demo --preview --minio', 'test:data:build --prepare build/osm-proof',
     'test:data:build --verify build/osm-proof']) assert(runs.includes(`pnpm run ${command}`), `Missing suite: ${command}`);
   assert(runs.includes('pnpm test'));
+  assert(runs.includes('pnpm run pack:server'));
+  assert.deepEqual(jobs.servers.strategy.matrix.host, ['node', 'cloudflare']);
+  assert.deepEqual(jobs.servers.needs, ['native-build', 'wasm-build']);
+  assert(jobs.servers.steps.some(step => step.run === 'pnpm run test:server:package'));
+  assert(jobs.servers.steps.some(step => step.run === 'pnpm run benchmark:server' && step.if === "matrix.host == 'cloudflare'"));
   assert.equal(runs.filter(run => run === 'pnpm run pack:sdk').length, 1);
   const examples = jobs.browsers.steps.find(step => step.run === 'pnpm run test:examples');
   assert.equal(examples.if, "matrix.browser == 'chromium'");

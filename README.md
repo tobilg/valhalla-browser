@@ -10,7 +10,7 @@ tiles load on demand through HTTP ranges from an indexed TAR, or as individual
 [Source](https://github.com/tobilg/valhalla-browser) ·
 [Release setup](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
 
-The repository prepares version **0.1.0**. Publication happens through the tagged
+The repository prepares version **0.2.1**. Publication happens through the tagged
 release workflow after the initial npm setup; implementation alone does not
 publish the package. Until then, use the local tarball instructions below.
 
@@ -60,6 +60,42 @@ Results preserve Valhalla's full native JSON: distances in **kilometers**, times
 in **seconds**, and leg shapes encoded as **polyline6**. Driving (`auto`), two
 locations, English directions, a 30 m correlation radius and minimum
 reachability 0 are the validated defaults.
+
+## Node.js and experimental Cloudflare Workers
+
+Use the separate `valhalla-server` package for server execution. It includes
+compiled WASM and self-contained TypeScript declarations. Import
+`valhalla-server/node` for a dedicated Node worker thread, or
+`valhalla-server/cloudflare` for the experimental HTTP/private-R2 adapter.
+The browser package and its CDN entry points remain unchanged. All adapters use
+the same graph format and four travel profiles.
+
+```sh
+pnpm add valhalla-server
+```
+
+```ts
+import { createRouter } from 'valhalla-server/node';
+
+const router = await createRouter({
+  // Replace with your deployment's versioned manifest URL.
+  manifestUrl: 'https://routing.example.com/datasets/your-release-id/manifest.json',
+});
+try {
+  const result = await router.route({
+    origin: { lat: 47.0666667, lon: 9.5 },
+    destination: { lat: 47.2397558, lon: 9.5262874 },
+  });
+  console.log(result.native.trip.summary);
+} finally {
+  await router.dispose();
+}
+```
+
+See [Node.js and Cloudflare Workers](https://github.com/tobilg/valhalla-browser/blob/main/docs/server-routing.md)
+for R2 bindings, per-request contexts, queue limits, cancellation and resource
+constraints. Cloudflare support has a local workerd proof; it remains experimental
+and is not a production capacity guarantee. The demo and docs stay on Pages.
 
 ## Travel profiles
 
@@ -126,6 +162,8 @@ const options: RouterOptions = {
   // Replace with your deployment's versioned dataset manifest URL.
   manifestUrl: 'https://routing.example.com/datasets/your-release-id/manifest.json',
   memoryBudgetBytes: 32 * 1024 * 1024,
+  // Optional: these are the defaults, in labels per search vector, not bytes.
+  searchMemory: { astar: 16_384, bidirectionalAstar: 16_384, clearReservedMemory: false },
 };
 const request: RouteRequest = {
   locations: [{ lat: 47.0666667, lon: 9.5 }, { lat: 47.2397558, lon: 9.5262874 }],
@@ -143,9 +181,18 @@ try {
 Importing the module is safe without browser globals. Creating a Router requires
 a browser; Node routing and server-side WASM execution are not supported.
 
+Search reservations grow when a route needs more labels; they are not search or
+memory limits. The defaults override the dataset's large A* reservations without
+changing its tiles, costing, or configuration file. Existing hosted datasets need
+no changes. `initialize()` reports the effective `searchMemory` settings and an
+`effectiveConfigSha256`, alongside the original dataset configuration hash.
+See [Diagnostics and memory](https://github.com/tobilg/valhalla-browser/blob/main/packages/documentation/guides/diagnostics.md)
+for tuning and [measured reservation results](https://github.com/tobilg/valhalla-browser/blob/main/docs/search-memory.md)
+for the native-equivalence checks and memory baseline.
+
 ## Use directly from a CDN
 
-After publishing version 0.1.0, save this as an HTML file and serve it over HTTP.
+After publishing version 0.2.1, save this as an HTML file and serve it over HTTP.
 No bundler is required. Keep the package version pinned in the import URL.
 
 <!-- example:cdn -->
@@ -157,7 +204,7 @@ No bundler is required. Keep the package version pinned in the import URL.
 <button id="route">Calculate route</button>
 <pre id="result"></pre>
 <script type="module">
-  import { createRouter } from 'https://cdn.jsdelivr.net/npm/valhalla-browser@0.1.0/dist/index.js';
+  import { createRouter } from 'https://cdn.jsdelivr.net/npm/valhalla-browser@0.2.1/dist/index.js';
   const output = document.querySelector('#result');
   const button = document.querySelector('#route');
   button.onclick = async () => {
@@ -262,6 +309,15 @@ or browser RSS. Diagnostics expose tile URLs and IDs; the SDK sends no telemetry
 
 ## Configure transport and handle errors
 
+Browser, Node and Cloudflare share one WASM binary with a 1,024 MiB upper ceiling.
+`wasmMemory` configures each instance's initial allocation and hard growth cap:
+128 / 512 MiB by default in browsers, 256 / 512 MiB in Node, or 64 / 96 MiB in Cloudflare.
+Use whole MiB with `64 <= initialMiB <= maximumMiB <= 1024`; resolved settings
+are available as `router.startup.wasmMemory`. This limits native heap, stack and
+static data, while JavaScript and other host overhead consume additional memory.
+`memoryBudgetBytes` separately bounds decoded tiles. A larger maximum does not
+allocate that amount at startup or increase a platform's own memory allowance.
+
 `indexed-tar` is the default. `individual-tiles` uses full GETs for the same
 standard tiles. A session pins a compatible, immutable manifest release.
 
@@ -275,10 +331,12 @@ const router = new Router({
   transport: 'individual-tiles',
   timeoutMs: 10_000,
   retries: 2,
+  // Hard WASM linear-memory cap; separate from the decoded-tile cache budget.
+  wasmMemory: { initialMiB: 64, maximumMiB: 256 },
   onProgress: event => console.log(event.phase),
   // Optional matching assets hosted on your application's origin:
-  // workerUrl: '/sdk/0.1.0/worker.js',
-  // wasmUrl: '/sdk/0.1.0/valhalla-browser.wasm',
+  // workerUrl: '/sdk/0.2.1/worker.js',
+  // wasmUrl: '/sdk/0.2.1/valhalla-browser.wasm',
 });
 try {
   await router.route({
@@ -328,9 +386,10 @@ the generated API documentation.
 
 ## Develop this workspace
 
-Use Node **22.22.2** and the pinned pnpm **12.4.2**. The three packages are the
-SDK (`valhalla-browser`), demo (`@tobilg/valhalla-browser-demo`) and documentation
-(`@tobilg/valhalla-browser-documentation`). SDK/demo use Vite **8.3.0**.
+Use Node **22.22.2** and the pinned pnpm **12.4.2**. The five packages are the
+browser SDK (`valhalla-browser`), server SDK (`valhalla-server`), private shared
+core (`@tobilg/valhalla-core`), demo (`@tobilg/valhalla-browser-demo`) and
+documentation (`@tobilg/valhalla-browser-documentation`). SDKs/demo use Vite **8.3.0**.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -338,9 +397,10 @@ pnpm build:docs               # No WASM, native toolchain or graph needed.
 pnpm preview:docs             # http://localhost:8081
 pnpm build                   # Requires existing verified native artifacts.
 pnpm dev                     # http://localhost:8080
-pnpm pack:sdk                # build/package/valhalla-browser-0.1.0.tgz
+pnpm pack:sdk                # build/package/valhalla-browser-0.2.1.tgz
+pnpm pack:server             # build/package/valhalla-server-0.2.1.tgz
 # In another application, before npm publication:
-pnpm add /absolute/path/to/valhalla-browser-0.1.0.tgz
+pnpm add /absolute/path/to/valhalla-browser-0.2.1.tgz
 ```
 
 A clean checkout needs the explicit native/data/WASM build steps in the
@@ -360,14 +420,14 @@ pnpm test:demo
 ```
 
 The root README is also the TypeDoc homepage and is copied into the npm package.
-Set all three package versions with `pnpm run version:set 0.1.0` (or
+Set all five package versions with `pnpm run version:set 0.1.0` (or
 `npm run version:set -- 0.1.0`), substituting your next stable version. The command
 also keeps the SDK version references in this README and the development guide
 in sync. See the
 [release guide](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
 for the remaining release steps.
 Guides and API comments are maintained with the source. Stable version tags
-publish the verified SDK through npm trusted publishing, then deploy documentation
+publish both verified SDKs through npm trusted publishing, then deploy documentation
 to **valhalla-browser-api** and the demo to **valhalla-browser** on Cloudflare Pages. See
 [release setup](https://github.com/tobilg/valhalla-browser/blob/main/docs/releases.md)
 for the initial npm publication, trust configuration, Pages setup and dry runs.

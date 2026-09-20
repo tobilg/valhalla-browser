@@ -6,12 +6,19 @@
     "strict": true,
     "verbatimModuleSyntax": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "types": [],
-    "rootDir": "src",
-    "outDir": "dist",
+    "rootDir": "..",
+    "outDir": "build/declarations",
     "declaration": true,
     "emitDeclarationOnly": true
   },
-  "files": ["src/client.ts", "src/assets.d.ts"]
+  "files": [
+    "src/client.ts",
+    "src/assets.d.ts"
+  ]
 }

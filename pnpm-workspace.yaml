@@ -6,6 +6,7 @@ allowBuilds:
   workerd: true
 
 minimumReleaseAgeExclude:
+  - '@cloudflare/workers-types@5.20260920.1'
   - miniflare@5.20260917.0-alpha
   - wrangler@4.134.0
 

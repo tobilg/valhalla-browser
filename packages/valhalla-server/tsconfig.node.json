@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": [
+      "node",
+      "webassembly-js-api"
+    ],
+    "lib": [
+      "ES2022"
+    ]
+  },
+  "files": [
+    "src/index.ts",
+    "src/node.ts",
+    "src/node-worker.ts",
+    "src/runtime.d.ts"
+  ]
+}

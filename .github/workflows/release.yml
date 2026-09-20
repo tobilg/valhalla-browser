@@ -44,6 +44,10 @@ jobs:
     uses: ./.github/workflows/browser-proof.yml
   publish:
     needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [valhalla-browser, valhalla-server]
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04
     permissions:
@@ -60,11 +64,11 @@ jobs:
           name: sdk-release
           path: build/package
       - id: registry
-        run: node scripts/release.js published
+        run: node scripts/release.js published "${{ matrix.package }}"
       - name: Publish verified tarball with npm OIDC
         if: steps.registry.outputs.published != 'true'
         env:
-          SDK_TARBALL: build/package/${{ needs.verify.outputs.tarball }}
+          SDK_TARBALL: build/package/${{ matrix.package }}-${{ needs.verify.outputs.version }}.tgz
         run: pnpm dlx npm@12.0.2 publish "$SDK_TARBALL" --access public --provenance --tag latest
   deploy-documentation:
     needs: [verify, publish]

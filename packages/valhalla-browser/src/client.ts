@@ -1,8 +1,10 @@
+/** @module valhalla-browser */
 import { workerUrl as defaultWorkerUrl, wasmUrl as defaultWasmUrl } from 'virtual:runtime-assets';
 import { RoutingError, cancelled } from './errors.js';
 import type { Operations, WorkerRequest, WorkerResponse } from './protocol.js';
 import type { Diagnostics, RouteRequest, RouteResult, RouterOptions, StartupResult } from './types.js';
 import { validateRequest } from './profiles.js';
+import { resolveWasmMemory } from '@tobilg/valhalla-core/wasm-memory';
 export { RoutingError } from './errors.js';
 export type { RoutingErrorCode, RoutingErrorOptions, SerializedRoutingError } from './errors.js';
 export type * from './types.js';
@@ -70,6 +72,7 @@ export class Router {
   async initialize(): Promise<StartupResult> {
     if (this.disposed) throw new RoutingError('DISPOSED', 'Router is disposed.');
     if (this.ready) return this.ready;
+    resolveWasmMemory(this.options.wasmMemory);
     const started = performance.now();
     let worker: Worker;
     let wasmUrl: string;
@@ -80,8 +83,8 @@ export class Router {
       this.releaseBootstrap();
       throw new RoutingError('WORKER_FAILED', 'Cannot create routing worker. Check asset URLs and CSP.', { cause });
     }
-    const { manifestUrl, transport, timeoutMs, retries, memoryBudgetBytes } = this.options;
-    const payload = { options: { manifestUrl, transport, timeoutMs, retries, memoryBudgetBytes, wasmUrl } };
+    const { manifestUrl, transport, timeoutMs, retries, memoryBudgetBytes, searchMemory, wasmMemory } = this.options;
+    const payload = { options: { manifestUrl, transport, timeoutMs, retries, memoryBudgetBytes, searchMemory, wasmMemory, wasmUrl } };
     const initializeId = ++this.sequence;
     let bootRetries = 0;
     const retryStartup = (worker: Worker): boolean => {
@@ -132,7 +135,7 @@ export class Router {
         if (data.type === 'error') {
           const error = new RoutingError(data.error.code, data.error.message, data.error);
           entry.reject(error);
-          if (['RUNTIME', 'WORKER_FAILED'].includes(error.code)) this.reset(error);
+          if (['RUNTIME', 'RESOURCE_LIMIT', 'WORKER_FAILED'].includes(error.code)) this.reset(error);
         } else entry.resolve(data.result);
       };
       worker.onerror = event => {

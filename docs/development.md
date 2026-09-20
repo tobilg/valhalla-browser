@@ -14,7 +14,7 @@ The migration was executed with pnpm 12 directly; the previously installed pnpm
 10.33.3 failed its version-12 handoff with ENOEXEC on this Mac. No global package
 manager upgrade is performed by repository scripts.
 
-One `pnpm-workspace.yaml` and `pnpm-lock.yaml` cover the private root and three
+One `pnpm-workspace.yaml` and `pnpm-lock.yaml` cover the private root and five
 packages. pnpm 12 stores its package-manager resolution and project resolution as
 two YAML documents inside that one lockfile. Required esbuild/workerd build scripts
 are explicitly allowed. The exact recent Wrangler/Miniflare versions are explicit
@@ -22,14 +22,16 @@ release-age exceptions; other pnpm defaults remain active.
 
 | Package | Build output | Role |
 | --- | --- | --- |
-| `valhalla-browser` | `packages/valhalla-browser/dist` | ESM SDK and unchanged WASM |
+| `valhalla-browser` | `packages/valhalla-browser/dist` | Browser ESM SDK and compiled WASM |
+| `valhalla-server` | `packages/valhalla-server/dist` | Node and experimental Cloudflare ESM/WASM |
+| `@tobilg/valhalla-core` | Bundled into the public SDKs | Private runtime, validation and transport core |
 | `@tobilg/valhalla-browser-demo` | `packages/demo/dist` | Vite application consuming workspace exports |
 | `@tobilg/valhalla-browser-documentation` | `packages/documentation/dist` | TypeDoc HTML with the root README as homepage |
 
 The SDK's `tsconfig.json` is an editor solution referencing separate client,
 Web Worker and Node/Vite configurations. This lets VS Code discover the worker's
 WebWorker globals and Emscripten declarations while keeping DOM and Node globals
-out of that runtime. `pnpm run typecheck` checks all three configurations; package
+out of that runtime. `pnpm run typecheck` checks these and the core/server configurations; package
 declarations and TypeDoc use `tsconfig.client.json`. After pulling configuration
 changes, use **TypeScript: Restart TS Server** in VS Code if old diagnostics remain.
 
@@ -40,7 +42,7 @@ pnpm run build:docs
 pnpm run preview:docs         # http://localhost:8081
 ```
 
-Documentation reads the SDK's public TypeScript entry point directly. It does not
+Documentation reads all three public TypeScript entry points directly. It does not
 build or load WASM and needs no native toolchain, graph or Docker. TypeDoc 0.28.20
 uses its own TypeScript 6.0.3; SDK compilation stays on TypeScript 7.0.2. Guides
 live with the documentation package, API comments live with the SDK source, and
@@ -83,7 +85,7 @@ The documentation header link remains `/`.
 ```sh
 pnpm run build
 pnpm run dev                 # http://localhost:8080
-pnpm run pack:sdk            # build/package/valhalla-browser-0.1.0.tgz
+pnpm run pack:sdk            # build/package/valhalla-browser-0.2.1.tgz
 ```
 
 `build` builds the SDK, demo and documentation. `build:sdk` builds just the SDK;
@@ -185,12 +187,16 @@ pnpm run test:data            # Requires data and data:region fixture archives.
 pnpm run test:data:build      # Fresh OSM build and Chromium/native route comparison.
 pnpm run test:docs
 pnpm run pack:sdk
-SDK_TARBALL=build/package/valhalla-browser-0.1.0.tgz pnpm run test:package
-SDK_TARBALL=build/package/valhalla-browser-0.1.0.tgz pnpm run test:cdn-import
-SDK_TARBALL=build/package/valhalla-browser-0.1.0.tgz pnpm run test:examples
+SDK_TARBALL=build/package/valhalla-browser-0.2.1.tgz pnpm run test:package
+SDK_TARBALL=build/package/valhalla-browser-0.2.1.tgz pnpm run test:cdn-import
+SDK_TARBALL=build/package/valhalla-browser-0.2.1.tgz pnpm run test:examples
 pnpm run test:browser
 BROWSER=firefox pnpm run test:browser
 BROWSER=webkit pnpm run test:browser
+pnpm run test:search-memory   # Reservation policies, full native corpus, cache and cancellation recovery.
+BROWSER=firefox pnpm run test:search-memory
+BROWSER=webkit pnpm run test:search-memory
+pnpm run benchmark:search-memory # Previous vs current reservations; five cold/twenty warm samples per profile.
 pnpm run test:demo
 pnpm run test:demo --preview
 pnpm run test:demo:static     # Standalone build, bundled Liechtenstein presets, separate graph origin.
@@ -235,6 +241,10 @@ samples per transport/browser. `test/profiles.test.js` checks that native fixtur
 paths actually demonstrate shortcuts, bicycle contraflow and truck detours.
 See [road profile verification](profile-verification.md) for the executed baseline
 and dataset migration details.
+See [search-label memory](search-memory.md) for the smaller SDK defaults and
+measurements against those same native corpora. The search-memory suite writes
+`test-results/search-memory-<browser>.json` and runs in each browser CI job;
+the optional benchmark uses loopback HTTP, with no CDN or R2 measurement.
 The browser suite also injects worker-script HTTP failures during cancellation recovery. An
 opaque browser load error before the worker's first message, or a WASM startup
 timeout during initialization, gets at most one shared retry after 100 ms; the
@@ -380,3 +390,32 @@ artifacts to the `valhalla-browser-api` and `valhalla-browser` Pages projects.
 See [release setup](releases.md) for trusted
 publishing, initial package setup and manual dry runs. Local passes do not claim
 that GitHub Actions, npm publication or Cloudflare deployment has executed.
+
+## Shared core and server adapters
+
+The five lockstep packages are `valhalla-browser`, `valhalla-server`, the private
+`@tobilg/valhalla-core`, the demo and documentation. Public packages bundle the
+private core and relocate its declarations; it is never a consumer dependency.
+
+Both SDKs declare core as a `workspace:*` development dependency and import its
+package exports, for example `@tobilg/valhalla-core/engine`. Use these exports
+instead of relative paths into another package's `src` directory. Packaging
+bundles the core JavaScript and emits its declarations into each SDK's
+`dist/core`, rewriting type imports to local `.js` paths. No separate core
+build or publication is required.
+
+Use `pnpm run build:sdks`, `pnpm run pack:server`, `pnpm run test:server:node`,
+`pnpm run test:server:cloudflare` and `pnpm run test:server:package`. The browser
+`build:sdk`/`pack:sdk` aliases remain available. Server setup and resource limits
+are documented in [Node.js and Cloudflare Workers](server-routing.md).
+
+The native build emits one ABI-3 `valhalla.js` / `valhalla.wasm` runtime shared by
+browser, Node and Cloudflare. Host adapters supply compilation/instantiation and
+imported memory, bounded by the binary's 1,024 MiB ceiling. The link-time library
+`native/runtime-library.js` provides Web Crypto entropy and teaches Emscripten's
+growth policy the instance's configured maximum. The browser package retains its
+existing `valhalla-browser.wasm` public asset name; both packages contain one
+copy of the same binary. The wrapper passes the upstream actor interrupt callback through
+Asyncify; no search algorithm patches are needed. `native/runtime-lock.json`
+records exact generated glue/WASM bytes for all targets. Update that record only
+after a pinned source build and meaningful runtime verification.

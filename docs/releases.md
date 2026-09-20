@@ -1,10 +1,10 @@
 # SDK releases and Cloudflare Pages
 
 The release workflow is `.github/workflows/release.yml` in
-`tobilg/valhalla-browser`. It publishes **valhalla-browser** and deploys documentation
+`tobilg/valhalla-browser`. It publishes **valhalla-browser** and **valhalla-server** and deploys documentation
 to **valhalla-browser-api** and the demo website to **valhalla-browser** on
 Cloudflare Pages. The demo and documentation remain private workspace packages;
-neither package nor the workspace root is published to npm.
+neither package, the private shared core, nor the workspace root is published to npm.
 
 Every push to `main` runs the full **Browser routing proof** workflow and uploads
 test reports, the SDK candidate, documentation and demo artifacts. These branch pushes
@@ -13,22 +13,25 @@ part of the tagged release workflow described below.
 
 ## Prepare the accounts once
 
-The unscoped npm package must exist before you can configure its trusted publisher.
+Each unscoped npm package must exist before you can configure its trusted publisher.
 For the first version, run **Release SDK, documentation and demo** manually from GitHub
 Actions on the intended commit. Manual runs are dry runs: they build native/WASM,
 run the verification suites, and upload `sdk-release`, `documentation` and `demo` artifacts,
-without publishing or deploying. Download the verified SDK tarball from `sdk-release`.
+without publishing or deploying. Download both verified SDK tarballs and `release.json` from `sdk-release`.
+The existing browser package already has trust; bootstrap `valhalla-server`
+separately before its first tagged publication.
 
 Log into npm as the owner and publish that exact tarball once, using your normal
 interactive authentication/2FA:
 
 ```sh
 npm login
-npm publish ./valhalla-browser-0.0.1.tgz --access public
+# Use the exact verified candidate version, without rebuilding.
+npm publish ./valhalla-server-0.1.0.tgz --access public
 ```
 
 Do not rebuild the downloaded artifact for this initial publication. Then open
-the package's npm settings and add a GitHub Actions trusted publisher:
+each package's npm settings and add a GitHub Actions trusted publisher:
 
 | Setting | Value |
 | --- | --- |
@@ -102,7 +105,7 @@ These are owner setup steps. Implementing the workspace does not execute them.
 
 ## Release a version
 
-Set the version of all three workspace packages together:
+Set the version of all five workspace packages together:
 
 ```sh
 pnpm run version:set 0.1.0
@@ -112,7 +115,7 @@ npm run version:set -- 0.1.0
 
 Replace `0.1.0` with the desired stable `X.Y.Z` version, without a `v` prefix.
 The command validates the argument and reads all inputs before writing them.
-The demo and documentation stay private and share the SDK version. Workspace
+The shared core, demo and documentation stay private and share the SDK version. Workspace
 dependencies remain `workspace:*`, so the pnpm lockfile does not need an update.
 It also updates the pinned SDK CDN URLs, asset paths, tarball filenames and version
 text in `README.md` and `docs/development.md`. Historical verification reports and
@@ -122,8 +125,8 @@ Run local verification, commit the change, and push a stable tag
 matching the SDK version exactly (for example, after setting `0.1.0`):
 
 ```sh
-git tag v0.0.2
-git push origin v0.0.2
+git tag v0.1.0
+git push origin v0.1.0
 ```
 
 Tags trigger validation, then the reusable browser-proof workflow. Malformed,
@@ -132,15 +135,18 @@ pinned source container on an ARM runner and a frozen pnpm lockfile. It does not
 change versions or commit build output.
 
 Native/data, WASM/package and documentation jobs run in parallel. The WASM job
-packs one candidate and uploads it with a SHA-512 release manifest. Browser jobs
+packs both candidates and uploads them with one SHA-512 release manifest.
+Node and workerd/R2 jobs run alongside the browser jobs; an isolated server
+consumer checks Node types without DOM libraries, generated Workers types, real
+routing, and Wrangler dry-run bundling. Browser jobs
 test that exact tarball across Chromium, Firefox and WebKit, while separate jobs
 verify the fresh OSM archive and the MinIO/demo behavior. README examples,
 native corpora, fault/recovery suites and TypeDoc remain required checks.
 The final `source-build-and-proof` gate rejects failed, cancelled and skipped
 prerequisites. Downloaded artifacts are candidates until the entire gate passes.
-The publication job downloads the verified candidate,
-checks its checksum, and publishes it to npm's `latest` tag with provenance.
-Only after publication succeeds do separate Pages jobs receive the matching
+A publication matrix downloads both verified candidates,
+checks both checksums, and independently publishes each missing package to npm's `latest` tag with provenance.
+Only after both package publications succeed do separate Pages jobs receive the matching
 documentation and demo artifacts. They deploy the tested output without rebuilding.
 Deployment uses `--branch main` so tags produce production deployments.
 
@@ -151,8 +157,10 @@ published version. Investigate the difference and use a new version when needed.
 ## Retry and dry-run behavior
 
 An authoritative registry 404 means unpublished. If the version exists and its
-name/version/integrity match, publication is skipped and both site deployments
+name/version/integrity match, publication for that package is skipped and both site deployments
 can continue. A mismatch, registry access error or network failure stops the job.
+If one package publishes and the other fails, rerun with the same artifacts: the
+matching package is skipped and only the missing package is published.
 Rerun failed jobs after correcting the problem; never overwrite a published version.
 
 Manual workflow runs never publish or deploy, including when selecting a tag.

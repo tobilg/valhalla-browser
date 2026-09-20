@@ -1,6 +1,6 @@
 {
   "name": "@tobilg/valhalla-browser-documentation",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,6 +12,8 @@
     "valhalla-browser": "workspace:*",
     "typedoc": "0.28.20",
     "typescript": "6.0.3",
-    "wrangler": "4.134.0"
+    "wrangler": "4.134.0",
+    "@types/node": "22.20.3",
+    "@cloudflare/workers-types": "5.20260920.1"
   }
 }

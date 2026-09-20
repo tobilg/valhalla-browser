@@ -1,9 +1,14 @@
-import createModule from '../public/wasm/valhalla-browser.js';
+import createModule from '../public/wasm/valhalla.js';
+import { instantiateTestRuntime } from './wasm-memory-probe.js';
+async function loadModule() {
+  const response = await fetch(new URL('../public/wasm/valhalla.wasm', import.meta.url));
+  return (await instantiateTestRuntime(createModule, await WebAssembly.compile(await response.arrayBuffer()), 64, 512)).runtime;
+}
 let module;
 const call=(name,input)=>JSON.parse(module.ccall(name,'string',['string'],[JSON.stringify(input)]));
 self.onmessage=async({data})=>{
   if(data.type==='initialize'){
-    module=await createModule({locateFile:file=>new URL(`../public/wasm/${file}`,import.meta.url).href,print:()=>{},printErr:()=>{}});
+    module=await loadModule();
     const manifest=await(await fetch(data.options.manifestUrl)).json();
     const config=await(await fetch(new URL(manifest.config.url,data.options.manifestUrl))).json();
     for(const tile of Object.values(manifest.tiles)){

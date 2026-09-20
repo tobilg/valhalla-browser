@@ -3,6 +3,8 @@ import { validateTag } from './release.js';
 
 const packages = [
   ['valhalla-browser', 'valhalla-browser'],
+  ['valhalla-server', 'valhalla-server'],
+  ['valhalla-core', '@tobilg/valhalla-core'],
   ['demo', '@tobilg/valhalla-browser-demo'],
   ['documentation', '@tobilg/valhalla-browser-documentation'],
 ];
@@ -11,7 +13,7 @@ const documentation = ['README.md', 'docs/development.md'];
 function updateExamples(contents, version) {
   // Match SDK references only: toolchain versions and historical reports stay intact.
   return contents
-    .replace(/(\bvalhalla-browser[@-])\d+\.\d+\.\d+\b/g, (_, prefix) => `${prefix}${version}`)
+    .replace(/(\bvalhalla-(?:browser|server)[@-])\d+\.\d+\.\d+\b/g, (_, prefix) => `${prefix}${version}`)
     .replace(/(\/sdk\/)\d+\.\d+\.\d+(?=\/)/g, (_, prefix) => `${prefix}${version}`)
     .replace(/(The repository prepares version \*\*)\d+\.\d+\.\d+(?=\*\*)/g, (_, prefix) => `${prefix}${version}`)
     .replace(/(After publishing version )\d+\.\d+\.\d+(?=,)/g, (_, prefix) => `${prefix}${version}`);
@@ -40,7 +42,7 @@ async function main() {
   }));
   for (const { file, pkg } of updates) await writeFile(file, JSON.stringify(pkg, null, 2) + '\n');
   for (const { file, contents } of docs) await writeFile(file, contents);
-  console.log(`Set all three packages to ${version}: ${updates.map(({ pkg }) => pkg.name).join(', ')}`);
+  console.log(`Set all five packages to ${version}: ${updates.map(({ pkg }) => pkg.name).join(', ')}`);
   console.log(`Updated SDK version references in ${documentation.join(' and ')}.`);
 }
 

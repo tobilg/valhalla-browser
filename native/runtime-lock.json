@@ -12,13 +12,33 @@
     "communityReference": "0246aee917aa4d72808d277cf560ac859c2ee227"
   },
   "artifacts": {
-    "public/wasm/valhalla-browser.js": {
-      "bytes": 171143,
-      "sha256": "b85ab8cbed0ad390174baba4882bc819f62282e99b4cbd72cabfa667028e3942"
+    "public/wasm/valhalla.js": {
+      "bytes": 116584,
+      "sha256": "fabe0f4830ab5bbde355c9ebc749b4b5dc83bffb05930080bf6f3d74961fa2bb"
     },
-    "public/wasm/valhalla-browser.wasm": {
-      "bytes": 10046298,
-      "sha256": "366f9b103751df4cb259cf51c35a6f6515cfb0e22da7f80ef9059749b0ec7444"
+    "public/wasm/valhalla.wasm": {
+      "bytes": 9861835,
+      "sha256": "2097e57700e51bc703da06ecd74fb2edf656b58173e51488a3cdc9ffe0cc0db1"
+    }
+  },
+  "abi": 3,
+  "memory": {
+    "imported": true,
+    "minimumInitialMiB": 64,
+    "compiledMaximumMiB": 1024,
+    "defaults": {
+      "browser": {
+        "initialMiB": 128,
+        "maximumMiB": 512
+      },
+      "node": {
+        "initialMiB": 256,
+        "maximumMiB": 512
+      },
+      "cloudflare": {
+        "initialMiB": 64,
+        "maximumMiB": 96
+      }
     }
   }
 }
