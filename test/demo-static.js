@@ -6,10 +6,13 @@ import { mkdir, mkdtemp, readFile, readdir } from 'node:fs/promises';
 import { preview } from 'vite';
 import { chromium, firefox, webkit } from 'playwright';
 import { createRangeServer } from '../scripts/server.js';
-import { root, execute, listen, closeHost, readJSON, writeReport } from './package-support.js';
+import { root, execute, listen, closeHost, readJSON, writeReport, device } from './package-support.js';
 import { mockBasemap, assertBasemap, exerciseMap, restoreBasemap, isBasemapRequest } from './demo-map.js';
 
 const artifact = process.argv.includes('--artifact');
+const reloadCycles = Number(process.env.DEMO_RELOAD_CYCLES ?? 1);
+assert(Number.isInteger(reloadCycles) && reloadCycles >= 1 && reloadCycles <= 100,
+  'DEMO_RELOAD_CYCLES must be 1–100');
 const engines = { chromium, firefox, webkit };
 assert(!process.env.BROWSER || Object.hasOwn(engines, process.env.BROWSER), `Unknown BROWSER: ${process.env.BROWSER}`);
 const requests = (await readJSON(path.join(root, 'fixtures/region/requests.json'))).filter(item => !item.profileCase);
@@ -18,8 +21,9 @@ const manifest = await readJSON(path.join(root, 'fixtures/region/manifest.json')
 const demoRoot = path.join(root, 'packages/demo');
 const host = artifact ? null : createRangeServer({ faults: true });
 let server;
-const report = { at: new Date().toISOString(), mode: artifact ? 'configured-artifact-startup' : 'static-cross-origin-routing',
-  basemap: 'local test images; no public OSM requests', browsers: [], passed: false };
+const report = { at: new Date().toISOString(), device: device(), node: process.version,
+  mode: artifact ? 'configured-artifact-startup' : 'static-cross-origin-routing',
+  basemap: 'local test images; no public OSM requests', reloadCycles, browsers: [], assets: [], passed: false };
 try {
   const graphOrigin = host ? await listen(host) : null;
   const manifestUrl = artifact ? process.env.VITE_DEMO_MANIFEST_URL?.trim()
@@ -40,12 +44,24 @@ try {
   assert.equal(assets.filter(file => file.endsWith('.wasm')).length, 1);
   server = await preview({ configFile: false, root: demoRoot, publicDir: false,
     build: { outDir: output }, preview: { host: 'localhost', port: 0, strictPort: true } });
+  // Worker fetches do not always appear in Playwright's page request events.
+  // Keep server-side evidence that the runtime response actually completed.
+  server.httpServer.on('request', (request, response) => {
+    if (!/\.(wasm|js)(?:\?|$)/.test(request.url)) return;
+    const record = { path: request.url, at: Date.now(), completed: false };
+    report.assets.push(record);
+    response.on('finish', () => Object.assign(record, {
+      completed: true, elapsedMs: Date.now() - record.at, status: response.statusCode,
+      contentLength: response.getHeader('content-length') ?? null,
+    }));
+    response.on('close', () => { record.closed = true; });
+  });
   const base = server.resolvedUrls.local[0];
   for (const [engine, launcher] of Object.entries(engines)) {
     if (process.env.BROWSER && process.env.BROWSER !== engine) continue;
     const browser = await launcher.launch();
     const checks = [];
-    const browserResult = { engine, version: browser.version(), checks, passed: false };
+    const browserResult = { engine, version: browser.version(), checks, reloads: [], passed: false };
     report.browsers.push(browserResult);
     try {
       for (const transport of artifact ? ['indexed-tar'] : ['indexed-tar', 'individual-tiles']) {
@@ -165,19 +181,26 @@ try {
               const body=JSON.stringify({...await response.json(),costings:['auto']});
               await intercepted.fulfill({response,body,headers:{...response.headers(),'content-length':String(Buffer.byteLength(body))}});
             });
-            await page.reload();
-            await page.waitForFunction(()=>document.querySelector('#preset').value==='balzers-ruggell');
-            await page.locator('#costing').selectOption('bicycle');
-            await page.getByRole('button',{name:'Calculate route'}).click();
-            await page.waitForFunction(()=>!document.querySelector('#route').disabled);
-            assert.match(await page.locator('#status').innerText(),/UNSUPPORTED_COSTING/);
-            // Playwright's isDisabled follows the wrapping label to its select;
-            // inspect the individual option's native state instead.
-            assert(await page.locator('#costing option[value=bicycle]').evaluate(option=>option.disabled),
-              await page.locator('#costing').evaluate(select=>select.outerHTML));
-            assert.equal(await page.locator('#geometry .route-line').count(),0);
-            await page.locator('#costing').selectOption('auto');
-            await calculate('balzers-ruggell');
+            for (let cycle = 1; cycle <= reloadCycles; cycle++) {
+              // Keep the context: repeated worker creation must work after real
+              // routing has warmed the browser's WASM compiler, not only cold.
+              await page.reload();
+              await page.waitForFunction(()=>document.querySelector('#preset').value==='balzers-ruggell');
+              await page.locator('#transport').selectOption(transport);
+              await page.locator('#costing').selectOption('bicycle');
+              await page.getByRole('button',{name:'Calculate route'}).click();
+              await page.waitForFunction(()=>!document.querySelector('#route').disabled);
+              assert.match(await page.locator('#status').innerText(),/UNSUPPORTED_COSTING/);
+              // Playwright's isDisabled follows the wrapping label to its select;
+              // inspect the individual option's native state instead.
+              assert(await page.locator('#costing option[value=bicycle]').evaluate(option=>option.disabled),
+                await page.locator('#costing').evaluate(select=>select.outerHTML));
+              assert.equal(await page.locator('#geometry .route-line').count(),0);
+              await page.locator('#costing').selectOption('auto');
+              const result = await calculate('balzers-ruggell');
+              browserResult.reloads.push({ transport, cycle, startup: result.startup, route: result.route });
+              if (reloadCycles > 1) console.log(`PASS ${engine} ${transport} reload ${cycle}/${reloadCycles}`);
+            }
             checks.push('legacy dataset capabilities disable unsupported profiles; driving remains usable');
           }
           assert.deepEqual(errors, []);

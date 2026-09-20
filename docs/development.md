@@ -247,9 +247,40 @@ after termination. The matrix report retains browser errors, failed request URLs
 and local asset-server records alongside the MinIO origin trace for diagnosis.
 The browser suite delays real WASM responses past the startup watchdog to verify
 bounded recovery, capability errors after recovery, and persistent timeout rejection.
+Clearing a fault in the CDN test host also releases pending injected delays, so
+the recovery attempt runs against a restored origin even if the browser retained
+a module download after its original worker terminated.
 The static demo report retains the failing engine/transport, completed checks,
-UI status and pending/failed requests. `BROWSER=webkit pnpm run test:demo:static`
+UI status, pending/failed requests, and server-side completion records for the
+worker script and WASM response. `BROWSER=webkit pnpm run test:demo:static`
 isolates that browser without changing assertions or retrying test cases.
+
+Playwright is pinned to **1.63.0** (WebKit **26.6**). On 2026-09-19, the previous
+1.58.2/WebKit 26.0 build reproduced the CI initialization timeout on Linux/arm64
+at the sixth reload in one context. Both WASM responses finished, but streaming
+instantiation stalled through the initial attempt and its retry while the WebKit
+process consumed approximately 5.2 GiB of resident memory and four CPUs. This is
+consistent with [upstream reports of Asyncify compilation pressure](https://bugs.webkit.org/show_bug.cgi?id=304810),
+although the exact WebKit compiler defect was not isolated. The same original
+WASM artifact passed ten reloads per transport with WebKit 26.6. The runtime
+build flags, startup timeout and retry limit are unchanged; this test-browser
+upgrade does not patch older WebKit installations used by SDK consumers.
+
+CI repeats the legacy-profile rejection and native-equivalent driving route ten
+times **per transport** in the same WebKit context, following the normal routing
+and cancellation checks. Each reload restores the selected transport. To run
+that regression locally:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm exec playwright install --with-deps webkit
+BROWSER=webkit DEMO_RELOAD_CYCLES=10 pnpm run test:demo:static
+```
+
+`DEMO_RELOAD_CYCLES` accepts 1–100 and defaults to one. Per-cycle startup and route
+measurements are saved in `test-results/demo-static.json`; failures still fail
+the test immediately, without test-level retries.
+
 To repeat the exact immediate-cancellation sequence with real regional routes:
 
 ```sh

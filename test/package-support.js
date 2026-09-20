@@ -64,6 +64,7 @@ export async function packedFixture() {
 // A second instance can serve an empty application document at another origin.
 export function staticHost({ packageRoot, html = '<!doctype html><title>Package consumer</title>', csp } = {}) {
   const records = [];
+  const delayed = new Set();
   let fault;
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://localhost');
@@ -75,7 +76,17 @@ export function staticHost({ packageRoot, html = '<!doctype html><title>Package 
     res.setHeader('Timing-Allow-Origin', '*');
     res.setHeader('Cache-Control', 'no-store');
     if (csp) res.setHeader('Content-Security-Policy', csp);
-    if (active?.delayMs) await new Promise(resolve => setTimeout(resolve, active.delayMs));
+    if (active?.delayMs) await new Promise(resolve => {
+      const finish = () => {
+        clearTimeout(timer);
+        delayed.delete(finish);
+        res.off('close', finish);
+        resolve();
+      };
+      const timer = setTimeout(finish, active.delayMs);
+      delayed.add(finish);
+      res.once('close', finish);
+    });
     if (req.destroyed) return;
     if (active?.status) { record.status = active.status; res.writeHead(active.status); res.end(); return; }
     try {
@@ -95,7 +106,13 @@ export function staticHost({ packageRoot, html = '<!doctype html><title>Package 
       res.writeHead(200, { 'Content-Length': bytes.length }); res.end(bytes);
     } catch { record.status = 404; res.writeHead(404); res.end(); }
   });
-  return { server, records, setFault: value => { fault = value && { remaining: 1, ...value }; } };
+  return { server, records, setFault: value => {
+    fault = value && { remaining: 1, ...value };
+    // Recovery starts with a healthy origin, including requests already delayed
+    // by the injected outage. A browser may retain an in-flight module download
+    // after worker termination and reuse it for the replacement worker.
+    if (!value) for (const finish of delayed) finish();
+  } };
 }
 
 export async function listen(host) {

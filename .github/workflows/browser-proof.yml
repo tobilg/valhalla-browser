@@ -171,6 +171,9 @@ jobs:
       - run: pnpm run test:cdn-import
       - run: pnpm run test:browser
       - run: pnpm run test:demo:static
+        env:
+          # Exercise warmed WASM compilation across reloads in the same context.
+          DEMO_RELOAD_CYCLES: ${{ matrix.browser == 'webkit' && '10' || '1' }}
       - run: pnpm run test:examples
         if: matrix.browser == 'chromium'
       - uses: actions/upload-artifact@v7

@@ -77,6 +77,8 @@ test('parallel verification preserves every suite and tests one shared release c
   assert.deepEqual(jobs.browsers.strategy, { 'fail-fast': false, matrix: { browser: ['chromium', 'firefox', 'webkit'] } });
   assert.equal(jobs.browsers.env.BROWSER, '${{ matrix.browser }}');
   assert.equal(jobs.browsers.env.SDK_TARBALL, 'build/package/${{ needs.wasm-build.outputs.tarball }}');
+  const staticDemo = jobs.browsers.steps.find(step => step.run === 'pnpm run test:demo:static');
+  assert.equal(staticDemo.env.DEMO_RELOAD_CYCLES, "${{ matrix.browser == 'webkit' && '10' || '1' }}");
   for (const name of ['browsers', 'osm-verification', 'minio-and-demo']) {
     assert.deepEqual(jobs[name].needs, ['native-build', 'wasm-build']);
     assert(jobs[name].steps.some(step => step.with?.name === 'browser-runtime' && step.uses?.startsWith('actions/download-artifact@')));
