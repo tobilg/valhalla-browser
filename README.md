@@ -1,18 +1,26 @@
-# valhalla-browser
+# valhalla-wasm
 
-Compute Valhalla routes in a browser Web Worker. The ESM package includes
-TypeScript declarations, the worker, and compiled WebAssembly. Standard graph
-tiles load on demand through HTTP ranges from an indexed TAR, or as individual
-`.gph` objects. Routing runs locally; the data host serves static files.
+Valhalla routing in WebAssembly for browsers, Node.js and experimental Cloudflare
+Workers. This repository provides two ESM packages with TypeScript declarations
+and a shared compiled WASM runtime:
 
-[Demo](https://valhalla-browser.gh.tobilg.com)
-[API documentation](https://valhalla-browser-api.gh.tobilg.com)
+| npm package | Runtime | Execution |
+| --- | --- | --- |
+| [valhalla-browser](https://www.npmjs.com/package/valhalla-browser) | Browser | Dedicated Web Worker; supports bundlers and direct CDN imports |
+| [valhalla-server](https://www.npmjs.com/package/valhalla-server) | Node.js and experimental Cloudflare Workers | Dedicated Node worker thread, or a Cloudflare Worker isolate |
+
+Both packages calculate routes with Valhalla and load standard graph tiles on
+demand through HTTP ranges from an indexed TAR, or as individual `.gph` objects.
+The Cloudflare adapter also supports private R2 bindings. Graph datasets are
+hosted separately from the routing engine.
+
+[Demo](https://valhalla-browser.gh.tobilg.com) ·
+[API documentation](https://valhalla-wasm-api.gh.tobilg.com) ·
 [Source](https://github.com/tobilg/valhalla-wasm) ·
 [Release setup](https://github.com/tobilg/valhalla-wasm/blob/main/docs/releases.md)
 
-The repository prepares version **0.2.1**. Publication happens through the tagged
-release workflow after the initial npm setup; implementation alone does not
-publish the package. Until then, use the local tarball instructions below.
+The examples use version **0.2.1**. Both SDKs are published on npm; the local
+tarball instructions below are available for testing workspace changes.
 
 ## Install and calculate a route
 
@@ -67,8 +75,7 @@ Use the separate `valhalla-server` package for server execution. It includes
 compiled WASM and self-contained TypeScript declarations. Import
 `valhalla-server/node` for a dedicated Node worker thread, or
 `valhalla-server/cloudflare` for the experimental HTTP/private-R2 adapter.
-The browser package and its CDN entry points remain unchanged. All adapters use
-the same graph format and four travel profiles.
+All adapters use the same WASM binary, graph format and four travel profiles.
 
 ```sh
 pnpm add valhalla-server
@@ -178,8 +185,9 @@ try {
 }
 ```
 
-Importing the module is safe without browser globals. Creating a Router requires
-a browser; Node routing and server-side WASM execution are not supported.
+Importing `valhalla-browser` is safe without browser globals, but creating its
+Router requires a browser. For server execution, import `valhalla-server/node`
+or the experimental `valhalla-server/cloudflare` adapter instead.
 
 Search reservations grow when a route needs more labels; they are not search or
 memory limits. The defaults override the dataset's large A* reservations without
@@ -192,8 +200,8 @@ for the native-equivalence checks and memory baseline.
 
 ## Use directly from a CDN
 
-After publishing version 0.2.1, save this as an HTML file and serve it over HTTP.
-No bundler is required. Keep the package version pinned in the import URL.
+Save this as an HTML file and serve it over HTTP. No bundler is required.
+Keep the package version pinned in the import URL.
 
 <!-- example:cdn -->
 ```html
@@ -392,14 +400,16 @@ core (`@tobilg/valhalla-core`), demo (`@tobilg/valhalla-browser-demo`) and
 documentation (`@tobilg/valhalla-browser-documentation`). SDKs/demo use Vite **8.3.0**.
 
 ```sh
+git clone https://github.com/tobilg/valhalla-wasm.git
+cd valhalla-wasm
 pnpm install --frozen-lockfile
 pnpm build:docs               # No WASM, native toolchain or graph needed.
 pnpm preview:docs             # http://localhost:8081
 pnpm build                   # Requires existing verified native artifacts.
 pnpm dev                     # http://localhost:8080
 pnpm pack:sdk                # build/package/valhalla-browser-0.2.1.tgz
-pnpm pack:server             # build/package/valhalla-server-0.2.1.tgz
-# In another application, before npm publication:
+pnpm pack:server              # build/package/valhalla-server-0.2.1.tgz
+# Test local changes in another application:
 pnpm add /absolute/path/to/valhalla-browser-0.2.1.tgz
 ```
 
@@ -416,10 +426,14 @@ pnpm test:cdn-import
 pnpm test:docs
 pnpm test:examples
 pnpm test:browser
+pnpm test:server:node
+pnpm test:server:cloudflare
+pnpm test:server:package
 pnpm test:demo
 ```
 
-The root README is also the TypeDoc homepage and is copied into the npm package.
+The root README is also the TypeDoc homepage and is copied into the
+`valhalla-browser` npm package. `valhalla-server` has its own package README.
 Set all five package versions with `pnpm run version:set 0.1.0` (or
 `npm run version:set -- 0.1.0`), substituting your next stable version. The command
 also keeps the SDK version references in this README and the development guide
@@ -446,7 +460,7 @@ for basemap configuration and hosting requirements.
 
 ## Limits and licensing
 
-Desktop Chromium, Firefox and WebKit are the verification targets. Physical
+Desktop Chromium, Firefox and WebKit are the browser verification targets. Physical
 mobile devices, other bundlers and worldwide coverage are not established.
 There is no OPFS, IndexedDB, service-worker cache, offline guarantee or external
 routing fallback. Bike-and-train routing remains separate discovery work.
@@ -455,5 +469,5 @@ See [verification](https://github.com/tobilg/valhalla-wasm/blob/main/docs/packag
 [MinIO testing](https://github.com/tobilg/valhalla-wasm/blob/main/docs/minio.md),
 and [R2 CORS policy](https://github.com/tobilg/valhalla-wasm/blob/main/docs/r2-cors.json).
 
-The SDK is MIT licensed. Compiled dependencies' license texts are included under
+Both SDKs are MIT licensed. Compiled dependencies' license texts are included under
 `dist/licenses/`; preserve these notices when redistributing the runtime.

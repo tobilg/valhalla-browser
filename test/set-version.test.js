@@ -34,8 +34,7 @@ test('npm argument forwarding updates packages and documentation while preservin
   for (let i = 2; i < 2 + manifests.length; i++) assert.deepEqual(JSON.parse(after[i]), { ...JSON.parse(before[i]), version: '1.2.3' });
   const readme = await readFile(path.join(directory, 'README.md'), 'utf8');
   assert(readme.includes('valhalla-browser@1.2.3/dist/index.js'));
-  assert(readme.includes('The repository prepares version **1.2.3**'));
-  assert(readme.includes('After publishing version 1.2.3,'));
+  assert(readme.includes('The examples use version **1.2.3**'));
   assert(readme.includes('/sdk/1.2.3/worker.js'));
   assert(readme.includes('/sdk/1.2.3/valhalla-browser.wasm'));
   for (const file of documentation) assert((await readFile(path.join(directory, file), 'utf8')).includes('valhalla-browser-1.2.3.tgz'));

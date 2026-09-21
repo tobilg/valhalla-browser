@@ -31,7 +31,7 @@ export function load(app) {
     const base = context.options.getValue('hostedBaseUrl');
     const url = new URL(page.url === 'index.html' ? './' : page.url, base).href;
     const title = page.model.isProject() ? page.project.name : `${page.model.name} | ${page.project.name}`;
-    const description = 'API reference and guides for valhalla-browser, the TypeScript SDK for local driving, cycling, walking and truck routing with Valhalla WebAssembly.';
+    const description = 'API reference and guides for valhalla-browser and valhalla-server: TypeScript SDKs for Valhalla WebAssembly routing in browsers, Node.js and experimental Cloudflare Workers.';
     const image = new URL('og-image.jpg', base).href;
     const alt = 'A blue route across a riverside city, connecting green and red map pins.';
     const properties = {

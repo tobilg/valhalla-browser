@@ -67,10 +67,10 @@ pnpm --filter @tobilg/valhalla-browser-documentation exec wrangler pages project
 Add repository secrets `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`. The API
 token needs Cloudflare Pages Edit permission for that account. Both deployments
 reuse these secrets and the documentation package's pinned Wrangler installation.
-The sites use no R2 bindings or storage credentials. Their default addresses are
-https://valhalla-browser-api.gh.tobilg.com and https://valhalla-browser.gh.tobilg.com;
-custom domains can be configured later.
-See [Pages CI deployment](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/).
+The sites use no R2 bindings or storage credentials. Their public addresses are
+https://valhalla-wasm-api.gh.tobilg.com and https://valhalla-browser.gh.tobilg.com.
+The documentation custom domain is mapped to the existing `valhalla-browser-api`
+Pages project; the hostname and deployment project name are separate settings.
 
 ### Configure the demo's R2 dataset
 

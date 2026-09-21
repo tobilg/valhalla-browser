@@ -15,8 +15,7 @@ function updateExamples(contents, version) {
   return contents
     .replace(/(\bvalhalla-(?:browser|server)[@-])\d+\.\d+\.\d+\b/g, (_, prefix) => `${prefix}${version}`)
     .replace(/(\/sdk\/)\d+\.\d+\.\d+(?=\/)/g, (_, prefix) => `${prefix}${version}`)
-    .replace(/(The repository prepares version \*\*)\d+\.\d+\.\d+(?=\*\*)/g, (_, prefix) => `${prefix}${version}`)
-    .replace(/(After publishing version )\d+\.\d+\.\d+(?=,)/g, (_, prefix) => `${prefix}${version}`);
+    .replace(/(The examples use version \*\*)\d+\.\d+\.\d+(?=\*\*)/g, (_, prefix) => `${prefix}${version}`);
 }
 
 async function main() {

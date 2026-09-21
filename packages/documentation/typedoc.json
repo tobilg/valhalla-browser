@@ -1,6 +1,6 @@
 {
   "$schema": "https://typedoc.org/schema.json",
-  "name": "valhalla-browser API",
+  "name": "valhalla-wasm API",
   "entryPoints": [
     "../valhalla-browser/src/client.ts",
     "../valhalla-server/src/node.ts",
@@ -48,10 +48,11 @@
   ],
   "treatWarningsAsErrors": true,
   "titleLink": "/",
-  "hostedBaseUrl": "https://valhalla-browser-api.gh.tobilg.com/",
+  "hostedBaseUrl": "https://valhalla-wasm-api.gh.tobilg.com/",
   "sourceLinkTemplate": "https://github.com/tobilg/valhalla-wasm/blob/{gitRevision}/{path}#L{line}",
   "navigationLinks": {
     "GitHub": "https://github.com/tobilg/valhalla-wasm",
-    "npm": "https://www.npmjs.com/package/valhalla-browser"
+    "npm: browser": "https://www.npmjs.com/package/valhalla-browser",
+    "npm: server": "https://www.npmjs.com/package/valhalla-server"
   }
 }

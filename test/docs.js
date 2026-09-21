@@ -64,7 +64,7 @@ try {
     try {
       const page = await browser.newPage();
       await page.goto(base);
-      await page.locator('h1#valhalla-browser').waitFor();
+      await page.locator('h1#valhalla-wasm').waitFor();
       for (const name of ['Install and calculate a route', 'Use directly from a CDN', 'Cancel and route again', 'Reuse a session and inspect diagnostics'])
         await page.getByRole('heading', { name: new RegExp('^' + name) }).waitFor();
       assert(await page.locator('pre').count() >= 8);
@@ -107,14 +107,14 @@ try {
         await page.getByRole('heading', { name: new RegExp(topic) }).waitFor();
       // The sidebar project link opens a separate overview; it must show the
       // complete README too, and the header must return to the local homepage.
-      await page.locator('.site-menu').getByRole('link', { name: 'valhalla-browser API', exact: true }).click();
+      await page.locator('.site-menu').getByRole('link', { name: 'valhalla-wasm API', exact: true }).click();
       await page.locator('.col-content .tsd-typography h1').waitFor();
       assert.equal(await page.locator('.col-content .tsd-typography').innerText(), readmeContent);
       await page.getByRole('heading', { name: /^Modules\b/ }).waitFor();
       assert.equal(await page.locator('a.title').getAttribute('href'), '/');
       await page.locator('a.title').click();
       assert.equal(new URL(page.url()).pathname, '/');
-      await page.locator('h1#valhalla-browser').waitFor();
+      await page.locator('h1#valhalla-wasm').waitFor();
       assert.equal(await page.locator('.col-content .tsd-typography').innerText(), readmeContent);
       report.browsers.push({ engine, version: browser.version(), passed: true });
       console.log(`PASS documentation: ${engine} homepage, search, API and guides`);

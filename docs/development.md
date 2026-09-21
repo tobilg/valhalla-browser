@@ -75,7 +75,7 @@ The demo's metadata lives in `packages/demo/index.html`; documentation metadata
 comes from `packages/documentation/readme-theme.js`, with titles and canonical URLs
 for each API/guide page. Public URLs use the domains linked in the README:
 `https://valhalla-browser.gh.tobilg.com/` and
-`https://valhalla-browser-api.gh.tobilg.com/`. For another deployment, update the
+`https://valhalla-wasm-api.gh.tobilg.com/`. For another deployment, update the
 demo's absolute metadata URLs and TypeDoc's `hostedBaseUrl` in `typedoc.json`.
 Local previews retain those public URLs so shared links identify the deployed site.
 The documentation header link remains `/`.
