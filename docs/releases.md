@@ -1,7 +1,7 @@
 # SDK releases and Cloudflare Pages
 
 The release workflow is `.github/workflows/release.yml` in
-`tobilg/valhalla-browser`. It publishes **valhalla-browser** and **valhalla-server** and deploys documentation
+`tobilg/valhalla-wasm`. It publishes **valhalla-browser** and **valhalla-server** and deploys documentation
 to **valhalla-browser-api** and the demo website to **valhalla-browser** on
 Cloudflare Pages. The demo and documentation remain private workspace packages;
 neither package, the private shared core, nor the workspace root is published to npm.
@@ -36,10 +36,17 @@ each package's npm settings and add a GitHub Actions trusted publisher:
 | Setting | Value |
 | --- | --- |
 | Organization or user | `tobilg` |
-| Repository | `valhalla-browser` |
+| Repository | `valhalla-wasm` |
 | Workflow filename | `release.yml` |
 | Environment | Leave empty; this workflow does not select a GitHub environment |
 | Allowed actions | Enable direct publish |
+
+Use the actual GitHub repository name, which is independent of the npm package
+names. A repository rename changes its OIDC identity; GitHub URL redirects do not
+update npm's trusted publisher. If a connection still names `valhalla-browser`,
+replace it with the settings above **for both packages**. npm's existing connections
+cannot be edited; add a matching connection, then remove the obsolete one.
+The packages' `repository.url` must also match `https://github.com/tobilg/valhalla-wasm`.
 
 The CI publisher has `id-token: write` and uses npm CLI 12.0.2 for OIDC and
 provenance. Installs, builds, tests and packing use pnpm 12.4.2. Do not add
@@ -162,6 +169,19 @@ can continue. A mismatch, registry access error or network failure stops the job
 If one package publishes and the other fails, rerun with the same artifacts: the
 matching package is skipped and only the missing package is published.
 Rerun failed jobs after correcting the problem; never overwrite a published version.
+
+For `ENEEDAUTH`, check each package's **Settings → Trusted publishing** on npm:
+the owner, current repository name, workflow filename, optional environment and
+permission for direct `npm publish` must match. The workflow prints the expected
+identity before publication and enables npm's verbose OIDC diagnostics. It never
+prints the OIDC token. Missing GitHub OIDC permissions or a mismatched package
+repository now fail before the publish attempt. `npm whoami` cannot verify OIDC.
+
+If only npm's trusted-publisher settings changed, rerun the failed publication
+jobs on the existing release run; neither retagging nor a version bump is needed
+when both versions remain unpublished. The verified tarballs are reused. A rerun
+uses the workflow from the original commit, so workflow-code fixes take effect
+only in a new run that references the updated commit.
 
 Manual workflow runs never publish or deploy, including when selecting a tag.
 They are suitable for the initial bootstrap and checking the pipeline without

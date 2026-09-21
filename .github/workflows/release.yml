@@ -65,11 +65,15 @@ jobs:
           path: build/package
       - id: registry
         run: node scripts/release.js published "${{ matrix.package }}"
+      - name: Check GitHub OIDC and package repository
+        if: steps.registry.outputs.published != 'true'
+        run: node scripts/release.js publish-environment "${{ matrix.package }}"
       - name: Publish verified tarball with npm OIDC
         if: steps.registry.outputs.published != 'true'
         env:
           SDK_TARBALL: build/package/${{ matrix.package }}-${{ needs.verify.outputs.version }}.tgz
-        run: pnpm dlx npm@12.0.2 publish "$SDK_TARBALL" --access public --provenance --tag latest
+        # npm hides failed OIDC exchanges behind ENEEDAUTH at the default log level.
+        run: pnpm dlx npm@12.0.2 publish "$SDK_TARBALL" --access public --provenance --tag latest --loglevel verbose
   deploy-documentation:
     needs: [verify, publish]
     if: github.event_name == 'push'
